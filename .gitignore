@@ -1,5 +1,6 @@
 /.*/
 !/.github/
+!/.vitepress/
 
 # Dependencies
 /node_modules
