@@ -59,7 +59,7 @@ Then we got to `Assert::greaterThan()`. In PHPUnit, the argument order is the sa
 
 So if we want to say `$foo is greater than 42`, we have to write `greaterThan(42, $foo)`.
 
-![greaterThan](/blog/assert-and-expect/img-2.png)
+![greaterThan](/blog/assert-and-expect/img-2.jpg)
 
 Looks disgusting, since everywhere else we use mathematical notation like `$foo > 42`.
 

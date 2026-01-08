@@ -58,7 +58,7 @@ function simpleTest(): void
 
 Т.е. если мы хотим сказать `$foo больше 42`, то надо написать `greaterThan(42, $foo)`.
 
-![greaterThan](/blog/assert-and-expect/img-2.png)
+![greaterThan](/blog/assert-and-expect/img-2-ru.jpg)
 
 Выглядит отвратительно, ведь везде используем математическую запись вида `$foo > 42`.
 
@@ -123,7 +123,7 @@ Expect::exception(Failure::class)
 
 Код занимает меньше места, фасады не раздутые. Вот это то, что выглядит действительно элегантно. А юзабельно или нет, покажет практика.
 
-![Пайповые ассерты](/blog/assert-and-expect/img-4.jpg)
+![Пайповые ассерты](/blog/assert-and-expect/img-4-ru.jpg)
 
 
 ---

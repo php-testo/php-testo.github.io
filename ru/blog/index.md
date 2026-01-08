@@ -4,4 +4,4 @@
 
 ## Статьи
 
-- `2026-01-01` [Assert и Expect](./assert-and-expect) - Грабли велосипедостроения в API проверок
+- `2026-01-01` [Assert и Expect](./assert-and-expect)
