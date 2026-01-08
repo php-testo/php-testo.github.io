@@ -1,0 +1,17 @@
+{
+  "name": "testo-docs",
+  "version": "1.0.0",
+  "description": "Documentation for Testo - PHP testing framework",
+  "type": "module",
+  "scripts": {
+    "dev": "vitepress dev",
+    "build": "vitepress build",
+    "preview": "vitepress preview"
+  },
+  "keywords": ["testo", "php", "testing", "documentation"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "vitepress": "^1.6.4"
+  }
+}
