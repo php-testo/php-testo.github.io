@@ -36,18 +36,16 @@ Dev server runs at `http://localhost:5173/`
 ## Project Structure
 
 ```
-docs/
+/
 ├── .vitepress/
 │   └── config.mts       # VitePress configuration
-├── pages/
-│   ├── en/              # Landing page (English)  -> /
-│   └── ru/              # Landing page (Russian)  -> /ru/
-├── docs/
-│   ├── en/              # Documentation (English)
-│   └── ru/              # Documentation (Russian)
-├── blog/
-│   ├── en/              # Blog articles (English)
-│   └── ru/              # Blog articles (Russian)
+├── docs/                # Documentation (English)
+├── blog/                # Blog articles (English)
+├── ru/
+│   ├── docs/            # Documentation (Russian)
+│   └── blog/            # Blog articles (Russian)
+├── index.md             # Landing page (English)
+├── ru/index.md          # Landing page (Russian)
 └── public/              # Static assets (logo, images)
 ```
 
@@ -55,13 +53,13 @@ docs/
 
 ### New documentation page
 
-1. Create `docs/en/my-page.md` and `docs/ru/my-page.md`
+1. Create `docs/my-page.md` and `ru/docs/my-page.md`
 2. Add to sidebar in `.vitepress/config.mts`
 
 ### New blog post
 
-1. Create `blog/en/my-post.md` and `blog/ru/my-post.md`
-2. Add link to `blog/en/index.md` and `blog/ru/index.md`
+1. Create `blog/my-post.md` and `ru/blog/my-post.md`
+2. Add link to `blog/index.md` and `ru/blog/index.md`
 
 ## Deployment
 

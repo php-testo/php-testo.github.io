@@ -8,7 +8,7 @@ hero:
   actions:
     - theme: brand
       text: Get Started
-      link: /docs/en/getting-started
+      link: /docs/getting-started
     - theme: alt
       text: View on GitHub
       link: https://github.com/php-testo/testo

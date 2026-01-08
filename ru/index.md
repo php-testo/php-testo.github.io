@@ -8,7 +8,7 @@ hero:
   actions:
     - theme: brand
       text: Начать
-      link: /docs/ru/getting-started
+      link: /ru/docs/getting-started
     - theme: alt
       text: GitHub
       link: https://github.com/php-testo/testo

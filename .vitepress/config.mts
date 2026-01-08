@@ -7,11 +7,6 @@ export default defineConfig({
   lastUpdated: true,
   cleanUrls: true,
 
-  rewrites: {
-    'pages/en/index.md': 'index.md',
-    'pages/ru/index.md': 'ru/index.md',
-  },
-
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
   ],
@@ -22,15 +17,15 @@ export default defineConfig({
       lang: 'en',
       themeConfig: {
         nav: [
-          { text: 'Docs', link: '/docs/en/getting-started' },
-          { text: 'Blog', link: '/blog/en/' },
+          { text: 'Docs', link: '/docs/getting-started' },
+          { text: 'Blog', link: '/blog/' },
         ],
         sidebar: {
-          '/docs/en/': [
+          '/docs/': [
             {
               text: 'Introduction',
               items: [
-                { text: 'Getting Started', link: '/docs/en/getting-started' },
+                { text: 'Getting Started', link: '/docs/getting-started' },
               ],
             },
           ],
@@ -43,15 +38,15 @@ export default defineConfig({
       link: '/ru/',
       themeConfig: {
         nav: [
-          { text: 'Документация', link: '/docs/ru/getting-started' },
-          { text: 'Блог', link: '/blog/ru/' },
+          { text: 'Документация', link: '/ru/docs/getting-started' },
+          { text: 'Блог', link: '/ru/blog/' },
         ],
         sidebar: {
-          '/docs/ru/': [
+          '/ru/docs/': [
             {
               text: 'Введение',
               items: [
-                { text: 'Начало работы', link: '/docs/ru/getting-started' },
+                { text: 'Начало работы', link: '/ru/docs/getting-started' },
               ],
             },
           ],
