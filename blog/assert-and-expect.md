@@ -48,6 +48,7 @@ But now we face a tricky question with lots of room for imagination: **how do we
 
 Sure, we could eventually create a hundred functions, a trait, and a base class with PHPUnit-like syntax... But hey, let's try to find something better first!
 
+
 ## Shorter and clearer
 
 I decided to start like the [webmozarts/assert](https://github.com/webmozarts/assert) library: since we no longer need to write `self::` or `$this->`, let's keep it simple: `Assert::same()`. I chose the familiar PHPUnit parameter order: **$expected** first, then **$actual** (webmozart puts the value being checked first, then the expected value, which actually **looks more logical**).
@@ -101,7 +102,6 @@ Cons:
 
 ![Meme](/blog/assert-and-expect/img-3.jpg)
 
----
 
 ## Trying something new
 
@@ -174,8 +174,6 @@ The final word on assert/expect hasn't been said. But while Testo hasn't reached
 I won't be surprised if in the future we decide that **$expected** should come after **$actual**, that pipe assertions aren't as convenient and we need functions, and that assertion history output is overkill.
 
 ---
-
-[Join](https://t.me/spiralphp/10863) the discussion or development, propose your wildest ideas or features. It's interesting.
 
 Special thanks to:
 

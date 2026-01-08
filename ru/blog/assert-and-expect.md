@@ -101,7 +101,6 @@ Assert::true($foo > 42);
 
 ![Мем](/blog/assert-and-expect/img-3.jpg)
 
----
 
 ## Пробуем что-то новое
 
@@ -126,7 +125,9 @@ Expect::exception(Failure::class)
 
 ![Пайповые ассерты](/blog/assert-and-expect/img-4.jpg)
 
+
 ---
+
 
 Вот мы сделали несколько таких пайповых ассертов.
 

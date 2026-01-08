@@ -1,0 +1,23 @@
+/* Wider content for all pages and blog styling */
+
+.VPDoc .container {
+  max-width: 1200px !important;
+}
+
+.VPDoc .content {
+  max-width: 900px !important;
+}
+
+.VPDoc.has-aside .content-container {
+  max-width: 1300px !important;
+}
+
+/* Horizontal rule spacing */
+.VPDoc.has-aside .content-container hr {
+  margin: 2.5rem 0 !important;
+}
+
+/* Paragraph spacing */
+.VPDoc.has-aside .content-container p {
+  /*margin: 1.25rem 0 !important;*/
+}
