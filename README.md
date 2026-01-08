@@ -1,4 +1,15 @@
-# Testo Documentation
+<p align="center">
+    <a href="#get-started"><img alt="TESTO"
+         src="https://github.com/php-testo/.github/blob/1.x/resources/logo-full.svg?raw=true"
+         style="width: 2in; display: block"
+    /></a>
+</p>
+
+<p align="center">
+    <a href="https://php-testo.github.io">
+        <img src="https://img.shields.io/badge/Documentation-Live-blue?style=for-the-badge&logo=gitbook&logoColor=white" alt="Documentation">
+    </a>
+</p>
 
 Documentation site for [Testo](https://github.com/php-testo/testo) - Modern PHP Testing Framework.
 
