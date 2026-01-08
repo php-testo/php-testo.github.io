@@ -50,6 +50,6 @@ Time:  0.05s
 
 ## Next Steps
 
-- Learn about [Assertions](/docs/en/assertions)
-- Explore [Test Organization](/docs/en/organizing-tests)
-- Configure [Parallel Execution](/docs/en/parallel)
+- Learn about Assertions
+- Explore Test Organization
+- Configure Parallel Execution
