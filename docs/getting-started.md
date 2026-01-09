@@ -1,7 +1,5 @@
 # Getting Started
 
-Testo is an extensible testing framework built on a lightweight core with a middleware system.
-It gives you full control over your testing environment while keeping the familiar PHP syntax you already know.
 
 ## Installation
 
@@ -11,9 +9,12 @@ Install Testo via Composer:
 composer require --dev testo/testo
 ```
 
-::: tip Requirements
-PHP 8.3 or higher
-:::
+<p style="display: flex; gap: 8px;">
+  <a href="https://packagist.org/packages/testo/testo"><img src="https://img.shields.io/packagist/php-v/testo/testo.svg?style=flat-square&logo=php" alt="PHP" style="display: inline-block;"></a>
+  <a href="https://packagist.org/packages/testo/testo"><img src="https://img.shields.io/packagist/v/testo/testo.svg?style=flat-square&logo=packagist" alt="Latest Version on Packagist" style="display: inline-block;"></a>
+  <a href="https://github.com/php-testo/testo/blob/1.x/LICENSE.md"><img src="https://img.shields.io/packagist/l/testo/testo.svg?style=flat-square" alt="License" style="display: inline-block;"></a>
+  <a href="https://packagist.org/packages/testo/testo/stats"><img src="https://img.shields.io/packagist/dt/testo/testo.svg?style=flat-square" alt="Total Downloads" style="display: inline-block;"></a>
+</p>
 
 ## Configuration
 
@@ -90,10 +91,10 @@ final class CalculatorTest
 
 ### Key Points
 
-- Use the `#[Test]` attribute to mark test methods
-- Test classes don't need to extend any base class
-- Use `Assert` class for assertions (`same`, `true`, `false`, `null`, `contains`, `instanceOf`, etc.)
-- Testo provides multiple attributes to extend testing capabilities (retry policies, exception handling, and more)
+- The `#[Test]` attribute is used to mark test methods.
+- Test classes don't need to inherit from a base class.
+- Use the `Assert` facade for assertions and `Expect` for expectations.
+- Testo provides multiple attributes to extend testing capabilities (retry policies, exception handling, and more).
 
 ## Running Tests
 
@@ -114,10 +115,3 @@ The plugin provides:
 - Navigation between test and implementation code
 - Test result visualization
 - Debugging support
-
-## Next Steps
-
-- Learn about [CLI options](/docs/cli-reference) for filtering and running tests
-- Explore [Events system](/docs/events) for extending test behavior
-- Understand [Test filtering](/docs/filtering) capabilities
-- Try the [Sample module](/docs/sample-module) for parameterized testing with data providers
