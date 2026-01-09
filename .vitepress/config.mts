@@ -25,6 +25,7 @@ export default defineConfig({
             {
               text: 'Introduction',
               items: [
+                { text: 'Why Testo?', link: '/docs/why-testo' },
                 { text: 'Getting Started', link: '/docs/getting-started' },
               ],
             },
@@ -60,6 +61,7 @@ export default defineConfig({
             {
               text: 'Введение',
               items: [
+                { text: 'Почему Testo?', link: '/ru/docs/why-testo' },
                 { text: 'Начало работы', link: '/ru/docs/getting-started' },
               ],
             },
