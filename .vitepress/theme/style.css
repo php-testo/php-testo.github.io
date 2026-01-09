@@ -149,11 +149,15 @@
   text-align: center;
 }
 
-.sponsors-title {
-  font-size: 28px !important;
-  font-weight: 600 !important;
+/* Styles specific to home page only */
+.VPHome .sponsors-title {
+  font-size: 24px !important;
+  font-weight: 400 !important;
   margin-bottom: 32px !important;
-  color: var(--vp-c-text-1);
+  color: var(--vp-c-text-2);
+  border: none !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .sponsors-grid {
@@ -184,7 +188,7 @@
 }
 
 .sponsor-logo {
-  padding: 40px 60px;
+  padding: 20px 40px;
   border-color: transparent;
   background: transparent;
 }
