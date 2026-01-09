@@ -2,28 +2,32 @@
 
 This document describes the command line interface for Testo.
 
+::: info Binary Path
+If Testo is installed via Composer, the binary path will be `vendor/bin/testo`. The examples below use just `testo` for brevity, but in real projects use `vendor/bin/testo` or set up an alias in your environment.
+:::
+
 ## Commands
 
-### `run`
+### `testo run`
 
 Execute test suites with optional filtering and output formatting.
 
 This is the default command and can be omitted when using flags.
 
 ```bash
-./bin/testo run [options]
-./bin/testo [options]  # run is optional
+testo run [options]
+testo [options]  # run is optional
 ```
 
 **Examples:**
 ```bash
 # Explicit run command
-./bin/testo run
-./bin/testo run --suite=Unit
+testo run
+testo run --suite=Unit
 
 # Implicit run command (default)
-./bin/testo
-./bin/testo --suite=Unit
+testo
+testo --suite=Unit
 ```
 
 ## Common Configuration Flags
@@ -36,8 +40,8 @@ Specify path to configuration file.
 
 **Examples:**
 ```bash
-./bin/testo run --config=./custom-testo.php
-./bin/testo run --suite=Integration --config=./ci-testo.php
+testo run --config=./custom-testo.php
+testo run --suite=Integration --config=./ci-testo.php
 ```
 
 ## Running Tests
@@ -52,8 +56,8 @@ Used by the [Testo plugin](https://plugins.jetbrains.com/plugin/28842-testo) for
 
 **Examples:**
 ```bash
-./bin/testo --teamcity
-./bin/testo --suite=Unit --teamcity
+testo --teamcity
+testo --suite=Unit --teamcity
 ```
 
 ### Filtering
@@ -76,10 +80,10 @@ Filter tests by test suite name. Suites are defined in configuration.
 **Examples:**
 ```bash
 # Single suite
-./bin/testo run --suite=Unit
+testo run --suite=Unit
 
 # Multiple suites
-./bin/testo run --suite=Unit --suite=Integration
+testo run --suite=Unit --suite=Integration
 ```
 
 #### `--path`
@@ -95,16 +99,16 @@ Filter test files by glob patterns. Supports wildcards: `*`, `?`, `[abc]`
 **Examples:**
 ```bash
 # Matches tests/Unit*
-./bin/testo run --path="tests/Unit"
+testo run --path="tests/Unit"
 
 # Matches tests/Unit/*Test.php
-./bin/testo run --path="tests/Unit/*Test.php"
+testo run --path="tests/Unit/*Test.php"
 
 # Multiple paths
-./bin/testo run --path="tests/Unit" --path="tests/Integration"
+testo run --path="tests/Unit" --path="tests/Integration"
 
 # Nested directories
-./bin/testo run --path="tests/*/Security/*Test.php"
+testo run --path="tests/*/Security/*Test.php"
 ```
 
 #### `--filter`
@@ -121,23 +125,23 @@ Filter tests by class, method, or function names.
 **Examples:**
 ```bash
 # Specific method
-./bin/testo run --filter=UserTest::testLogin
+testo run --filter=UserTest::testLogin
 
 # Entire class
-./bin/testo run --filter=UserTest
+testo run --filter=UserTest
 
 # By FQN
-./bin/testo run --filter=Tests\Unit\UserTest
+testo run --filter=Tests\Unit\UserTest
 
 # Method name across all classes
-./bin/testo run --filter=testLogin
+testo run --filter=testLogin
 
 # Multiple filters (OR)
-./bin/testo run --filter=UserTest::testCreate --filter=UserTest::testUpdate
+testo run --filter=UserTest::testCreate --filter=UserTest::testUpdate
 
 # Combine with other filters (AND)
-./bin/testo run --filter=testAuthentication --suite=Unit
-./bin/testo run --filter=UserTest --path="tests/Unit"
+testo run --filter=testAuthentication --suite=Unit
+testo run --filter=UserTest --path="tests/Unit"
 ```
 
 **Filter Behavior:** See [Filtering](/docs/filtering) for details.
@@ -147,16 +151,16 @@ Filter tests by class, method, or function names.
 **Examples:**
 ```bash
 # Name AND suite
-./bin/testo run --filter=testLogin --suite=Unit
+testo run --filter=testLogin --suite=Unit
 
 # Name AND path
-./bin/testo run --filter=UserTest --path="tests/Unit"
+testo run --filter=UserTest --path="tests/Unit"
 
 # All three types (AND)
-./bin/testo run --filter=testImportant --path="tests/Unit" --suite=Critical
+testo run --filter=testImportant --path="tests/Unit" --suite=Critical
 
 # Multiple values with multiple types
-./bin/testo run \
+testo run \
   --filter=testCreate --filter=testUpdate \
   --path="tests/Unit" --path="tests/Integration" \
   --suite=Critical

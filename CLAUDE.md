@@ -32,6 +32,12 @@ ru/           # Russian locale (same structure)
 2. Add to sidebar in `.vitepress/config.mts` for both locales
 3. Internal links: `./page` or `/docs/page` (no `.html`)
 
+**Syncing translations:**
+- **CRITICAL:** When changing documentation content (adding sections, examples, explanations), ALWAYS update BOTH English and Russian versions
+- This applies to content changes, NOT just translation quality fixes
+- If you modify `docs/page.md`, you MUST also update `ru/docs/page.md` with the translated version
+- Exception: Only fixing translation quality in `ru/` doesn't require touching English version
+
 **Dead links:** Create stub with `::: tip Coming Soon` block
 
 **Styles:** `.vitepress/theme/style.css` - brand colors `--vp-c-brand-1`, responsive breakpoints 960px/640px

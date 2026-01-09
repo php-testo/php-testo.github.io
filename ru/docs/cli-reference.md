@@ -2,28 +2,32 @@
 
 Этот документ описывает интерфейс командной строки для Testo.
 
+::: info Путь к бинарнику
+Если Testo установлен через Composer, путь до бинарника будет `vendor/bin/testo`. В примерах ниже используется просто `testo` для краткости, но в реальных проектах используйте `vendor/bin/testo` или настройте алиас в вашем окружении.
+:::
+
 ## Команды
 
-### `run`
+### `testo run`
 
-Выполнить наборы тестов с опциональной фильтрацией и форматированием вывода.
+Выполнить комплекты тестов с опциональной фильтрацией и форматированием вывода.
 
 Это команда по умолчанию и может быть опущена при использовании флагов.
 
 ```bash
-./bin/testo run [options]
-./bin/testo [options]  # run опциональна
+testo run [options]
+testo [options]  # run опциональна
 ```
 
 **Примеры:**
 ```bash
 # Явная команда run
-./bin/testo run
-./bin/testo run --suite=Unit
+testo run
+testo run --suite=Unit
 
 # Неявная команда run (по умолчанию)
-./bin/testo
-./bin/testo --suite=Unit
+testo
+testo --suite=Unit
 ```
 
 ## Общие флаги конфигурации
@@ -36,8 +40,8 @@
 
 **Примеры:**
 ```bash
-./bin/testo run --config=./custom-testo.php
-./bin/testo run --suite=Integration --config=./ci-testo.php
+testo run --config=./custom-testo.php
+testo run --suite=Integration --config=./ci-testo.php
 ```
 
 ## Запуск тестов
@@ -52,8 +56,8 @@
 
 **Примеры:**
 ```bash
-./bin/testo --teamcity
-./bin/testo --suite=Unit --teamcity
+testo --teamcity
+testo --suite=Unit --teamcity
 ```
 
 ### Фильтрация
@@ -69,17 +73,17 @@ Testo предоставляет три типа фильтров, которы�
 
 #### `--suite`
 
-Фильтрация тестов по имени набора тестов. Наборы определяются в конфигурации.
+Фильтрация тестов по имени комплекта тестов. Комплекты определяются в конфигурации.
 
 **Повторяемый:** Да (логика ИЛИ)
 
 **Примеры:**
 ```bash
 # Один набор
-./bin/testo run --suite=Unit
+testo run --suite=Unit
 
 # Несколько наборов
-./bin/testo run --suite=Unit --suite=Integration
+testo run --suite=Unit --suite=Integration
 ```
 
 #### `--path`
@@ -95,16 +99,16 @@ Testo предоставляет три типа фильтров, которы�
 **Примеры:**
 ```bash
 # Соответствует tests/Unit*
-./bin/testo run --path="tests/Unit"
+testo run --path="tests/Unit"
 
 # Соответствует tests/Unit/*Test.php
-./bin/testo run --path="tests/Unit/*Test.php"
+testo run --path="tests/Unit/*Test.php"
 
 # Несколько путей
-./bin/testo run --path="tests/Unit" --path="tests/Integration"
+testo run --path="tests/Unit" --path="tests/Integration"
 
 # Вложенные директории
-./bin/testo run --path="tests/*/Security/*Test.php"
+testo run --path="tests/*/Security/*Test.php"
 ```
 
 #### `--filter`
@@ -121,23 +125,23 @@ Testo предоставляет три типа фильтров, которы�
 **Примеры:**
 ```bash
 # Конкретный метод
-./bin/testo run --filter=UserTest::testLogin
+testo run --filter=UserTest::testLogin
 
 # Весь класс
-./bin/testo run --filter=UserTest
+testo run --filter=UserTest
 
 # По FQN
-./bin/testo run --filter=Tests\Unit\UserTest
+testo run --filter=Tests\Unit\UserTest
 
 # Имя метода во всех классах
-./bin/testo run --filter=testLogin
+testo run --filter=testLogin
 
 # Несколько фильтров (ИЛИ)
-./bin/testo run --filter=UserTest::testCreate --filter=UserTest::testUpdate
+testo run --filter=UserTest::testCreate --filter=UserTest::testUpdate
 
 # Комбинация с другими фильтрами (И)
-./bin/testo run --filter=testAuthentication --suite=Unit
-./bin/testo run --filter=UserTest --path="tests/Unit"
+testo run --filter=testAuthentication --suite=Unit
+testo run --filter=UserTest --path="tests/Unit"
 ```
 
 **Поведение фильтров:** Подробности в разделе [Фильтрация](/ru/docs/filtering).
@@ -147,16 +151,16 @@ Testo предоставляет три типа фильтров, которы�
 **Примеры:**
 ```bash
 # Имя И набор
-./bin/testo run --filter=testLogin --suite=Unit
+testo run --filter=testLogin --suite=Unit
 
 # Имя И путь
-./bin/testo run --filter=UserTest --path="tests/Unit"
+testo run --filter=UserTest --path="tests/Unit"
 
 # Все три типа (И)
-./bin/testo run --filter=testImportant --path="tests/Unit" --suite=Critical
+testo run --filter=testImportant --path="tests/Unit" --suite=Critical
 
 # Несколько значений с несколькими типами
-./bin/testo run \
+testo run \
   --filter=testCreate --filter=testUpdate \
   --path="tests/Unit" --path="tests/Integration" \
   --suite=Critical
