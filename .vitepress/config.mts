@@ -6,6 +6,7 @@ export default defineConfig({
 
   lastUpdated: true,
   cleanUrls: true,
+  srcExclude: ['CLAUDE.md', 'README.md'],
 
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
