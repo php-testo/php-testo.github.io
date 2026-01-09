@@ -28,6 +28,20 @@ export default defineConfig({
                 { text: 'Getting Started', link: '/docs/getting-started' },
               ],
             },
+            {
+              text: 'Guide',
+              items: [
+                { text: 'CLI Reference', link: '/docs/cli-reference' },
+                { text: 'Filtering', link: '/docs/filtering' },
+                { text: 'Sample Module', link: '/docs/sample-module' },
+              ],
+            },
+            {
+              text: 'Customization',
+              items: [
+                { text: 'Events', link: '/docs/events' },
+              ],
+            },
           ],
         },
       },
@@ -47,6 +61,20 @@ export default defineConfig({
               text: 'Введение',
               items: [
                 { text: 'Начало работы', link: '/ru/docs/getting-started' },
+              ],
+            },
+            {
+              text: 'Руководство',
+              items: [
+                { text: 'CLI справка', link: '/ru/docs/cli-reference' },
+                { text: 'Фильтрация', link: '/ru/docs/filtering' },
+                { text: 'Модуль Sample', link: '/ru/docs/sample-module' },
+              ],
+            },
+            {
+              text: 'Кастомизация',
+              items: [
+                { text: 'События', link: '/ru/docs/events' },
               ],
             },
           ],
