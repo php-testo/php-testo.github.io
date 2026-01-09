@@ -23,8 +23,8 @@ $filter = new Filter(
 ### Свойства
 
 **`testSuites`**: `list<non-empty-string>`
-- Названия наборов тестов для фильтрации
-- Используется на Этапе 1 для определения, какие области конфигурации загружать
+- Названия Test Suite для фильтрации
+- Используется на Этапе 1 для определения, какие Test Suite загружать
 
 **`names`**: `list<non-empty-string>`
 - Имена классов, методов или функций для фильтрации
@@ -33,7 +33,7 @@ $filter = new Filter(
   - FQN: `Namespace\ClassName` или `Namespace\functionName`
   - Фрагмент: `methodName`, `functionName` или `ShortClassName`
 - Опциональные индексы DataProvider: `name:providerIndex:datasetIndex`
-  - Предоставляет индексы для модуля data provider
+  - Предоставляет индексы для модуля провайдера данных
   - Индексы начинаются с 0 и независимы от меток наборов данных
   - `datasetIndex` опционален (можно опустить, чтобы передать только индекс provider)
   - Примеры: `UserTest::testLogin:0`, `testAuth:1:3`, `UserTest:0`
@@ -70,13 +70,13 @@ $result = $app->run($filter);
 
 - `names: ['test1', 'test2']` → совпадает, если имя test1 **ИЛИ** test2
 - `paths: ['path1', 'path2']` → совпадает, если путь path1 **ИЛИ** path2
-- `suites: ['Unit', 'Integration']` → совпадает, если набор Unit **ИЛИ** Integration
+- `suites: ['Unit', 'Integration']` → совпадает, если Test Suite - Unit **ИЛИ** Integration
 
 ### Разные типы: логика И
 
 Разные типы фильтров комбинируются логикой И:
 
-- `names: ['test1'], suites: ['Unit']` → совпадает, если имя test1 **И** набор Unit
+- `names: ['test1'], suites: ['Unit']` → совпадает, если имя test1 **И** Test Suite - Unit
 - `names: ['UserTest'], paths: ['tests/Unit/*']` → совпадает, если имя UserTest **И** путь соответствует tests/Unit/*
 
 **Формула**: `AND(OR(names), OR(paths), OR(suites))`
@@ -105,7 +105,7 @@ $filter = new Filter(
 **Пример:**
 ```php
 $filter = new Filter(names: ['UserTest::testLogin']);
-// Результат: класс UserTest с только методом testLogin
+// Результат: класс UserTest только с методом testLogin
 ```
 
 ### Формат FQN или фрагмента
@@ -137,7 +137,7 @@ $filter = new Filter(names: ['testLogin']);
 
 ### Индексы DataProvider
 
-Когда тесты используют data provider, имена могут включать индексы provider и dataset с использованием разделителя двоеточие. Эти индексы становятся доступны модулю data provider.
+Когда тесты используют провайдер данных, имена могут включать индексы provider и dataset с использованием разделителя двоеточие. Эти индексы становятся доступны модулю провайдера данных.
 
 **Формат:** `name:providerIndex:datasetIndex`
 
@@ -164,14 +164,14 @@ $filter = new Filter(names: ['UserTest:0']);
 
 Фильтрация работает в пять этапов:
 
-### Этап 1: Фильтр набора (уровень конфигурации)
+### Этап 1: Фильтр Test Suite (уровень конфигурации)
 
 **Входные данные:** `Filter::$suites`
 
-- Фильтрует области конфигурации на основе названий наборов
-- Каждый набор определяет расположение и паттерны сканирования файлов
+- Фильтрует Test Suite по названиям
+- Каждый Test Suite определяет расположение и паттерны сканирования файлов
 - Определяет начальный набор директорий для сканирования
-- Несколько наборов используют логику ИЛИ
+- Несколько Test Suite используют логику ИЛИ
 
 ### Этап 2: Фильтр путей (уровень Finder)
 
