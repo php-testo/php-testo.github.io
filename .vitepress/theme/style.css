@@ -44,13 +44,23 @@
 
 /* ===== HOME PAGE STYLES ===== */
 
-/* Logo glow effect with dough colors */
+.VPHero {
+    padding-top: 80px !important;
+}
+
+  /* Logo glow effect with dough colors */
 .VPHero .image-container img,
 .VPHero .VPImage {
   animation: logo-glow 3s ease-in-out infinite alternate;
   filter: drop-shadow(0 0 20px rgba(245, 222, 179, 0.5));
   transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   transform-origin: center center;
+}
+.VPHero .text {
+  font-weight: 400;
+}
+.VPHero .tagline {
+  font-weight: normal;
 }
 
 @keyframes logo-glow {
@@ -62,66 +72,6 @@
     filter: drop-shadow(0 0 25px rgba(245, 222, 179, 0.6))
             drop-shadow(0 0 50px rgba(255, 235, 205, 0.4));
   }
-}
-
-.VPHero .image-container img:hover,
-.VPHero .VPImage:hover {
-  filter: drop-shadow(0 0 30px rgba(245, 222, 179, 0.7))
-          drop-shadow(0 0 60px rgba(255, 235, 205, 0.5));
-}
-
-/* Hero section enhancements */
-.VPHero {
-  padding-top: 80px !important;
-  padding-bottom: 80px !important;
-}
-
-.VPHero .text {
-  font-size: 64px !important;
-  font-weight: 700;
-}
-
-.VPHero .tagline {
-  font-size: 20px !important;
-  line-height: 1.6 !important;
-  max-width: 800px;
-  margin: 0 auto;
-  opacity: 0.9;
-}
-
-/* Action buttons styling */
-.VPHero .actions {
-  gap: 16px !important;
-  padding-top: 32px !important;
-}
-
-.VPHero .action.brand {
-  background: linear-gradient(135deg, var(--vp-c-brand-1), var(--vp-c-brand-2)) !important;
-  border: none !important;
-  box-shadow: 0 8px 24px rgba(245, 222, 179, 0.3);
-  transition: all 0.3s ease;
-  font-weight: 600;
-  padding: 12px 32px !important;
-  font-size: 16px !important;
-}
-
-.VPHero .action.brand:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 32px rgba(245, 222, 179, 0.4);
-}
-
-.VPHero .action.alt {
-  border: 2px solid var(--vp-c-brand-1) !important;
-  transition: all 0.3s ease;
-  font-weight: 600;
-  padding: 12px 32px !important;
-  font-size: 16px !important;
-}
-
-.VPHero .action.alt:hover {
-  background: var(--vp-c-brand-soft) !important;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(245, 222, 179, 0.2);
 }
 
 /* Features section */
@@ -269,45 +219,4 @@
 
 .sponsor-cta-link a:hover {
   color: var(--vp-c-brand-1);
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .VPHero .text {
-    font-size: 42px !important;
-  }
-
-  .VPHero .tagline {
-    font-size: 17px !important;
-  }
-
-  .vp-doc h2 {
-    font-size: 28px !important;
-  }
-
-  .VPHero .image-container img,
-  .VPHero .VPImage {
-    max-width: 80%;
-  }
-
-  .sponsors-section {
-    margin: 60px auto 40px;
-  }
-
-  .sponsors-title {
-    font-size: 24px !important;
-  }
-
-  .sponsor-card {
-    padding: 24px 32px;
-    min-width: 240px;
-  }
-
-  .sponsor-logo {
-    padding: 32px 40px;
-  }
-
-  .sponsor-image {
-    width: 120px;
-  }
 }

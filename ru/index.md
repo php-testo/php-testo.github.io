@@ -3,8 +3,14 @@ layout: home
 
 hero:
   name:
-  text: PHP фреймворк тестирования, которым вы управляете
-  tagline: Создан для фреймворков, SDK и сложных систем. Без наследования, полная расширяемость через middleware, чистый API утверждений.
+  text: |
+    PHP-фреймворк
+    тестирования
+    со вкусом хинкали
+  tagline: |
+    Или пельменей.
+    Хлебо-булочные тесты,
+    сочный контроль над тестовой средой.
   image:
     src: https://github.com/php-testo/.github/blob/1.x/resources/logo-full.svg?raw=true
     alt: Testo Logo

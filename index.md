@@ -3,8 +3,14 @@ layout: home
 
 hero:
   name: 
-  text: The PHP Testing Framework You Control
-  tagline: Built for frameworks, SDKs, and complex systems. No inheritance, full extensibility through middleware, clean assertions API.
+  text: |
+    The PHP
+    Testing Framework
+    You Control
+  tagline: |
+    Built for developers, who crave
+    bread-and-butter tests
+    with juicy environment control.
   image:
     src: https://github.com/php-testo/.github/blob/1.x/resources/logo-full.svg?raw=true
     alt: Testo Logo
