@@ -1,4 +1,61 @@
-# Гайдлайн по переводу документации
+# Testo Documentation
+
+**Testo** - extensible PHP testing framework. Tests without TestCase inheritance, middleware architecture, PSR-14 events, separate Assert/Expect facades.
+
+## Structure
+
+```
+docs/         # English (root)
+├── index.md  # Home page
+├── docs/     # Documentation pages
+└── .vitepress/
+    ├── config.mts       # Config: nav, sidebar, locales
+    └── theme/style.css  # Custom styles (dough colors)
+
+ru/           # Russian locale (same structure)
+```
+
+## Style Guide
+
+**Tone:** Informal but technically accurate. Code examples over explanations.
+
+**Home page rules:**
+- DON'T show code in features (text only, 1 sentence each)
+- Don't mention competitors, use "old solutions"
+
+**Markdown:** Use `::: tip`, `::: warning`, `::: info` blocks
+
+## Working with Content
+
+**Adding pages:**
+1. Create both `docs/page.md` (EN) and `ru/docs/page.md` (RU)
+2. Add to sidebar in `.vitepress/config.mts` for both locales
+3. Internal links: `./page` or `/docs/page` (no `.html`)
+
+**Dead links:** Create stub with `::: tip Coming Soon` block
+
+**Styles:** `.vitepress/theme/style.css` - brand colors `--vp-c-brand-1`, responsive breakpoints 960px/640px
+
+## VitePress Commands
+
+```bash
+npm run docs:dev      # Dev server at localhost:5173
+npm run docs:build    # Build to .vitepress/dist/
+npm run docs:preview  # Preview build
+```
+
+## Configuration
+
+**File:** `.vitepress/config.mts`
+
+- `locales`: root (EN) + `ru` (RU) with separate nav/sidebar
+- `cleanUrls: true`, `lastUpdated: true`, `search.provider: 'local'`
+- Nav and Sidebar defined in `themeConfig` for each locale
+- Sidebar sections: Introduction, Guide, Customization
+
+---
+
+# Гайдлайн по переводу документации на Русский язык
 
 ## Основные принципы
 
