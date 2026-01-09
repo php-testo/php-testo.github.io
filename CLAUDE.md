@@ -87,6 +87,17 @@ npm run docs:preview  # Preview build
 | callable | вызываемый | вызываемый объект | В контексте |
 | closure | закрытие | замыкание | |
 
+### Иерархия Testo
+
+Важно понимать правильную иерархию компонентов:
+
+1. **Test Suite** (комплект тестов) - Unit, Integration, Feature
+   - События: `TestSuite*` (TestSuiteStarting, TestSuiteFinished)
+2. **Test Case** (тестовый класс) - UserTest, OrderTest
+   - События: `TestCase*` (TestCaseStarting, TestCaseFinished)
+3. **Test** (тестовый метод или функция) - testLogin(), testCreate()
+   - События: `Test*` (TestStarting, TestFinished, TestBatchStarting)
+
 ### Специфичные фразы
 
 | Английский | ❌ Неправильно | ✅ Правильно |

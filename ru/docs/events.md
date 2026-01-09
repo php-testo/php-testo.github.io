@@ -46,44 +46,46 @@ class MyPlugin
 
 События генерируются на трёх уровнях детализации:
 
-### Уровень набора
+### Уровень Test Suite
 
-Один тестовый класс = один набор. Содержит несколько тестовых кейсов (методов).
-
-```
-TestSuitePipelineStarting      # Перед перехватчиками набора
-  TestSuiteStarting            # Начинается выполнение набора
-    ... выполняются тестовые кейсы ...
-  TestSuiteFinished            # Завершается выполнение набора
-TestSuitePipelineFinished      # После перехватчиков набора
-```
-
-### Уровень кейса
-
-Один тестовый метод = один кейс. Может содержать несколько запусков теста (через провайдеры данных или повторные попытки).
+Test Suite (Unit, Integration и т.д.), определённые в конфигурации. Содержат несколько тестовых классов (Test Cases).
 
 ```
-TestCasePipelineStarting       # Перед перехватчиками кейса
-  TestCaseStarting             # Начинается выполнение кейса
-    ... выполняются пакеты тестов ...
-  TestCaseFinished             # Завершается выполнение кейса
-TestCasePipelineFinished       # После перехватчиков кейса
+TestSuitePipelineStarting      # Перед перехватчиками Test Suite
+  TestSuiteStarting            # Начинается выполнение Test Suite
+    ... выполняются тестовые классы ...
+  TestSuiteFinished            # Завершается выполнение Test Suite
+TestSuitePipelineFinished      # После перехватчиков Test Suite
 ```
 
-### Уровень теста
+### Уровень Test Case
 
-Одно выполнение теста = один запуск теста. Это самый детальный уровень.
+Один тестовый класс = один Test Case. Содержит несколько тестовых методов.
 
 ```
-TestPipelineStarting           # Перед перехватчиками теста
+TestCasePipelineStarting       # Перед перехватчиками Test Case
+  TestCaseStarting             # Начинается выполнение Test Case
+    ... выполняются тестовые методы ...
+  TestCaseFinished             # Завершается выполнение Test Case
+TestCasePipelineFinished       # После перехватчиков Test Case
+```
+
+### Уровень тестового метода
+
+Один тестовый метод. Может содержать несколько запусков теста (через провайдеры данных или повторные попытки).
+
+```
+TestPipelineStarting           # Перед перехватчиками тестового метода
   TestBatchStarting            # Начинается пакет (для провайдеров данных/повторов)
     TestStarting               # Начинается один запуск теста
+      ... выполнение теста ...
     TestFinished               # Завершается один запуск теста
     TestRetrying               # (опционально) Тест будет повторён
     TestStarting               # Начинается попытка повтора
+      ... выполнение теста ...
     TestFinished               # Завершается попытка повтора
   TestBatchFinished            # Завершается пакет
-TestPipelineFinished           # После перехватчиков теста
+TestPipelineFinished           # После перехватчиков тестового метода
 ```
 
 ## Правила упорядочивания событий
@@ -98,20 +100,20 @@ TestPipelineFinished           # После перехватчиков тест�
 
 3. **Иерархия течёт вниз:**
    ```
-   Suite Pipeline Start
-     Suite Start
-       Case Pipeline Start
-         Case Start
-           Test Pipeline Start
-             Batch Start
-               Test Start
-               Test Finish
-             Batch Finish
-           Test Pipeline Finish
-         Case Finish
-       Case Pipeline Finish
-     Suite Finish
-   Suite Pipeline Finish
+   Test Suite Pipeline Start            (TestSuitePipelineStarting)
+     Test Suite Start                   (TestSuiteStarting)
+       Test Case Pipeline Start         (TestCasePipelineStarting)
+         Test Case Start                (TestCaseStarting)
+           Test Method Pipeline Start   (TestPipelineStarting)
+             Batch Start                (TestBatchStarting)
+               Test Start               (TestStarting)
+               Test Finish              (TestFinished)
+             Batch Finish               (TestBatchFinished)
+           Test Method Pipeline Finish  (TestPipelineFinished)
+         Test Case Finish               (TestCaseFinished)
+       Test Case Pipeline Finish        (TestCasePipelineFinished)
+     Test Suite Finish                  (TestSuiteFinished)
+   Test Suite Pipeline Finish           (TestSuitePipelineFinished)
    ```
 
 4. **Пакеты группируют запуски:**
@@ -152,60 +154,18 @@ $events->addListener(TestResultEvent::class, function (TestResultEvent $event) {
 });
 ```
 
-### Слушать все события кейса
+### Слушать все события Test Case
 
 ```php
 use Testo\Test\Event\TestCase\TestCaseEvent;
 
 $events->addListener(TestCaseEvent::class, function (TestCaseEvent $event) {
-    // Срабатывает для всех событий TestCase*
+    // Срабатывает для всех событий TestCase* (уровень Test Case)
     $this->trackCase($event->caseInfo);
 });
 ```
 
 Это полезно, когда вас не интересует конкретный тип события, а только данные, которые оно несёт.
-
-## Распространённые случаи использования
-
-### Сбор метрик тестов
-
-```php
-$events->addListener(TestFinished::class, function (TestFinished $event) {
-    $duration = $event->testResult->executionTime;
-    $memory = $event->testResult->memoryUsage;
-
-    $this->metrics->record($event->testInfo->name, $duration, $memory);
-});
-```
-
-### Пользовательский вывод тестов
-
-```php
-$events->addListener(TestCaseStarting::class, function (TestCaseStarting $event) {
-    echo "Running: {$event->caseInfo->className}::{$event->caseInfo->methodName}\n";
-});
-```
-
-### Уведомления о повторах
-
-```php
-$events->addListener(TestRetrying::class, function (TestRetrying $event) {
-    $this->logger->warning(
-        "Retrying test {$event->testInfo->name}, attempt {$event->attempt}"
-    );
-});
-```
-
-### Интеграция с внешними инструментами
-
-```php
-$events->addListener(TestSuiteFinished::class, function (TestSuiteFinished $event) {
-    $this->externalReporter->sendSuiteResults(
-        $event->suiteInfo,
-        $event->suiteResult
-    );
-});
-```
 
 ## Пользовательский диспетчер событий
 

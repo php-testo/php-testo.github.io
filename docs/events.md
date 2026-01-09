@@ -46,44 +46,46 @@ class MyPlugin
 
 Events fire at three levels of granularity:
 
-### Suite Level
+### Test Suite Level
 
-One test class = one suite. Contains multiple test cases (methods).
+Test Suite (Unit, Integration, etc.) defined in configuration. Contains multiple test cases (classes).
 
 ```
-TestSuitePipelineStarting      # Before suite interceptors
-  TestSuiteStarting            # Suite execution begins
+TestSuitePipelineStarting      # Before test suite interceptors
+  TestSuiteStarting            # Test suite execution begins
     ... test cases run ...
-  TestSuiteFinished            # Suite execution ends
-TestSuitePipelineFinished      # After suite interceptors
+  TestSuiteFinished            # Test suite execution ends
+TestSuitePipelineFinished      # After test suite interceptors
 ```
 
-### Case Level
+### Test Case Level
 
-One test method = one case. May contain multiple test runs (via data providers or retries).
-
-```
-TestCasePipelineStarting       # Before case interceptors
-  TestCaseStarting             # Case execution begins
-    ... test batches run ...
-  TestCaseFinished             # Case execution ends
-TestCasePipelineFinished       # After case interceptors
-```
-
-### Test Level
-
-One execution of a test = one test run. This is the most granular level.
+One test class = one test case. Contains multiple test methods.
 
 ```
-TestPipelineStarting           # Before test interceptors
+TestCasePipelineStarting       # Before test case interceptors
+  TestCaseStarting             # Test case execution begins
+    ... test methods run ...
+  TestCaseFinished             # Test case execution ends
+TestCasePipelineFinished       # After test case interceptors
+```
+
+### Test Method Level
+
+One test method. May contain multiple test runs (via data providers or retries).
+
+```
+TestPipelineStarting           # Before test method interceptors
   TestBatchStarting            # Batch begins (for data providers/retries)
     TestStarting               # Single test run starts
+      ... test execution ...
     TestFinished               # Single test run ends
     TestRetrying               # (optional) Test will be retried
     TestStarting               # Retry attempt starts
+      ... test execution ...
     TestFinished               # Retry attempt ends
   TestBatchFinished            # Batch ends
-TestPipelineFinished           # After test interceptors
+TestPipelineFinished           # After test method interceptors
 ```
 
 ## Event Ordering Rules
@@ -98,20 +100,20 @@ TestPipelineFinished           # After test interceptors
 
 3. **Hierarchy flows downward:**
    ```
-   Suite Pipeline Start
-     Suite Start
-       Case Pipeline Start
-         Case Start
-           Test Pipeline Start
-             Batch Start
-               Test Start
-               Test Finish
-             Batch Finish
-           Test Pipeline Finish
-         Case Finish
-       Case Pipeline Finish
-     Suite Finish
-   Suite Pipeline Finish
+   Test Suite Pipeline Start            (TestSuitePipelineStarting)
+     Test Suite Start                   (TestSuiteStarting)
+       Test Case Pipeline Start         (TestCasePipelineStarting)
+         Test Case Start                (TestCaseStarting)
+           Test Method Pipeline Start   (TestPipelineStarting)
+             Batch Start                (TestBatchStarting)
+               Test Start               (TestStarting)
+               Test Finish              (TestFinished)
+             Batch Finish               (TestBatchFinished)
+           Test Method Pipeline Finish  (TestPipelineFinished)
+         Test Case Finish               (TestCaseFinished)
+       Test Case Pipeline Finish        (TestCasePipelineFinished)
+     Test Suite Finish                  (TestSuiteFinished)
+   Test Suite Pipeline Finish           (TestSuitePipelineFinished)
    ```
 
 4. **Batches group runs:**
@@ -152,60 +154,18 @@ $events->addListener(TestResultEvent::class, function (TestResultEvent $event) {
 });
 ```
 
-### Listen to All Case Events
+### Listen to All Test Case Events
 
 ```php
 use Testo\Test\Event\TestCase\TestCaseEvent;
 
 $events->addListener(TestCaseEvent::class, function (TestCaseEvent $event) {
-    // Fires for all TestCase* events
+    // Fires for all TestCase* events (test case level)
     $this->trackCase($event->caseInfo);
 });
 ```
 
 This is useful when you don't care about the specific event type, only the data it carries.
-
-## Common Use Cases
-
-### Collecting Test Metrics
-
-```php
-$events->addListener(TestFinished::class, function (TestFinished $event) {
-    $duration = $event->testResult->executionTime;
-    $memory = $event->testResult->memoryUsage;
-
-    $this->metrics->record($event->testInfo->name, $duration, $memory);
-});
-```
-
-### Custom Test Output
-
-```php
-$events->addListener(TestCaseStarting::class, function (TestCaseStarting $event) {
-    echo "Running: {$event->caseInfo->className}::{$event->caseInfo->methodName}\n";
-});
-```
-
-### Retry Notifications
-
-```php
-$events->addListener(TestRetrying::class, function (TestRetrying $event) {
-    $this->logger->warning(
-        "Retrying test {$event->testInfo->name}, attempt {$event->attempt}"
-    );
-});
-```
-
-### Integration with External Tools
-
-```php
-$events->addListener(TestSuiteFinished::class, function (TestSuiteFinished $event) {
-    $this->externalReporter->sendSuiteResults(
-        $event->suiteInfo,
-        $event->suiteResult
-    );
-});
-```
 
 ## Custom Event Dispatcher
 
