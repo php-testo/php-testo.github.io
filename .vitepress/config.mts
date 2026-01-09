@@ -20,6 +20,10 @@ export default defineConfig({
           { text: 'Docs', link: '/docs/getting-started' },
           { text: 'Blog', link: '/blog/' },
         ],
+        editLink: {
+          pattern: 'https://github.com/php-testo/php-testo.github.io/edit/master/:path',
+          text: 'Edit this page',
+        },
         sidebar: {
           '/docs/': [
             {
@@ -56,6 +60,10 @@ export default defineConfig({
           { text: 'Документация', link: '/ru/docs/getting-started' },
           { text: 'Блог', link: '/ru/blog/' },
         ],
+        editLink: {
+          pattern: 'https://github.com/php-testo/php-testo.github.io/edit/master/:path',
+          text: 'Редактировать эту страницу',
+        },
         sidebar: {
           '/ru/docs/': [
             {
