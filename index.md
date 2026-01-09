@@ -2,11 +2,11 @@
 layout: home
 
 hero:
-  name: 
+  name:
   text: |
-    The PHP
-    Testing Framework
-    You Control
+    The PHP Testing
+    Framework with a
+    Taste for Khinkali
   tagline: |
     Built for developers, who crave
     bread-and-butter tests

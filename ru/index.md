@@ -5,11 +5,11 @@ hero:
   name:
   text: |
     PHP-фреймворк
-    тестирования
+    для тестирования
     со вкусом хинкали
   tagline: |
     Или пельменей.
-    Хлебо-булочные тесты,
+    Хлебобулочные тесты,
     сочный контроль над тестовой средой.
   image:
     src: https://github.com/php-testo/.github/blob/1.x/resources/logo-full.svg?raw=true
