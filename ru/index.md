@@ -48,5 +48,7 @@ features:
   </div>
   <div class="sponsor-cta-link">
     <a href="/ru/sponsor">Стать спонсором</a>
+    <span class="separator">|</span>
+    <a href="https://github.com/php-testo/testo" target="_blank" rel="noopener">Поставить звезду</a>
   </div>
 </div>

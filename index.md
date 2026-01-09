@@ -48,5 +48,7 @@ features:
   </div>
   <div class="sponsor-cta-link">
     <a href="/sponsor">Become a Sponsor</a>
+    <span class="separator">|</span>
+    <a href="https://github.com/php-testo/testo" target="_blank" rel="noopener">Star</a>
   </div>
 </div>

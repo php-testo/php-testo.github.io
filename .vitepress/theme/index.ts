@@ -2,6 +2,7 @@ import { h } from 'vue'
 import type { Theme } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
 import BlogSponsor from './BlogSponsor.vue'
+import GitHubStars from './GitHubStars.vue'
 import './style.css'
 
 export default {
@@ -9,6 +10,7 @@ export default {
   Layout: () => {
     return h(DefaultTheme.Layout, null, {
       'doc-after': () => h(BlogSponsor),
+      'nav-bar-content-after': () => h(GitHubStars),
     })
   },
 } satisfies Theme
