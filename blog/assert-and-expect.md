@@ -59,7 +59,7 @@ Then we got to `Assert::greaterThan()`. In PHPUnit, the argument order is the sa
 
 So if we want to say `$foo is greater than 42`, we have to write `greaterThan(42, $foo)`.
 
-![greaterThan](/blog/assert-and-expect/img-2.jpg)
+![Exceed forty-two, $foo must. Sense this, I do.](/blog/assert-and-expect/img-2.jpg)
 
 Looks disgusting, since everywhere else we use mathematical notation like `$foo > 42`.
 
@@ -124,7 +124,7 @@ This way, at the start of the pipe in `Assert::string()`, we immediately verify 
 
 Code takes less space, facades aren't bloated. Now this is what looks truly elegant. Whether it's usable or not — practice will tell.
 
-![Pipe assertions](/blog/assert-and-expect/img-4.jpg)
+![Cool. I like it!](/blog/assert-and-expect/img-4.jpg)
 
 ---
 
