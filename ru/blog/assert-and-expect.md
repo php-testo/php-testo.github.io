@@ -178,7 +178,4 @@ public function checkIterableTraitMethods(): void
 
 [Присоединяйтесь](https://t.me/spiralphp/10863) к обсуждению или разработке, предлагайте самые смелые идеи или фичи. Это интересно.
 
-Отдельно выражаю благодарность:
-
-- [@petrdobr](https://github.com/petrdobr) за помощь в имплементации ассертов.
-- [@xepozz](https://github.com/xepozz/) за [IDE плагин](https://plugins.jetbrains.com/plugin/28842-testo), который нуждается в ваших звёздах.
+Отдельно выражаю благодарность [@petrdobr](https://github.com/petrdobr) за помощь в имплементации ассертов.

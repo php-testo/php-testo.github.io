@@ -175,7 +175,4 @@ I won't be surprised if in the future we decide that **$expected** should come a
 
 ---
 
-Special thanks to:
-
-- [@petrdobr](https://github.com/petrdobr) for help with assertion implementation.
-- [@xepozz](https://github.com/xepozz/) for the [IDE plugin](https://plugins.jetbrains.com/plugin/28842-testo), which needs your stars.
+Special thanks to [@petrdobr](https://github.com/petrdobr) for help with assertion implementation.
