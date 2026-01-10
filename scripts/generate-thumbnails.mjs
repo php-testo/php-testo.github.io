@@ -32,11 +32,12 @@ async function generateThumbnails() {
       const { data: frontmatter } = matter(content)
 
       if (frontmatter.image) {
-        const imagePath = path.join(docsRoot, frontmatter.image)
+        // Images are in public/ folder
+        const imagePath = path.join(docsRoot, 'public', frontmatter.image)
         if (existsSync(imagePath)) {
           images.push(imagePath)
         } else {
-          console.warn(`⚠ Image not found: ${frontmatter.image}`)
+          console.warn(`⚠ Image not found: ${frontmatter.image} (looked in public/)`)
         }
       }
     }
