@@ -4,6 +4,7 @@ import DefaultTheme from 'vitepress/theme'
 import BlogSponsor from './BlogSponsor.vue'
 import GitHubStars from './GitHubStars.vue'
 import CodeTabs from './CodeTabs.vue'
+import JetBrainsPluginButton from './JetBrainsPluginButton.vue'
 import './style.css'
 
 export default {
@@ -16,5 +17,6 @@ export default {
   },
   enhanceApp({ app }) {
     app.component('CodeTabs', CodeTabs)
+    app.component('JetBrainsPluginButton', JetBrainsPluginButton)
   },
 } satisfies Theme

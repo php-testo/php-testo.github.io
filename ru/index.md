@@ -37,6 +37,13 @@ features:
 ---
 
 <script setup>
+import { data as jbPlugin } from '../.vitepress/theme/jetbrains-plugin.data'
+
+const ideScreenshot = {
+  light: '/images/ide-screenshot-light.jpg',
+  dark: '/images/ide-screenshot-dark.jpg'
+}
+
 const assertTabs = [
   { name: 'Assert.php', slot: 'assert', icon: 'testo' },
   { name: 'Expect.php', slot: 'expect', icon: 'testo' },
@@ -147,7 +154,7 @@ public function testInvalidInput(): void
 
 ## Разные способы объявления тестов
 
-<div class="home-feature-row home-feature-row-reverse">
+<div class="home-feature-row">
 <div class="home-feature-text">
 
 Пишите тесты так, как удобно вам.
@@ -241,6 +248,27 @@ final class Calculator
 </template>
 
 </CodeTabs>
+</div>
+</div>
+</div>
+
+<div class="home-feature">
+
+## Полноценная интеграция с IDE
+
+<div class="home-feature-row">
+<div
+  class="home-feature-bg-image"
+  :style="{ '--bg-image-light': `url(${ideScreenshot.light})`, '--bg-image-dark': `url(${ideScreenshot.dark})` }"
+></div>
+<div class="home-feature-text">
+
+Нативный плагин для PhpStorm и IntelliJ IDEA.
+
+Весь привычный функционал: запуск и перезапуск из gutter-иконок, навигация между тестами и кодом, отладка с брейкпоинтами, генерация тестов, дерево результатов.
+
+<JetBrainsPluginButton :pluginId="jbPlugin.pluginId" :downloads="jbPlugin.downloads" :rating="jbPlugin.rating" />
+
 </div>
 </div>
 </div>
