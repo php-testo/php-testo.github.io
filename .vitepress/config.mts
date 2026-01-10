@@ -1,4 +1,27 @@
 import { defineConfig } from 'vitepress'
+import { RssPlugin } from 'vitepress-plugin-rss'
+
+const baseUrl = 'https://php-testo.github.io'
+
+const rssOptionsEn = {
+  title: 'Testo Blog',
+  baseUrl,
+  copyright: 'Copyright © Testo',
+  description: 'Updates from Testo - Modern PHP Testing Framework',
+  filename: 'feed.xml',
+  filter: (post: { url: string }) => post.url.startsWith('/blog/') && !post.url.endsWith('/blog/'),
+  icon: false,
+}
+
+const rssOptionsRu = {
+  title: 'Блог Testo',
+  baseUrl,
+  copyright: 'Copyright © Testo',
+  description: 'Новости Testo - современного PHP фреймворка для тестирования',
+  filename: 'ru/feed.xml',
+  filter: (post: { url: string }) => post.url.startsWith('/ru/blog/') && !post.url.endsWith('/blog/'),
+  icon: false,
+}
 
 export default defineConfig({
   title: 'Testo',
@@ -7,15 +30,23 @@ export default defineConfig({
   lastUpdated: true,
   cleanUrls: true,
   srcExclude: ['CLAUDE.md', 'README.md'],
+  ignoreDeadLinks: [/feed\.xml$/],
 
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
   ],
 
+  vite: {
+    plugins: [RssPlugin(rssOptionsEn), RssPlugin(rssOptionsRu)],
+  },
+
   locales: {
     root: {
       label: 'English',
       lang: 'en',
+      head: [
+        ['link', { rel: 'alternate', type: 'application/rss+xml', title: 'Testo Blog', href: '/feed.xml' }],
+      ],
       themeConfig: {
         nav: [
           { text: 'Docs', link: '/docs/getting-started' },
@@ -56,6 +87,9 @@ export default defineConfig({
       label: 'Русский',
       lang: 'ru',
       link: '/ru/',
+      head: [
+        ['link', { rel: 'alternate', type: 'application/rss+xml', title: 'Блог Testo', href: '/ru/feed.xml' }],
+      ],
       themeConfig: {
         nav: [
           { text: 'Документация', link: '/ru/docs/getting-started' },

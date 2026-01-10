@@ -1,3 +1,9 @@
+---
+title: "Assert и Expect"
+date: 2026-01-01
+description: "Исследуем дизайн API утверждений в Testo: почему мы разделили фасады Assert и Expect, и как пайп-ассерты делают тесты чище."
+---
+
 # Testo. Assert и Expect
 
 ![Testo Assert и Expect](/blog/assert-and-expect/img-1.jpg)

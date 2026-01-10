@@ -1,3 +1,9 @@
+---
+title: "Khinkali"
+date: 2025-10-30
+description: "The story behind the khinkali icon for Testo IDE plugin."
+---
+
 # Khinkali
 
 The elephant logo with a rolling pin is nice, of course. But we also need small icon formats to use in the IDE.

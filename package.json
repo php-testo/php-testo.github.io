@@ -8,10 +8,18 @@
     "build": "vitepress build",
     "preview": "vitepress preview"
   },
-  "keywords": ["testo", "php", "testing", "documentation"],
+  "keywords": [
+    "testo",
+    "php",
+    "testing",
+    "documentation"
+  ],
   "author": "",
   "license": "MIT",
   "devDependencies": {
     "vitepress": "^1.6.4"
+  },
+  "dependencies": {
+    "vitepress-plugin-rss": "^0.4.2"
   }
 }

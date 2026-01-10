@@ -1,3 +1,9 @@
+---
+title: "Assert and Expect"
+date: 2026-01-01
+description: "Exploring assertion API design in Testo: why we split Assert and Expect facades, and how pipe assertions make tests cleaner."
+---
+
 # Testo. Assert and Expect
 
 ![Testo Assert and Expect](/blog/assert-and-expect/img-1.jpg)

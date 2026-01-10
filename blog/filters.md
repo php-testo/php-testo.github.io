@@ -1,3 +1,9 @@
+---
+title: "Filters"
+date: 2025-11-07
+description: "Multi-layered filtering system in Testo: from Test Suite level down to individual test methods."
+---
+
 # Testo. Filters
 
 ![Filters](/blog/filters/img-1.jpg)

@@ -42,6 +42,23 @@ ru/           # Russian locale (same structure)
 
 **Styles:** `.vitepress/theme/style.css` - brand colors `--vp-c-brand-1`, responsive breakpoints 960px/640px
 
+## Blog
+
+**Adding blog posts:**
+1. Create both `blog/post.md` (EN) and `ru/blog/post.md` (RU)
+2. Add link to `blog/index.md` and `ru/blog/index.md`
+
+**Required frontmatter for RSS:**
+```yaml
+---
+title: "Post Title"
+date: 2025-01-01
+description: "Short description for RSS feed"
+---
+```
+
+All three fields (`title`, `date`, `description`) are required for proper RSS generation.
+
 ## VitePress Commands
 
 ```bash
