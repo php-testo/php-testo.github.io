@@ -5,6 +5,7 @@ import BlogSponsor from './BlogSponsor.vue'
 import GitHubStars from './GitHubStars.vue'
 import CodeTabs from './CodeTabs.vue'
 import JetBrainsPluginButton from './JetBrainsPluginButton.vue'
+import BlogPosts from './BlogPosts.vue'
 import './style.css'
 
 export default {
@@ -18,5 +19,6 @@ export default {
   enhanceApp({ app }) {
     app.component('CodeTabs', CodeTabs)
     app.component('JetBrainsPluginButton', JetBrainsPluginButton)
+    app.component('BlogPosts', BlogPosts)
   },
 } satisfies Theme
