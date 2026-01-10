@@ -46,6 +46,13 @@ const assertTabs = [
   { name: 'Exception.php', slot: 'expectException', icon: 'testo' },
   { name: 'Attributes.php', slot: 'expectAttr', icon: 'testo-class' },
 ]
+
+const declareTabs = [
+  { name: 'Class', slot: 'declare-class', icon: 'testo-class' },
+  { name: 'Function', slot: 'declare-function', icon: 'testo-function' },
+  { name: 'Convention', slot: 'declare-convention', icon: 'testo-class' },
+  { name: 'Inline', slot: 'declare-inline', icon: 'class' },
+]
 </script>
 
 <div class="home-feature">
@@ -129,6 +136,108 @@ public function testInvalidInput(): void
     $input = ['age' => 'twenty'];
 
     $this->service->validateInput($input);
+}
+```
+
+</template>
+
+</CodeTabs>
+</div>
+</div>
+</div>
+
+<div class="home-feature">
+
+## Multiple Ways to Declare Tests
+
+<div class="home-feature-row home-feature-row-reverse">
+<div class="home-feature-text">
+
+Write tests the way that fits your style.
+
+- Tests can be classes, functions, or even attributes right in production code (Inline Tests).
+- Classes don't need to inherit from a base test class. Code stays clean.
+- Test discovery by naming conventions or explicit attributes.
+
+</div>
+<div class="home-feature-code">
+<CodeTabs :tabs="declareTabs">
+
+<template #declare-class>
+
+```php
+// Explicit test declaration with #[Test] attribute
+
+final class OrderTest
+{
+    #[Test]
+    public function createsOrderWithItems(): void
+    {
+        $order = new Order();
+        $order->addItem(new Product('Bread'));
+
+        Assert::int($order->itemCount())->equals(1);
+    }
+}
+```
+
+</template>
+
+<template #declare-function>
+
+```php
+// Explicit test with #[Test] attribute
+// or "test" prefix in function name
+
+#[Test]
+function validates_email_format(): void
+{
+    $validator = new EmailValidator();
+
+    Assert::true($validator->isValid('user@example.com'));
+    Assert::false($validator->isValid('invalid'));
+}
+
+function testEmailValidator(): void { ... }
+```
+
+</template>
+
+<template #declare-convention>
+
+```php
+// "Test" suffix on class and "test" prefix on methods
+
+final class UserServiceTest
+{
+    public function testCreatesUser(): void
+    {
+        $user = $this->service->create('john@example.com');
+
+        Assert::string($user->email)->contains('@');
+    }
+
+    public function testDeletesUser(): void { /* ... */ }
+}
+```
+
+</template>
+
+<template #declare-inline>
+
+```php
+// Test the method right in your code
+// Convenient for simple cases
+
+final class Calculator
+{
+    #[TestInline([1, 1], 2)]
+    #[TestInline([40, 2], 42)]
+    #[TestInline([-5, 5], 0)]
+    public function sum(int $a, int $b): int
+    {
+        return $a + $b;
+    }
 }
 ```
 

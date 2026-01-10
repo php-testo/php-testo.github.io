@@ -254,7 +254,7 @@
 }
 
 .home-feature-text {
-  flex: 1;
+  flex: 2;
   text-align: left;
 }
 
@@ -293,9 +293,8 @@
 }
 
 .home-feature-code {
-  flex: 1;
+  flex: 3;
   min-width: 0;
-  width: 100%;
 }
 
 .home-feature-code .code-tabs-ide {
@@ -307,5 +306,11 @@
   .home-feature-row {
     flex-direction: column;
     gap: 32px;
+  }
+
+  .home-feature-text,
+  .home-feature-code {
+    flex: none;
+    width: 100%;
   }
 }

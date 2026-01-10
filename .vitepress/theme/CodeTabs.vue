@@ -32,6 +32,10 @@ const iconMap: Record<string, { light: string; dark: string }> = {
     light: '/icon/light-khinkali-bordered.svg',
     dark: '/icon/dark-khinkali-bordered.svg',
   },
+  'class': {
+    light: '/icon/light-class.svg',
+    dark: '/icon/dark-class.svg',
+  },
 }
 
 const getIcon = (tab: Tab) => {
@@ -81,8 +85,8 @@ const getIcon = (tab: Tab) => {
 /* Tabs */
 .ide-tabs {
   display: flex;
-  background: #252526;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  background: var(--vp-c-bg-soft);
+  border-bottom: 1px solid var(--vp-c-divider);
   overflow-x: auto;
   border-radius: 12px 12px 0 0;
   scrollbar-width: none; /* Firefox */
@@ -93,10 +97,6 @@ const getIcon = (tab: Tab) => {
   display: none; /* Chrome/Safari */
 }
 
-.dark .ide-tabs {
-  background: #1e1e1e;
-}
-
 .ide-tab:first-child {
   border-radius: 12px 0 0 0;
 }
@@ -105,11 +105,11 @@ const getIcon = (tab: Tab) => {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 16px;
+  padding: 4px 10px;
   background: transparent;
   border: none;
-  border-right: 1px solid rgba(255,255,255,0.05);
-  color: #888;
+  border-right: 1px solid var(--vp-c-divider);
+  color: var(--vp-c-text-3);
   font-size: 13px;
   font-family: var(--vp-font-family-base);
   cursor: pointer;
@@ -118,13 +118,13 @@ const getIcon = (tab: Tab) => {
 }
 
 .ide-tab:hover {
-  background: rgba(255,255,255,0.05);
-  color: #ccc;
+  background: var(--vp-c-bg-alt);
+  color: var(--vp-c-text-2);
 }
 
 .ide-tab.active {
   background: var(--vp-code-block-bg);
-  color: #fff;
+  color: var(--vp-c-text-1);
   border-bottom: 2px solid var(--vp-c-brand-1);
   margin-bottom: -1px;
 }
