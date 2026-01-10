@@ -65,7 +65,7 @@ const declareTabs = [
 Testo is still under active development and not ready for production use.
 Feel free to explore and experiment, but don't rely on it for real projects yet.
 
-Want to help? [Star the repo](https://github.com/php-testo/testo) or [become a sponsor](/sponsor).
+Want to support the project? [Star the repo](https://github.com/php-testo/testo) or [become a sponsor](/sponsor).
 :::
 
 </div>
