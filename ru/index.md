@@ -39,6 +39,106 @@ features:
     details: Раздельные фасады Assert (сейчас) и Expect (потом) с пайповыми ассертами для типобезопасных проверок.
 ---
 
+<script setup>
+const assertTabs = [
+  { name: 'Assert.php', slot: 'assert', icon: 'testo' },
+  { name: 'Expect.php', slot: 'expect', icon: 'testo' },
+  { name: 'Exception.php', slot: 'expectException', icon: 'testo' },
+  { name: 'Attributes.php', slot: 'expectAttr', icon: 'testo-class' },
+]
+</script>
+
+<div class="home-feature">
+
+## Продуманный API ассертов
+
+<div class="home-feature-row">
+<div class="home-feature-text">
+
+Функции проверок разбиты на семантические группы:
+
+- Фасад `Assert::` — утверждения, выполняются сразу
+- Фасад `Expect::` — ожидания, откладываются до завершения теста
+
+Пайповый синтаксис с группировкой по типу делает код лаконичным и типобезопасным.
+
+</div>
+<div class="home-feature-code">
+<CodeTabs :tabs="assertTabs">
+
+<template #assert>
+
+```php
+use Testo\Assert;
+
+// Пайповые ассерты — группировка по типу
+Assert::string($email)->contains('@');
+Assert::int($age)->greaterThan(18);
+Assert::file('config.php')->exists();
+
+Assert::array($order->items)
+    ->allOf(Item::class)
+    ->hasCount(3);
+```
+
+</template>
+
+<template #expect>
+
+```php
+use Testo\Expect;
+
+// ORM должен остаться в памяти
+Expect::leaks($orm);
+
+// Тест упадёт, если сущности не будут подчищены
+Expect::notLeaks(...$entitis);
+
+// Валидация вывода
+Expect::output()->contains('Done');
+```
+
+</template>
+
+<template #expectException>
+
+```php
+// Где вы ещё такое видели?
+Expect::exception(ValidationException::class)
+    ->fromMethod(Service::class, 'validateInput')
+    ->withMessage('Invalid input')
+    ->withPrevious(
+        WrongTypeException::class,
+        static fn (ExpectedException $e) => $e
+            ->withCode(42)
+            ->withMessage('Field "age" must be integer.'),
+    );
+```
+
+</template>
+
+<template #expectAttr>
+
+```php
+/**
+ * Можно использовать атрибуты для ожидания исключений
+ */
+#[ExpectException(ValidationException::class)]
+public function testInvalidInput(): void
+{
+    $input = ['age' => 'twenty'];
+
+    $this->service->validateInput($input);
+}
+```
+
+</template>
+
+</CodeTabs>
+</div>
+</div>
+</div>
+
 <div class="sponsors-section">
   <h2 class="sponsors-title">Спонсоры</h2>
   <div class="sponsors-grid">
