@@ -7,7 +7,15 @@ export interface Post {
   date: string
   description: string
   image?: string
+  thumb?: string
   author?: string
+}
+
+function getThumbUrl(imageUrl: string | undefined): string | undefined {
+  if (!imageUrl) return undefined
+  const ext = imageUrl.lastIndexOf('.')
+  if (ext === -1) return undefined
+  return `${imageUrl.slice(0, ext)}.thumb.jpg`
 }
 
 declare const data: Post[]
@@ -23,6 +31,7 @@ export default createContentLoader(getBlogGlobPatterns(), {
         date: formatDate(page.frontmatter.date),
         description: page.frontmatter.description,
         image: page.frontmatter.image,
+        thumb: getThumbUrl(page.frontmatter.image),
         author: page.frontmatter.author,
       }))
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())

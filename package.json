@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vitepress dev",
-    "build": "vitepress build",
-    "preview": "vitepress preview"
+    "build": "npm run thumbnails && vitepress build",
+    "preview": "vitepress preview",
+    "thumbnails": "node scripts/generate-thumbnails.mjs"
   },
   "keywords": [
     "testo",
@@ -18,6 +19,7 @@
   "license": "MIT",
   "devDependencies": {
     "gray-matter": "^4.0.3",
+    "sharp": "^0.34.5",
     "vitepress": "^1.6.4"
   },
   "dependencies": {

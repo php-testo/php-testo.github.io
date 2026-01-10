@@ -15,7 +15,7 @@ const filteredPosts = computed(() => {
   <div class="blog-posts">
     <article v-for="post in filteredPosts" :key="post.url" class="post-card">
       <a :href="post.url" class="post-image-link">
-        <img v-if="post.image" :src="post.image" :alt="post.title" class="post-image" />
+        <img v-if="post.thumb || post.image" :src="post.thumb || post.image" :alt="post.title" class="post-image" />
       </a>
       <div class="post-content">
         <div class="post-title">
