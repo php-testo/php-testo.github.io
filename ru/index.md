@@ -19,9 +19,6 @@ hero:
       text: Начать
       link: /ru/docs/getting-started
     - theme: alt
-      text: Почему Testo?
-      link: /ru/docs/why-testo
-    - theme: alt
       text: GitHub
       link: https://github.com/php-testo/testo
 
