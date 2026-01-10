@@ -36,6 +36,7 @@ const filteredPosts = computed(() => {
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  margin-top: 1.5rem;
 }
 
 .post-card {

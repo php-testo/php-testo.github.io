@@ -8,13 +8,12 @@ import CodeTabs from './CodeTabs.vue'
 import JetBrainsPluginButton from './JetBrainsPluginButton.vue'
 import BlogPosts from './BlogPosts.vue'
 import BlogPostHeader from './BlogPostHeader.vue'
+import { isBlogPath } from '../locales'
 import './style.css'
 
 function isBlogPost() {
   const route = useRoute()
-  const path = route.path
-  return (path.startsWith('/blog/') || path.startsWith('/ru/blog/')) &&
-    path !== '/blog/' && path !== '/ru/blog/'
+  return isBlogPath(route.path)
 }
 
 export default {

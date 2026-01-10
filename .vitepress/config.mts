@@ -1,5 +1,6 @@
 import { defineConfig, HeadConfig } from 'vitepress'
-import { generateRss } from './rss'
+import { generateRss, rssPlugin } from './rss'
+import { isBlogPath } from './locales'
 
 const baseUrl = 'https://php-testo.github.io'
 
@@ -7,10 +8,14 @@ export default defineConfig({
   title: 'Testo',
   description: 'Modern PHP Testing Framework',
 
-  lastUpdated: true,
+  lastUpdated: false,
   cleanUrls: true,
   srcExclude: ['CLAUDE.md', 'README.md'],
   ignoreDeadLinks: [/feed\.xml$/],
+
+  vite: {
+    plugins: [rssPlugin()],
+  },
 
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
@@ -125,6 +130,15 @@ export default defineConfig({
     search: {
       provider: 'local',
     },
+  },
+
+  transformPageData(pageData) {
+    // Disable lastUpdated and editLink for blog posts
+    const pagePath = '/' + pageData.relativePath.replace(/\.md$/, '')
+    if (isBlogPath(pagePath) || isBlogPath(pagePath + '/')) {
+      pageData.frontmatter.lastUpdated = false
+      pageData.frontmatter.editLink = false
+    }
   },
 
   transformHead({ pageData }) {

@@ -1,4 +1,5 @@
 import { createContentLoader } from 'vitepress'
+import { getBlogGlobPatterns, isBlogIndexPath } from '../locales'
 
 export interface Post {
   title: string
@@ -12,10 +13,10 @@ export interface Post {
 declare const data: Post[]
 export { data }
 
-export default createContentLoader(['blog/*.md', 'ru/blog/*.md'], {
+export default createContentLoader(getBlogGlobPatterns(), {
   transform(raw): Post[] {
     return raw
-      .filter((page) => page.url !== '/blog/' && page.url !== '/ru/blog/')
+      .filter((page) => !isBlogIndexPath(page.url))
       .map((page) => ({
         title: page.frontmatter.title,
         url: page.url,
