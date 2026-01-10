@@ -2,11 +2,11 @@
 title: "Assert and Expect"
 date: 2026-01-01
 description: "Exploring assertion API design in Testo: why we split Assert and Expect facades, and how pipe assertions make tests cleaner."
+image: /blog/assert-and-expect/img-1.jpg
+author: Aleksei Gagarin
 ---
 
 # Testo. Assert and Expect
-
-![Testo Assert and Expect](/blog/assert-and-expect/img-1.jpg)
 
 Let's talk about the pitfalls of reinventing the wheel that I've already stumbled upon while building a new testing framework [Testo](https://github.com/php-testo/testo).
 

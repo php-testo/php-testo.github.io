@@ -2,11 +2,11 @@
 title: "Assert и Expect"
 date: 2026-01-01
 description: "Исследуем дизайн API утверждений в Testo: почему мы разделили фасады Assert и Expect, и как пайп-ассерты делают тесты чище."
+image: /blog/assert-and-expect/img-1.jpg
+author: Алексей Гагарин
 ---
 
 # Testo. Assert и Expect
-
-![Testo Assert и Expect](/blog/assert-and-expect/img-1.jpg)
 
 Поговорим про грабли велосипедостроения, с которыми я уже познакомился при написании нового фреймворка тестирования [Testo](https://github.com/php-testo/testo).
 

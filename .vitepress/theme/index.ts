@@ -1,17 +1,27 @@
 import { h } from 'vue'
 import type { Theme } from 'vitepress'
+import { useRoute } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
 import BlogSponsor from './BlogSponsor.vue'
 import GitHubStars from './GitHubStars.vue'
 import CodeTabs from './CodeTabs.vue'
 import JetBrainsPluginButton from './JetBrainsPluginButton.vue'
 import BlogPosts from './BlogPosts.vue'
+import BlogPostHeader from './BlogPostHeader.vue'
 import './style.css'
+
+function isBlogPost() {
+  const route = useRoute()
+  const path = route.path
+  return (path.startsWith('/blog/') || path.startsWith('/ru/blog/')) &&
+    path !== '/blog/' && path !== '/ru/blog/'
+}
 
 export default {
   extends: DefaultTheme,
   Layout: () => {
     return h(DefaultTheme.Layout, null, {
+      'doc-before': () => isBlogPost() ? h(BlogPostHeader) : null,
       'doc-after': () => h(BlogSponsor),
       'nav-bar-content-after': () => h(GitHubStars),
     })

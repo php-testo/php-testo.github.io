@@ -2,6 +2,7 @@
 title: "Khinkali"
 date: 2025-10-30
 description: "The story behind the khinkali icon for Testo IDE plugin."
+author: Aleksei Gagarin
 ---
 
 # Khinkali

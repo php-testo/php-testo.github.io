@@ -5,6 +5,8 @@ export interface Post {
   url: string
   date: string
   description: string
+  image?: string
+  author?: string
 }
 
 declare const data: Post[]
@@ -19,6 +21,8 @@ export default createContentLoader(['blog/*.md', 'ru/blog/*.md'], {
         url: page.url,
         date: formatDate(page.frontmatter.date),
         description: page.frontmatter.description,
+        image: page.frontmatter.image,
+        author: page.frontmatter.author,
       }))
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
   },

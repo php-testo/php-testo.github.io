@@ -2,11 +2,11 @@
 title: "Filters"
 date: 2025-11-07
 description: "Multi-layered filtering system in Testo: from Test Suite level down to individual test methods."
+image: /blog/filters/img-1.jpg
+author: Aleksei Gagarin
 ---
 
 # Testo. Filters
-
-![Filters](/blog/filters/img-1.jpg)
 
 Filters are needed to narrow down the set of tests to run. In other words, it's the ability to select tests before running them.
 

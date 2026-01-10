@@ -48,16 +48,20 @@ ru/           # Russian locale (same structure)
 1. Create both `blog/post.md` (EN) and `ru/blog/post.md` (RU)
 2. Add link to `blog/index.md` and `ru/blog/index.md`
 
-**Required frontmatter for RSS:**
+**Required frontmatter:**
 ```yaml
 ---
 title: "Post Title"
 date: 2025-01-01
-description: "Short description for RSS feed"
+description: "Short description for RSS and sharing"
+image: /blog/post-name/preview.jpg
+author: Author Name
 ---
 ```
 
-All three fields (`title`, `date`, `description`) are required for proper RSS generation.
+- `title`, `date`, `description` — required for RSS
+- `image` — used for preview in blog list, og:image for social sharing, and displayed in post header
+- `author` — displayed in blog list and post header
 
 ## VitePress Commands
 

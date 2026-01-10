@@ -1,4 +1,4 @@
-import { defineConfig } from 'vitepress'
+import { defineConfig, HeadConfig } from 'vitepress'
 import { RssPlugin } from 'vitepress-plugin-rss'
 
 const baseUrl = 'https://php-testo.github.io'
@@ -147,5 +147,27 @@ export default defineConfig({
     search: {
       provider: 'local',
     },
+  },
+
+  transformHead({ pageData }) {
+    const head: HeadConfig[] = []
+
+    if (pageData.frontmatter.image) {
+      head.push(['meta', { property: 'og:image', content: baseUrl + pageData.frontmatter.image }])
+      head.push(['meta', { name: 'twitter:image', content: baseUrl + pageData.frontmatter.image }])
+      head.push(['meta', { name: 'twitter:card', content: 'summary_large_image' }])
+    }
+
+    if (pageData.frontmatter.description) {
+      head.push(['meta', { property: 'og:description', content: pageData.frontmatter.description }])
+      head.push(['meta', { name: 'twitter:description', content: pageData.frontmatter.description }])
+    }
+
+    if (pageData.frontmatter.title) {
+      head.push(['meta', { property: 'og:title', content: pageData.frontmatter.title }])
+      head.push(['meta', { name: 'twitter:title', content: pageData.frontmatter.title }])
+    }
+
+    return head
   },
 })
