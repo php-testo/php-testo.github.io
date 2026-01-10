@@ -1,27 +1,7 @@
 import { defineConfig, HeadConfig } from 'vitepress'
-import { RssPlugin } from 'vitepress-plugin-rss'
+import { generateRss } from './rss'
 
 const baseUrl = 'https://php-testo.github.io'
-
-const rssOptionsEn = {
-  title: 'Testo Blog',
-  baseUrl,
-  copyright: 'Copyright © Testo',
-  description: 'Updates from Testo - Modern PHP Testing Framework',
-  filename: 'feed.xml',
-  filter: (post: { url: string }) => post.url.startsWith('/blog/') && !post.url.endsWith('/blog/'),
-  icon: false,
-}
-
-const rssOptionsRu = {
-  title: 'Блог Testo',
-  baseUrl,
-  copyright: 'Copyright © Testo',
-  description: 'Новости Testo - современного PHP фреймворка для тестирования',
-  filename: 'ru/feed.xml',
-  filter: (post: { url: string }) => post.url.startsWith('/ru/blog/') && !post.url.endsWith('/blog/'),
-  icon: false,
-}
 
 export default defineConfig({
   title: 'Testo',
@@ -36,9 +16,7 @@ export default defineConfig({
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
   ],
 
-  vite: {
-    plugins: [RssPlugin(rssOptionsEn), RssPlugin(rssOptionsRu)],
-  },
+  buildEnd: generateRss,
 
   locales: {
     root: {

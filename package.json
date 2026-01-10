@@ -20,6 +20,6 @@
     "vitepress": "^1.6.4"
   },
   "dependencies": {
-    "vitepress-plugin-rss": "^0.4.2"
+    "feed": "^5.1.0"
   }
 }
