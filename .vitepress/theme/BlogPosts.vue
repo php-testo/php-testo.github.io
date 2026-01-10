@@ -9,13 +9,26 @@ const props = defineProps<{
 const filteredPosts = computed(() => {
   return posts.filter((post) => post.url.startsWith(props.folder))
 })
+
+function onImageError(event: Event, fallback: string | undefined) {
+  const img = event.target as HTMLImageElement
+  if (fallback && img.src !== fallback) {
+    img.src = fallback
+  }
+}
 </script>
 
 <template>
   <div class="blog-posts">
     <article v-for="post in filteredPosts" :key="post.url" class="post-card">
       <a :href="post.url" class="post-image-link">
-        <img v-if="post.thumb || post.image" :src="post.thumb || post.image" :alt="post.title" class="post-image" />
+        <img
+          v-if="post.thumb || post.image"
+          :src="post.thumb || post.image"
+          :alt="post.title"
+          class="post-image"
+          @error="onImageError($event, post.image)"
+        />
       </a>
       <div class="post-content">
         <div class="post-title">

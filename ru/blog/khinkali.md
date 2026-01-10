@@ -2,6 +2,7 @@
 title: "Хинкали"
 date: 2025-10-30
 description: "История создания иконки хинкали для IDE-плагина Testo."
+image: /blog/khinkali/img-0.jpg
 author: Алексей Гагарин
 ---
 
