@@ -50,6 +50,7 @@ export default defineConfig({
             },
             {
               text: 'Writing Tests',
+              link: '/docs/writing-tests',
               items: [
                 { text: 'Inline Tests', link: '/docs/inline-tests' },
               ],
@@ -99,6 +100,7 @@ export default defineConfig({
             },
             {
               text: 'Пишем тесты',
+              link: '/ru/docs/writing-tests',
               items: [
                 { text: 'Встроенные тесты', link: '/ru/docs/inline-tests' },
               ],
