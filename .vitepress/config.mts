@@ -60,7 +60,7 @@ export default defineConfig({
               items: [
                 { text: 'CLI Reference', link: '/docs/cli-reference' },
                 { text: 'Filtering', link: '/docs/filtering' },
-                { text: 'Sample Module', link: '/docs/sample-module' },
+                { text: 'Data Providers', link: '/docs/data-providers' },
               ],
             },
             {
@@ -110,7 +110,7 @@ export default defineConfig({
               items: [
                 { text: 'CLI справка', link: '/ru/docs/cli-reference' },
                 { text: 'Фильтрация', link: '/ru/docs/filtering' },
-                { text: 'Модуль Sample', link: '/ru/docs/sample-module' },
+                { text: 'Провайдеры данных', link: '/ru/docs/data-providers' },
               ],
             },
             {

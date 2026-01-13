@@ -1,12 +1,4 @@
-# Sample Module
-
-The Sample module provides attributes for parameterized testing - running the same test logic with different input data. Think of it as a way to test your functions against multiple scenarios without writing repetitive test code.
-
-Currently includes:
-- **DataProvider** - for dynamic, complex data sets
-- **[TestInline](./inline-tests)** - for simple, static test cases right on the method
-
-## Data Provider
+# Data Providers
 
 `DataProvider` lets you specify a method or callable that returns test data. Each data set from the provider runs as a separate test:
 
