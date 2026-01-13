@@ -55,6 +55,7 @@ export default defineConfig({
                 { text: 'Test Attribute', link: '/docs/test-attribute' },
                 { text: 'Naming Conventions', link: '/docs/naming-conventions' },
                 { text: 'Inline Tests', link: '/docs/inline-tests' },
+                { text: 'Data Providers', link: '/docs/data-providers' },
               ],
             },
             {
@@ -62,7 +63,6 @@ export default defineConfig({
               items: [
                 { text: 'CLI Reference', link: '/docs/cli-reference' },
                 { text: 'Filtering', link: '/docs/filtering' },
-                { text: 'Data Providers', link: '/docs/data-providers' },
               ],
             },
             {
@@ -107,6 +107,7 @@ export default defineConfig({
                 { text: 'Атрибут Test', link: '/ru/docs/test-attribute' },
                 { text: 'Конвенции именования', link: '/ru/docs/naming-conventions' },
                 { text: 'Встроенные тесты', link: '/ru/docs/inline-tests' },
+                { text: 'Провайдеры данных', link: '/ru/docs/data-providers' },
               ],
             },
             {
@@ -114,7 +115,6 @@ export default defineConfig({
               items: [
                 { text: 'CLI справка', link: '/ru/docs/cli-reference' },
                 { text: 'Фильтрация', link: '/ru/docs/filtering' },
-                { text: 'Провайдеры данных', link: '/ru/docs/data-providers' },
               ],
             },
             {

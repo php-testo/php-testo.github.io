@@ -125,8 +125,7 @@ const getIcon = (tab: Tab) => {
 .ide-tab.active {
   background: var(--vp-code-block-bg);
   color: var(--vp-c-text-1);
-  border-bottom: 2px solid var(--vp-c-brand-1);
-  margin-bottom: -1px;
+  box-shadow: inset 0 -2px 0 var(--vp-c-brand-1);
 }
 
 .tab-icon {

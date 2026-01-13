@@ -23,6 +23,15 @@ ru/           # Russian locale (same structure)
 - DON'T show code in features (text only, 1 sentence each)
 - Don't mention competitors, use "old solutions"
 
+**Code examples:**
+- List of options first, then one code block with all examples (easier to read than many small blocks)
+- Keep examples compact — show structure, not implementation (when implementation doesn't matter)
+- Show contrast between approaches in examples
+
+**Text structure:**
+- Avoid tautology in lists, fix typos
+- Small sections sometimes better integrated into existing ones
+
 **Markdown:** Use `::: tip`, `::: warning`, `::: info` blocks
 
 ## Working with Content
