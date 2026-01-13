@@ -39,5 +39,3 @@ Use `#[Test]` when:
 - You want **explicit** test declaration without relying on naming patterns
 - Your method/function name doesn't follow the `test` prefix convention
 - You prefer attribute-based discovery over convention-based
-
-The attribute can be combined with [naming conventions](./naming-conventions) in the same project.

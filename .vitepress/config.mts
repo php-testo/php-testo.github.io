@@ -53,6 +53,7 @@ export default defineConfig({
               link: '/docs/writing-tests',
               items: [
                 { text: 'Test Attribute', link: '/docs/test-attribute' },
+                { text: 'Naming Conventions', link: '/docs/naming-conventions' },
                 { text: 'Inline Tests', link: '/docs/inline-tests' },
               ],
             },
@@ -104,6 +105,7 @@ export default defineConfig({
               link: '/ru/docs/writing-tests',
               items: [
                 { text: 'Атрибут Test', link: '/ru/docs/test-attribute' },
+                { text: 'Конвенции именования', link: '/ru/docs/naming-conventions' },
                 { text: 'Встроенные тесты', link: '/ru/docs/inline-tests' },
               ],
             },
