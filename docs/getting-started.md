@@ -91,8 +91,7 @@ final class CalculatorTest
 
 ### Key Points
 
-- The `#[Test]` attribute is used to mark test methods.
-- Test classes don't need to inherit from a base class.
+- The `#[Test]` attribute marks test methods, and test classes don't need to inherit from a base class. See [Writing Tests](./writing-tests) for more options.
 - Use the `Assert` facade for assertions and `Expect` for expectations.
 - Testo provides multiple attributes to extend testing capabilities (retry policies, exception handling, and more).
 

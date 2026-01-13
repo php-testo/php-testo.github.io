@@ -1,3 +1,8 @@
+/* Reserve space for scrollbar to prevent layout shift */
+html {
+  scrollbar-gutter: stable;
+}
+
 /* Override VitePress brand colors with dough/testo colors */
 :root {
   --vp-c-brand-1: #d4a574;
