@@ -52,6 +52,7 @@ export default defineConfig({
               text: 'Writing Tests',
               link: '/docs/writing-tests',
               items: [
+                { text: 'Test Attribute', link: '/docs/test-attribute' },
                 { text: 'Inline Tests', link: '/docs/inline-tests' },
               ],
             },
@@ -102,6 +103,7 @@ export default defineConfig({
               text: 'Пишем тесты',
               link: '/ru/docs/writing-tests',
               items: [
+                { text: 'Атрибут Test', link: '/ru/docs/test-attribute' },
                 { text: 'Встроенные тесты', link: '/ru/docs/inline-tests' },
               ],
             },
