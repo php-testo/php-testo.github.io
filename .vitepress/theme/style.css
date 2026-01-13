@@ -83,7 +83,7 @@
 .VPFeature {
   background: var(--vp-c-bg-soft);
   border: 1px solid var(--vp-c-divider);
-  border-radius: надо уменьшить контен12px;
+  border-radius: 12px;
   transition: all 0.3s ease;
   height: 100%;
 }
@@ -103,14 +103,6 @@
   font-size: 15px !important;
   line-height: 1.7 !important;
   opacity: 0.9;
-}
-
-/* Content sections on home page */
-.vp-doc h2 {
-  font-size: 36px !important;
-  font-weight: 700 !important;
-  margin-top: 64px !important;
-  margin-bottom: 24px !important;
 }
 
 .vp-doc .vp-code-group,
