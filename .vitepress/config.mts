@@ -49,6 +49,12 @@ export default defineConfig({
               ],
             },
             {
+              text: 'Writing Tests',
+              items: [
+                { text: 'Inline Tests', link: '/docs/inline-tests' },
+              ],
+            },
+            {
               text: 'Guide',
               items: [
                 { text: 'CLI Reference', link: '/docs/cli-reference' },
@@ -89,6 +95,12 @@ export default defineConfig({
               items: [
                 { text: 'Почему Testo?', link: '/ru/docs/why-testo' },
                 { text: 'Начало работы', link: '/ru/docs/getting-started' },
+              ],
+            },
+            {
+              text: 'Пишем тесты',
+              items: [
+                { text: 'Встроенные тесты', link: '/ru/docs/inline-tests' },
               ],
             },
             {
