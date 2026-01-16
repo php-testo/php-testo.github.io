@@ -1,6 +1,31 @@
 # Data Providers
 
-`DataProvider` lets you specify a method or callable that returns test data. Each data set from the provider runs as a separate test:
+Data providers let you run one test with different sets of input data. Each set runs as a separate test.
+
+## DataSet
+
+The simplest way — specify data directly above the method:
+
+```php
+use Testo\Attribute\Test;
+use Testo\Attribute\DataSet;
+
+#[Test]
+#[DataSet([1, 1, 2])]
+#[DataSet([2, 3, 5])]
+#[DataSet([0, 0, 0])]
+public function testSum(int $a, int $b, int $expected): void
+{
+    Assert::same($expected, $a + $b);
+}
+```
+
+Each `DataSet` is an array of arguments passed to the test method. The test runs three times with different values.
+
+
+## DataProvider
+
+For large amounts of data or dynamic generation, use `DataProvider`. It accepts a method or callable that returns test data:
 
 ```php
 use Testo\Attribute\Test;
@@ -55,26 +80,3 @@ public function testUser($data): void { ... }
 ```
 
 Invokable objects are particularly useful for separating data loading logic. For example, loading test cases from JSON/CSV files into a dedicated class keeps your test code clean.
-
-### Labels and Descriptions
-
-Each data set can be labeled with a string key. These labels appear in test reports, making it easier to identify which scenario failed:
-
-```php
-public function userDataProvider(): array
-{
-    return [
-        'valid email' => ['test@example.com', true],
-        'invalid format' => ['not-an-email', false],
-        'empty string' => ['', false],
-    ];
-}
-```
-
-Use `DataProvider` when:
-- You have many test cases (10+)
-- Data is generated dynamically or loaded from external files
-- Test cases need labels or descriptions for clarity
-- You need complex setup logic for test data
-
-**Note:** `DataProvider` is an addition to regular tests (methods marked with `#[Test]`). It provides data to existing test methods.
