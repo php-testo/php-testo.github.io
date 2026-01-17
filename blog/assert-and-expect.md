@@ -20,8 +20,7 @@ assertTrue(...);
 
 All these calls lead to one place — the `Assert` facade with ~2300 lines.
 
-::: info 🤔
-Did you know that PHPUnit has neither a standalone `expectException()` function nor a method with the same name in the `Assert` facade?
+::: info 🤔 Did you know that PHPUnit has neither a standalone `expectException()` function nor a method with the same name in the `Assert` facade?
 In test code, you can only write `$this->expectException()`.
 :::
 
@@ -48,8 +47,7 @@ function simpleTest(): void
 }
 ```
 
-::: tip 🧠
-But now we face a tricky question with lots of room for imagination: **how do we provide a convenient API for assertions?**
+::: tip 🧠 But now we face a tricky question with lots of room for imagination: **how do we provide a convenient API for assertions?**
 :::
 
 Sure, we could eventually create a hundred functions, a trait, and a base class with PHPUnit-like syntax... But hey, let's try to find something better first!
@@ -82,8 +80,7 @@ Assert::that($foo)->greaterThan(42);
 Assert::true($foo > 42);
 ```
 
-::: warning ☝
-This led us to a strategic decision: provide only "complex" assertions that save characters or entire lines of code.
+::: warning ☝ This led us to a strategic decision: provide only "complex" assertions that save characters or entire lines of code.
 :::
 
 ---
@@ -171,8 +168,7 @@ We're also trying out how it would look in an IDE. Will this be useful?
 
 There's also an option to output each assertion as a nested checkmark in the test tree (like DataSet), but I think that would be too cluttered.
 
-::: tip ☝
-It might seem like there are only more open questions. But over time, not only questions appear, but expertise grows too: each answer to a closed question is backed by mental or practical experience.
+::: tip ☝ It might seem like there are only more open questions. But over time, not only questions appear, but expertise grows too: each answer to a closed question is backed by mental or practical experience.
 :::
 
 The final word on assert/expect hasn't been said. But while Testo hasn't reached a stable release, we can afford any experiments.
