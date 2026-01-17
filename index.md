@@ -12,7 +12,7 @@ hero:
     bread-and-butter tests
     with juicy environment control.
   image:
-    src: https://github.com/php-testo/.github/blob/1.x/resources/logo-full.svg?raw=true
+    src: /logo-full.svg
     alt: Testo Logo
   actions:
     - theme: brand

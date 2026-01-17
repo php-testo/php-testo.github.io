@@ -12,7 +12,7 @@ hero:
     Хлебобулочные тесты,
     сочный контроль над тестовой средой.
   image:
-    src: https://github.com/php-testo/.github/blob/1.x/resources/logo-full.svg?raw=true
+    src: /logo-full.svg
     alt: Testo Logo
   actions:
     - theme: brand
