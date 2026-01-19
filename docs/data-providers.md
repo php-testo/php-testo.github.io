@@ -22,6 +22,16 @@ public function testSum(int $a, int $b, int $expected): void
 
 Each `DataSet` is an array of arguments passed to the test method. The test runs three times with different values.
 
+### Dataset Labels
+
+The second argument is an optional label. It appears in reports and helps identify which scenario failed:
+
+```php
+#[DataSet([1, 1, 2], 'positive numbers')]
+#[DataSet([-1, -1, -2], 'negative numbers')]
+#[DataSet([0, 0, 0], 'zeros')]
+public function testSum(int $a, int $b, int $expected): void { ... }
+```
 
 ## DataProvider
 
@@ -80,3 +90,18 @@ public function testUser($data): void { ... }
 ```
 
 Invokable objects are particularly useful for separating data loading logic. For example, loading test cases from JSON/CSV files into a dedicated class keeps your test code clean.
+
+### Dataset Labels
+
+Labels are set via string array keys:
+
+```php
+public function userDataProvider(): array
+{
+    return [
+        'valid email' => ['test@example.com', true],
+        'invalid format' => ['not-an-email', false],
+        'empty string' => ['', false],
+    ];
+}
+```

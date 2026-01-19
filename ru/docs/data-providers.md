@@ -22,6 +22,16 @@ public function testSum(int $a, int $b, int $expected): void
 
 Каждый `DataSet` — массив аргументов, которые передаются в тестовый метод. Тест запустится три раза с разными значениями.
 
+### Метки датасетов
+
+Второй аргумент — опциональная метка. Отображается в отчётах и помогает понять, какой именно сценарий упал:
+
+```php
+#[DataSet([1, 1, 2], 'positive numbers')]
+#[DataSet([-1, -1, -2], 'negative numbers')]
+#[DataSet([0, 0, 0], 'zeros')]
+public function testSum(int $a, int $b, int $expected): void { ... }
+```
 
 ## DataProvider
 
@@ -80,3 +90,18 @@ public function testUser($data): void { ... }
 ```
 
 Вызываемые объекты особенно полезны для разделения логики загрузки данных. Например, загрузка тестов из JSON/CSV файлов в выделенный класс позволяет сохранить код тестов чистым.
+
+### Метки датасетов
+
+Метки задаются через строковые ключи массива:
+
+```php
+public function userDataProvider(): array
+{
+    return [
+        'valid email' => ['test@example.com', true],
+        'invalid format' => ['not-an-email', false],
+        'empty string' => ['', false],
+    ];
+}
+```
