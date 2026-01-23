@@ -56,6 +56,7 @@ export default defineConfig({
                 { text: 'Naming Conventions', link: '/docs/naming-conventions' },
                 { text: 'Inline Tests', link: '/docs/inline-tests' },
                 { text: 'Data Providers', link: '/docs/data-providers' },
+                { text: 'Lifecycle', link: '/docs/lifecycle' },
               ],
             },
             {
@@ -108,6 +109,7 @@ export default defineConfig({
                 { text: 'Конвенции именования', link: '/ru/docs/naming-conventions' },
                 { text: 'Встроенные тесты', link: '/ru/docs/inline-tests' },
                 { text: 'Провайдеры данных', link: '/ru/docs/data-providers' },
+                { text: 'Жизненный цикл', link: '/ru/docs/lifecycle' },
               ],
             },
             {
