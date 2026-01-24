@@ -4,7 +4,7 @@ The `#[Test]` attribute explicitly marks a method, function, or class as a test.
 
 Can be placed on:
 
-- **Class** — all public methods become tests
+- **Class** — all public methods with `void` return type become tests
 - **Method** — only that method is a test
 - **Function** — the function is a test
 
