@@ -124,6 +124,11 @@ html {
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
 }
 
+/* Prevent inline code from wrapping */
+.vp-doc :not(pre) > code {
+  white-space: nowrap;
+}
+
 /* Custom info/tip boxes */
 .vp-doc .custom-block {
   border-radius: 12px !important;

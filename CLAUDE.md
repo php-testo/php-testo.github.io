@@ -72,6 +72,13 @@ author: Author Name
 - `image` — used for preview in blog list, og:image for social sharing, and displayed in post header
 - `author` — displayed in blog list and post header
 
+**Optional frontmatter:**
+- `outline` — controls heading levels shown in the right sidebar (table of contents):
+  - `outline: [2, 3]` — show h2 and h3 (default behavior)
+  - `outline: 'deep'` — show all levels (h2-h6)
+  - `outline: false` — hide outline completely
+  - `outline: 2` — show only h2
+
 ## VitePress Commands
 
 ```bash
