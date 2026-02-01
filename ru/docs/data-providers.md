@@ -7,9 +7,6 @@
 Самый простой способ — указать данные прямо над методом:
 
 ```php
-use Testo\Attribute\Test;
-use Testo\Attribute\DataSet;
-
 #[Test]
 #[DataSet([1, 1, 2])]
 #[DataSet([2, 3, 5])]
@@ -38,9 +35,6 @@ public function testSum(int $a, int $b, int $expected): void { ... }
 Для большого количества данных или динамической генерации используйте `DataProvider`. Он принимает метод или вызываемый объект, который возвращает тестовые данные:
 
 ```php
-use Testo\Attribute\Test;
-use Testo\Sample\DataProvider;
-
 #[Test]
 #[DataProvider('userDataProvider')]
 public function testUserValidation(string $email, bool $expected): void

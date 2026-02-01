@@ -26,9 +26,9 @@ composer require --dev testo/testo
 
 declare(strict_types=1);
 
-use Testo\Config\ApplicationConfig;
-use Testo\Config\SuiteConfig;
-use Testo\Config\FinderConfig;
+use Testo\Application\Config\ApplicationConfig;
+use Testo\Application\Config\SuiteConfig;
+use Testo\Application\Config\FinderConfig;
 
 return new ApplicationConfig(
     suites: [
@@ -54,9 +54,9 @@ declare(strict_types=1);
 namespace Tests;
 
 use Testo\Assert;
-use Testo\Attribute\Test;
-use Testo\Attribute\RetryPolicy;
-use Testo\Attribute\ExpectException;
+use Testo\Assert\ExpectException;
+use Testo\Application\Attribute\Test;
+use Testo\Retry\RetryPolicy;
 
 final class CalculatorTest
 {

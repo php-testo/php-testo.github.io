@@ -11,8 +11,6 @@ Testo provides a flexible filtering system that operates in multiple stages to p
 The `Testo\Common\Filter` class is an immutable DTO containing test filtering criteria:
 
 ```php
-use Testo\Common\Filter;
-
 $filter = new Filter(
     suites: ['Unit', 'Integration'],
     names: ['UserTest::testLogin', 'testAuthentication'],
@@ -47,9 +45,6 @@ $filter = new Filter(
 The `Filter` object can be passed to `Application::run()`:
 
 ```php
-use Testo\Application;
-use Testo\Common\Filter;
-
 $app = Application::createFromInput(/* ... */);
 
 $filter = new Filter(

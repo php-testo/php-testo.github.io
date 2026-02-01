@@ -67,12 +67,6 @@ AfterAll (один раз)
 ## Базовый пример
 
 ```php
-use Testo\Attribute\Test;
-use Testo\Attribute\BeforeEach;
-use Testo\Attribute\AfterEach;
-use Testo\Attribute\BeforeAll;
-use Testo\Attribute\AfterAll;
-
 final class DatabaseTest
 {
     private static Connection $connection;

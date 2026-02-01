@@ -17,9 +17,6 @@ Testo генерирует события на протяжении всего �
 Регистрируйте слушателей через интерфейс `EventListenerCollector` в ваших плагинах. См. [плагины](./plugins.md) для разработки плагинов.
 
 ```php
-use Testo\Config\EventListenerCollector;
-use Testo\Test\Event\Test\TestFinished;
-
 class MyPlugin
 {
     public function configure(EventListenerCollector $events): void
@@ -133,8 +130,6 @@ TestPipelineFinished           # После перехватчиков тест�
 ### Слушать все события теста
 
 ```php
-use Testo\Test\Event\Test\TestEvent;
-
 $events->addListener(TestEvent::class, function (TestEvent $event) {
     // Срабатывает для: TestStarting, TestFinished, TestRetrying, TestBatchStarting, и т.д.
     $this->logger->debug("Test event: " . get_class($event));
@@ -144,8 +139,6 @@ $events->addListener(TestEvent::class, function (TestEvent $event) {
 ### Слушать все события с результатами
 
 ```php
-use Testo\Test\Event\Test\TestResultEvent;
-
 $events->addListener(TestResultEvent::class, function (TestResultEvent $event) {
     // Срабатывает для: TestFinished, TestBatchFinished, TestPipelineFinished
     if ($event->testResult->isFailed()) {
@@ -157,8 +150,6 @@ $events->addListener(TestResultEvent::class, function (TestResultEvent $event) {
 ### Слушать все события Test Case
 
 ```php
-use Testo\Test\Event\TestCase\TestCaseEvent;
-
 $events->addListener(TestCaseEvent::class, function (TestCaseEvent $event) {
     // Срабатывает для всех событий TestCase* (уровень Test Case)
     $this->trackCase($event->caseInfo);

@@ -3,8 +3,6 @@
 Встроенные тесты позволяют писать тесты прямо на тестируемом методе с помощью атрибута `#[TestInline]`. Отдельный тестовый класс не нужен.
 
 ```php
-use Testo\Sample\TestInline;
-
 #[TestInline([1, 1], 2)]
 #[TestInline([40, 2], 42)]
 #[TestInline([-5, 5], 0)]
@@ -80,8 +78,6 @@ private function calculateFinalPrice(
 Для сложных проверок передайте замыкание вторым параметром:
 
 ```php
-use Testo\Assert;
-
 #[TestInline([10, 3], fn($r) => Assert::greaterThan(3, $r))]
 public function divide(int $a, int $b): float
 {
@@ -109,8 +105,6 @@ public function createUser(string $email): User
 В PHP 8.6 это станет ещё элегантнее благодаря [partial application](https://wiki.php.net/rfc/partial_function_application_v2):
 
 ```php
-use Testo\Assert;
-
 #[TestInline([10, 3], Assert::greaterThan(3, ?))]
 public function divide(int $a, int $b): float
 {

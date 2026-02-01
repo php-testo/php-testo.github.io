@@ -7,9 +7,6 @@ Data providers let you run one test with different sets of input data. Each set 
 The simplest way — specify data directly above the method:
 
 ```php
-use Testo\Attribute\Test;
-use Testo\Attribute\DataSet;
-
 #[Test]
 #[DataSet([1, 1, 2])]
 #[DataSet([2, 3, 5])]
@@ -38,9 +35,6 @@ public function testSum(int $a, int $b, int $expected): void { ... }
 For large amounts of data or dynamic generation, use `DataProvider`. It accepts a method or callable that returns test data:
 
 ```php
-use Testo\Attribute\Test;
-use Testo\Sample\DataProvider;
-
 #[Test]
 #[DataProvider('userDataProvider')]
 public function testUserValidation(string $email, bool $expected): void

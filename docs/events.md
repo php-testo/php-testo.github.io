@@ -17,9 +17,6 @@ Event characteristics:
 Register listeners via `EventListenerCollector` interface in your plugins. See [plugins](./plugins.md) for plugin development.
 
 ```php
-use Testo\Config\EventListenerCollector;
-use Testo\Test\Event\Test\TestFinished;
-
 class MyPlugin
 {
     public function configure(EventListenerCollector $events): void
@@ -133,8 +130,6 @@ Since events are classes, you can listen to parent classes or interfaces to hand
 ### Listen to All Test Events
 
 ```php
-use Testo\Test\Event\Test\TestEvent;
-
 $events->addListener(TestEvent::class, function (TestEvent $event) {
     // Fires for: TestStarting, TestFinished, TestRetrying, TestBatchStarting, etc.
     $this->logger->debug("Test event: " . get_class($event));
@@ -144,8 +139,6 @@ $events->addListener(TestEvent::class, function (TestEvent $event) {
 ### Listen to All Events with Results
 
 ```php
-use Testo\Test\Event\Test\TestResultEvent;
-
 $events->addListener(TestResultEvent::class, function (TestResultEvent $event) {
     // Fires for: TestFinished, TestBatchFinished, TestPipelineFinished
     if ($event->testResult->isFailed()) {
@@ -157,8 +150,6 @@ $events->addListener(TestResultEvent::class, function (TestResultEvent $event) {
 ### Listen to All Test Case Events
 
 ```php
-use Testo\Test\Event\TestCase\TestCaseEvent;
-
 $events->addListener(TestCaseEvent::class, function (TestCaseEvent $event) {
     // Fires for all TestCase* events (test case level)
     $this->trackCase($event->caseInfo);

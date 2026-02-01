@@ -3,8 +3,6 @@
 Inline tests let you write test cases directly on the method being tested using the `#[TestInline]` attribute. No separate test class needed.
 
 ```php
-use Testo\Sample\TestInline;
-
 #[TestInline([1, 1], 2)]
 #[TestInline([40, 2], 42)]
 #[TestInline([-5, 5], 0)]
@@ -80,8 +78,6 @@ private function calculateFinalPrice(
 For complex checks, pass a closure as the second parameter:
 
 ```php
-use Testo\Assert;
-
 #[TestInline([10, 3], fn($r) => Assert::greaterThan(3, $r))]
 public function divide(int $a, int $b): float
 {
@@ -109,8 +105,6 @@ public function createUser(string $email): User
 In PHP 8.6 this becomes even more elegant with [partial application](https://wiki.php.net/rfc/partial_function_application_v2):
 
 ```php
-use Testo\Assert;
-
 #[TestInline([10, 3], Assert::greaterThan(3, ?))]
 public function divide(int $a, int $b): float
 {

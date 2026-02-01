@@ -11,8 +11,6 @@ Testo предоставляет гибкую систему фильтраци�
 Класс `Testo\Common\Filter` представляет собой неизменяемый DTO, содержащий критерии фильтрации тестов:
 
 ```php
-use Testo\Common\Filter;
-
 $filter = new Filter(
     suites: ['Unit', 'Integration'],
     names: ['UserTest::testLogin', 'testAuthentication'],
@@ -47,9 +45,6 @@ $filter = new Filter(
 Объект `Filter` может быть передан в `Application::run()`:
 
 ```php
-use Testo\Application;
-use Testo\Common\Filter;
-
 $app = Application::createFromInput(/* ... */);
 
 $filter = new Filter(
