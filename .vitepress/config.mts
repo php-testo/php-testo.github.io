@@ -166,23 +166,31 @@ gtag('config', 'G-VYGDN3X0PR');`],
     }
   },
 
-  transformHead({ pageData }) {
+  transformHead({ pageData, siteData }) {
     const head: HeadConfig[] = []
 
-    if (pageData.frontmatter.image) {
-      head.push(['meta', { property: 'og:image', content: baseUrl + pageData.frontmatter.image }])
-      head.push(['meta', { name: 'twitter:image', content: baseUrl + pageData.frontmatter.image }])
+    const title = pageData.frontmatter.title || siteData.title
+    const description = pageData.frontmatter.description || siteData.description
+    const image = pageData.frontmatter.image
+    const pageUrl = baseUrl + '/' + pageData.relativePath.replace(/index\.md$/, '').replace(/\.md$/, '')
+
+    head.push(['meta', { property: 'og:type', content: 'website' }])
+    head.push(['meta', { property: 'og:url', content: pageUrl }])
+
+    if (title) {
+      head.push(['meta', { property: 'og:title', content: title }])
+      head.push(['meta', { name: 'twitter:title', content: title }])
+    }
+
+    if (description) {
+      head.push(['meta', { property: 'og:description', content: description }])
+      head.push(['meta', { name: 'twitter:description', content: description }])
+    }
+
+    if (image) {
+      head.push(['meta', { property: 'og:image', content: baseUrl + image }])
+      head.push(['meta', { name: 'twitter:image', content: baseUrl + image }])
       head.push(['meta', { name: 'twitter:card', content: 'summary_large_image' }])
-    }
-
-    if (pageData.frontmatter.description) {
-      head.push(['meta', { property: 'og:description', content: pageData.frontmatter.description }])
-      head.push(['meta', { name: 'twitter:description', content: pageData.frontmatter.description }])
-    }
-
-    if (pageData.frontmatter.title) {
-      head.push(['meta', { property: 'og:title', content: pageData.frontmatter.title }])
-      head.push(['meta', { name: 'twitter:title', content: pageData.frontmatter.title }])
     }
 
     return head

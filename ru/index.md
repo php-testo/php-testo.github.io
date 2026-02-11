@@ -1,5 +1,8 @@
 ---
 layout: home
+title: Testo — PHP-фреймворк для тестирования
+description: PHP-фреймворк для тестирования без наследования от TestCase. Чистый ООП, middleware-архитектура, PSR-14 события, фасады Assert/Expect.
+image: /images/og-image.jpg
 
 hero:
   name:

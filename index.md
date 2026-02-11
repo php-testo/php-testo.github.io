@@ -1,5 +1,8 @@
 ---
 layout: home
+title: Testo — Modern PHP Testing Framework
+description: PHP testing framework without TestCase inheritance. Clean OOP, middleware architecture, PSR-14 events, Assert/Expect facades.
+image: /images/og-image.jpg
 
 hero:
   name:
