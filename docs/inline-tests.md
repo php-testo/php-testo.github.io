@@ -1,3 +1,7 @@
+---
+llms_description: "#[TestInline] attribute for testing methods in-place, private method testing, custom assertions, named arguments"
+---
+
 # Inline Tests
 
 Inline tests let you write test cases directly on the method being tested using the `#[TestInline]` attribute. No separate test class needed.

@@ -79,6 +79,35 @@ author: Author Name
   - `outline: false` — hide outline completely
   - `outline: 2` — show only h2
 
+## llms.txt
+
+Testo provides `llms.txt` for AI agents. Only `docs/` pages are included — blog posts are excluded from llms generation entirely (no llms frontmatter in blog files).
+
+**Manifest:** `llms.config.ts` — project-level metadata (title, summary, key facts, base URL). Edit when project description or key facts change.
+
+**Generator:** `.vitepress/llms.ts` — builds `llms.txt`, `llms-full.txt`, and per-page `.md` files during `buildEnd`. Only scans `docs/` directory.
+
+**Frontmatter fields (English `docs/` pages only, not `ru/` or `blog/`):**
+
+```yaml
+---
+llms: true              # default — included in "Docs" section
+llms: "optional"        # included in "Optional" section (secondary content)
+llms: false             # excluded from llms.txt
+llms_description: "Technical description of what LLM learns from this page"
+---
+```
+
+- `llms` — controls inclusion. Default is `true` (can be omitted). `"optional"` for secondary content, `false` to exclude
+- `llms_description` — short, technical description for LLM context. Lists key entities and concepts, not marketing text. Required for all included pages
+
+**Guidelines for `llms_description`:**
+- List specific classes, attributes, methods — not vague descriptions
+- Example: `"#[BeforeEach], #[AfterEach], #[BeforeAll], #[AfterAll] lifecycle hooks, execution order, priority"`
+- NOT: `"Learn about test lifecycle management"`
+
+**When adding new doc pages:** add `llms_description` to the English version frontmatter. Do NOT add llms frontmatter to blog posts.
+
 ## VitePress Commands
 
 ```bash

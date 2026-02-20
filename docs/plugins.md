@@ -1,3 +1,7 @@
+---
+llms_description: "Plugin system for extending Testo: event listeners, middleware, custom discovery (documentation in progress)"
+---
+
 # Plugins
 
 Testo's plugin system allows you to extend and customize the testing framework behavior.

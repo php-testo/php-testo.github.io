@@ -1,3 +1,7 @@
+---
+llms: false
+---
+
 # Become a Sponsor
 
 Support Testo's development and help build the future of PHP testing.

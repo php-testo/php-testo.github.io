@@ -1,3 +1,7 @@
+---
+llms_description: "CLI commands and flags: testo run, --config, --teamcity, --suite, --path, --filter, filter combination logic, exit codes"
+---
+
 # Command Line Interface
 
 This document describes the command line interface for Testo.

@@ -1,3 +1,7 @@
+---
+llms: false
+---
+
 # Why Testo?
 
 Testo (pronounced [test-oh], meaning "dough" in many languages) is an extensible testing framework for PHP. Built for scenarios requiring complete customization of the testing process: SDKs, framework tools, complex integrations.

@@ -1,3 +1,7 @@
+---
+llms_description: "#[Test] attribute on classes, methods, and functions for explicit test declaration"
+---
+
 # Test Attribute
 
 The `#[Test]` attribute explicitly marks a method, function, or class as a test.

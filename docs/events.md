@@ -1,3 +1,7 @@
+---
+llms_description: "PSR-14 event system: TestSuite/TestCase/Test event hierarchy, lifecycle event ordering, polymorphic listeners, custom dispatchers"
+---
+
 # Events
 
 Testo emits events throughout the test execution lifecycle. Events are your primary extension point for customizing test behavior, collecting metrics, or integrating with external tools.

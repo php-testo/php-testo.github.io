@@ -1,3 +1,7 @@
+---
+llms_description: "Installation via Composer, testo.php configuration, writing first test class, running tests, IDE plugin setup"
+---
+
 # Getting Started
 
 

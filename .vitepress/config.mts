@@ -1,5 +1,6 @@
 import { defineConfig, HeadConfig } from 'vitepress'
 import { generateRss, rssPlugin } from './rss'
+import { generateLlms, llmsPlugin } from './llms'
 import { isBlogPath } from './locales'
 
 const baseUrl = 'https://php-testo.github.io'
@@ -14,7 +15,7 @@ export default defineConfig({
   ignoreDeadLinks: [/feed\.xml$/],
 
   vite: {
-    plugins: [rssPlugin()],
+    plugins: [rssPlugin(), llmsPlugin()],
   },
 
   head: [
@@ -26,7 +27,10 @@ gtag('js', new Date());
 gtag('config', 'G-VYGDN3X0PR');`],
   ],
 
-  buildEnd: generateRss,
+  buildEnd: async (config) => {
+    await generateRss(config)
+    await generateLlms(config)
+  },
 
   locales: {
     root: {

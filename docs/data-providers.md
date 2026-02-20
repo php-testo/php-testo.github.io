@@ -1,3 +1,7 @@
+---
+llms_description: "Parameterized tests: #[DataSet], #[DataProvider] with callables, DataZip (pairing), DataCross (cartesian product), DataUnion (merging), nested combinations"
+---
+
 # Data Providers
 
 Data providers let you run one test with different sets of input data. Each set runs as a separate test.

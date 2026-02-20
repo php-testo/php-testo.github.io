@@ -1,3 +1,7 @@
+---
+llms_description: "#[BeforeEach], #[AfterEach], #[BeforeAll], #[AfterAll] lifecycle hooks, execution order, priority, class instantiation behavior"
+---
+
 # Lifecycle
 
 Lifecycle attributes define setup and teardown methods that run automatically at specific points during test execution.

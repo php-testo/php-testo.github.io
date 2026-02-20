@@ -1,3 +1,7 @@
+---
+llms_description: "Filter class API, name/path/suite filters, OR/AND combination logic, 5-stage filtering pipeline, pattern matching behavior, DataProvider indices"
+---
+
 # Test Filtering
 
 This document describes the business logic of test filtering in Testo.

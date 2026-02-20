@@ -1,3 +1,7 @@
+---
+llms_description: "Overview of test declaration approaches: methods in classes, standalone functions, inline attributes, discovery strategies"
+---
+
 # Writing Tests
 
 Testo doesn't care where a test lives, as long as it can be wrapped in a Closure.

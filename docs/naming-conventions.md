@@ -1,3 +1,8 @@
+---
+llms: "optional"
+llms_description: "Convention-based test discovery: *Test class suffix, test* method/function prefix"
+---
+
 # Naming Conventions
 
 Testo can discover tests by naming patterns — no attributes required.
