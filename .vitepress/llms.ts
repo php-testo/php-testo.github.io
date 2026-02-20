@@ -38,7 +38,7 @@ function readPages(srcDir: string): PageInfo[] {
         title: fm.title || extractH1(content) || slug,
         llms_description: fm.llms_description,
         url: `/docs/${slug}`,
-        srcPath: `llm/docs/${file}`,
+        srcPath: `docs/${file}`,
         content: content.trim(),
         section: llmsValue === 'optional' ? 'optional' : 'docs',
       })
@@ -139,23 +139,33 @@ function buildLlmsFullTxt(pages: PageInfo[]): string {
   return lines.join('\n')
 }
 
+/** Strip frontmatter from a .md file and return clean content */
+function stripFrontmatter(filePath: string): string {
+  const raw = readFileSync(filePath, 'utf-8')
+  const { content } = matter(raw)
+  return content.trim() + '\n'
+}
+
 // Build-time generation (called from buildEnd)
 export async function generateLlms(config: SiteConfig) {
-  const pages = sortPages(readPages(config.srcDir), getSidebarPaths(config))
+  const { srcDir, outDir } = config
 
-  // Per-page .md files
-  for (const page of pages) {
-    const outPath = path.join(config.outDir, page.srcPath)
+  // Per-page .md files for ALL pages (uses VitePress's own page list)
+  for (const page of config.pages) {
+    const outPath = path.join(outDir, page)
     mkdirSync(path.dirname(outPath), { recursive: true })
-    writeFileSync(outPath, page.content + '\n')
+    writeFileSync(outPath, stripFrontmatter(path.join(srcDir, page)))
   }
 
-  writeFileSync(path.join(config.outDir, 'llms.txt'), buildLlmsTxt(pages))
-  writeFileSync(path.join(config.outDir, 'llms-full.txt'), buildLlmsFullTxt(pages))
+  // llms.txt and llms-full.txt (filtered by llms frontmatter)
+  const pages = sortPages(readPages(srcDir), getSidebarPaths(config))
 
+  writeFileSync(path.join(outDir, 'llms.txt'), buildLlmsTxt(pages))
+  writeFileSync(path.join(outDir, 'llms-full.txt'), buildLlmsFullTxt(pages))
+
+  console.log(`✓ ${config.pages.length} per-page .md files generated`)
   console.log(`✓ llms.txt generated (${pages.length} docs)`)
   console.log(`✓ llms-full.txt generated`)
-  console.log(`✓ ${pages.length} per-page .md files generated`)
 }
 
 // Vite plugin for dev server
@@ -185,15 +195,12 @@ export function llmsPlugin(): Plugin {
           return
         }
 
-        // Serve per-page .md files
-        const mdMatch = url.match(/^\/llm\/docs\/(.+\.md)$/)
-        if (mdMatch) {
-          const filePath = path.join(docsRoot, 'docs', mdMatch[1])
+        // Serve per-page .md files (strip frontmatter)
+        if (url.endsWith('.md')) {
+          const filePath = path.join(docsRoot, url.slice(1))
           if (existsSync(filePath)) {
-            const raw = readFileSync(filePath, 'utf-8')
-            const { content } = matter(raw)
             res.setHeader('Content-Type', 'text/markdown; charset=utf-8')
-            res.end(content.trim() + '\n')
+            res.end(stripFrontmatter(filePath))
             return
           }
         }

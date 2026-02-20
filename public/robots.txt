@@ -3,4 +3,4 @@ Allow: /
 
 Disallow: /llms.txt
 Disallow: /llms-full.txt
-Disallow: /llm/
+Disallow: /*.md$
