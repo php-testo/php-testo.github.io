@@ -15,6 +15,7 @@ $filter = new Filter(
     suites: ['Unit', 'Integration'],
     names: ['UserTest::testLogin', 'testAuthentication'],
     paths: ['tests/Unit/*', 'tests/Integration/*'],
+    type: 'test',
 );
 ```
 
@@ -39,6 +40,12 @@ $filter = new Filter(
 **`paths`**: `list<non-empty-string>`
 - Пути к файлам или директориям для фильтрации
 - Поддерживает glob-паттерны: `*`, `?`, `[abc]`
+
+**`type`**: `?non-empty-string`
+- Тип тестов для фильтрации
+- Возможные значения: `test` (обычные тесты), `inline` (встроенные тесты), `bench` (бенчмарки), или другие пользовательские типы
+- Если не указан — запускаются все типы тестов
+- Мидлвари, привязанные к определённому типу, не попадут в пайплайн, если тип не совпадает
 
 ### Использование с Application
 
@@ -73,17 +80,19 @@ $result = $app->run($filter);
 
 - `names: ['test1'], suites: ['Unit']` → совпадает, если имя test1 **И** Test Suite - Unit
 - `names: ['UserTest'], paths: ['tests/Unit/*']` → совпадает, если имя UserTest **И** путь соответствует tests/Unit/*
+- `names: ['test1'], type: 'inline'` → совпадает, если имя test1 **И** тип - inline
 
-**Формула**: `AND(OR(names), OR(paths), OR(suites))`
+**Формула**: `AND(OR(names), OR(paths), OR(suites), type)`
 
 **Пример:**
 ```php
 $filter = new Filter(
     names: ['test1', 'test2'],        // test1 ИЛИ test2
     paths: ['path1', 'path2'],        // path1 ИЛИ path2
-    suites: ['Unit', 'Critical'], // Unit ИЛИ Critical
+    suites: ['Unit', 'Critical'],     // Unit ИЛИ Critical
+    type: 'test',                     // только обычные тесты
 );
-// Результат: (test1 ИЛИ test2) И (path1 ИЛИ path2) И (Unit ИЛИ Critical)
+// Результат: (test1 ИЛИ test2) И (path1 ИЛИ path2) И (Unit ИЛИ Critical) И type=test
 ```
 
 ## Поведение фильтра по именам

@@ -19,6 +19,7 @@ $filter = new Filter(
     suites: ['Unit', 'Integration'],
     names: ['UserTest::testLogin', 'testAuthentication'],
     paths: ['tests/Unit/*', 'tests/Integration/*'],
+    type: 'test',
 );
 ```
 
@@ -43,6 +44,12 @@ $filter = new Filter(
 **`paths`**: `list<non-empty-string>`
 - File or directory paths to filter by
 - Supports glob patterns: `*`, `?`, `[abc]`
+
+**`type`**: `?non-empty-string`
+- Test type to filter by
+- Possible values: `test` (regular tests), `inline` (inline tests), `bench` (benchmarks), or other custom types
+- If not specified — all test types are run
+- Middleware bound to a specific type won't enter the pipeline if the type doesn't match
 
 ### Usage with Application
 
@@ -77,17 +84,19 @@ Different filter types are combined with AND logic:
 
 - `names: ['test1'], suites: ['Unit']` → matches if name is test1 **AND** suite is Unit
 - `names: ['UserTest'], paths: ['tests/Unit/*']` → matches if name is UserTest **AND** path matches tests/Unit/*
+- `names: ['test1'], type: 'inline'` → matches if name is test1 **AND** type is inline
 
-**Formula**: `AND(OR(names), OR(paths), OR(suites))`
+**Formula**: `AND(OR(names), OR(paths), OR(suites), type)`
 
 **Example:**
 ```php
 $filter = new Filter(
     names: ['test1', 'test2'],        // test1 OR test2
     paths: ['path1', 'path2'],        // path1 OR path2
-    suites: ['Unit', 'Critical'], // Unit OR Critical
+    suites: ['Unit', 'Critical'],     // Unit OR Critical
+    type: 'test',                     // regular tests only
 );
-// Result: (test1 OR test2) AND (path1 OR path2) AND (Unit OR Critical)
+// Result: (test1 OR test2) AND (path1 OR path2) AND (Unit OR Critical) AND type=test
 ```
 
 ## Name Filter Behavior

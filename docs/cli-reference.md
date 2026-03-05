@@ -1,5 +1,5 @@
 ---
-llms_description: "CLI commands and flags: testo run, --config, --teamcity, --suite, --path, --filter, filter combination logic, exit codes"
+llms_description: "CLI commands and flags: testo run, --config, --teamcity, --suite, --path, --filter, --type, filter combination logic, exit codes"
 ---
 
 # Command Line Interface
@@ -71,7 +71,7 @@ Testo provides three types of filters that can be combined to selectively run te
 **Filter Combination Logic:**
 - Same type filters use OR logic: `--filter=test1 --filter=test2` → test1 OR test2
 - Different type filters use AND logic: `--filter=test1 --suite=Unit` → test1 AND Unit
-- Formula: `AND(OR(filters), OR(paths), OR(suites))`
+- Formula: `AND(OR(filters), OR(paths), OR(suites), type)`
 
 For detailed information about filtering behavior, see [Filtering](/docs/filtering).
 
@@ -149,6 +149,35 @@ testo run --filter=UserTest --path="tests/Unit"
 ```
 
 **Filter Behavior:** See [Filtering](/docs/filtering) for details.
+
+#### `--type`
+
+Filter tests by type. If specified, only tests of the matching type are run.
+
+**Possible values:**
+- `test` — regular tests (methods in classes)
+- `inline` — [inline tests](/docs/inline-tests) (tests via `#[TestInline]`)
+- `bench` — benchmarks
+
+**Examples:**
+```bash
+# Regular tests only
+testo run --type=test
+
+# Inline tests only
+testo run --type=inline
+
+# Benchmarks only
+testo run --type=bench
+
+# Combine with other filters
+testo run --type=test --suite=Unit
+testo run --type=inline --filter=testLogin
+```
+
+::: info Middleware and test types
+Middleware bound to a specific test type is excluded from the pipeline if the type doesn't match the one specified in `--type`.
+:::
 
 ### Combining Filters
 
