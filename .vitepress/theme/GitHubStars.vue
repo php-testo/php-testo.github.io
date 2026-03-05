@@ -98,6 +98,9 @@ const formatStars = (count: number | null) => {
   .github-text {
     display: none;
   }
+  .github-count {
+    display: none;
+  }
 
   .github-stars-button {
     padding: 4px 8px;

@@ -1,7 +1,12 @@
 <script setup lang="ts">
-import { useData } from 'vitepress'
+import { useData, useRoute } from 'vitepress'
 
 const { frontmatter } = useData()
+const route = useRoute()
+
+const isRu = route.path.startsWith('/ru/')
+const blogUrl = isRu ? '/ru/blog/' : '/blog/'
+const backTitle = isRu ? 'Назад в блог' : 'Back to blog'
 
 function formatDate(date: string | Date): string {
   const d = new Date(date)
@@ -11,12 +16,18 @@ function formatDate(date: string | Date): string {
 
 <template>
   <div class="blog-post-header" v-if="frontmatter.image || frontmatter.date || frontmatter.author">
-    <img
-      v-if="frontmatter.image"
-      :src="frontmatter.image"
-      :alt="frontmatter.title"
-      class="post-hero-image"
-    />
+    <div class="post-image-wrap" v-if="frontmatter.image">
+      <a :href="blogUrl" class="back-to-blog" :title="backTitle">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M11 4L6 9L11 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <img
+        :src="frontmatter.image"
+        :alt="frontmatter.title"
+        class="post-hero-image"
+      />
+    </div>
     <div class="post-meta" v-if="frontmatter.date || frontmatter.author">
       <span v-if="frontmatter.date" class="post-date">{{ formatDate(frontmatter.date) }}</span>
       <span v-if="frontmatter.author" class="post-author">{{ frontmatter.author }}</span>
@@ -27,6 +38,38 @@ function formatDate(date: string | Date): string {
 <style scoped>
 .blog-post-header {
   margin-bottom: 1.5rem;
+}
+
+.post-image-wrap {
+  position: relative;
+}
+
+.back-to-blog {
+  position: absolute;
+  top: 12px;
+  left: -48px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--vp-c-divider);
+  background: var(--vp-c-bg);
+  color: var(--vp-c-text-2);
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.back-to-blog:hover {
+  color: var(--vp-c-brand-1);
+  border-color: var(--vp-c-brand-1);
+}
+
+@media (min-width: 1280px) {
+  .back-to-blog {
+    display: flex;
+  }
 }
 
 .post-hero-image {

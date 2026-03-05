@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'url'
 import { defineConfig, HeadConfig } from 'vitepress'
 import { generateRss, rssPlugin } from './rss'
 import { generateLlms, llmsPlugin } from './llms'
@@ -16,6 +17,14 @@ export default defineConfig({
 
   vite: {
     plugins: [rssPlugin(), llmsPlugin()],
+    resolve: {
+      alias: [
+        {
+          find: /.*\/VPLocalNav\.vue$/,
+          replacement: fileURLToPath(new URL('./theme/VPLocalNav.vue', import.meta.url)),
+        },
+      ],
+    },
   },
 
   head: [

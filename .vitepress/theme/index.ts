@@ -1,4 +1,4 @@
-import { h } from 'vue'
+import { computed, defineComponent, h, provide } from 'vue'
 import type { Theme } from 'vitepress'
 import { useRoute } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
@@ -8,23 +8,26 @@ import CodeTabs from './CodeTabs.vue'
 import JetBrainsPluginButton from './JetBrainsPluginButton.vue'
 import BlogPosts from './BlogPosts.vue'
 import BlogPostHeader from './BlogPostHeader.vue'
-import { isBlogPath } from '../locales'
+import { isBlogPath, getBlogBackLink, localNavBackKey } from '../locales'
 import './style.css'
-
-function isBlogPost() {
-  const route = useRoute()
-  return isBlogPath(route.path)
-}
 
 export default {
   extends: DefaultTheme,
-  Layout: () => {
-    return h(DefaultTheme.Layout, null, {
-      'doc-before': () => isBlogPost() ? h(BlogPostHeader) : null,
-      'doc-after': () => h(BlogSponsor),
-      'nav-bar-content-after': () => h(GitHubStars),
-    })
-  },
+  Layout: defineComponent({
+    setup() {
+      const route = useRoute()
+
+      const isBlog = computed(() => isBlogPath(route.path))
+
+      provide(localNavBackKey, computed(() => getBlogBackLink(route.path)))
+
+      return () => h(DefaultTheme.Layout, null, {
+        'doc-before': () => isBlog.value ? h(BlogPostHeader) : null,
+        'doc-after': () => h(BlogSponsor),
+        'nav-bar-content-after': () => h(GitHubStars),
+      })
+    },
+  }),
   enhanceApp({ app }) {
     app.component('CodeTabs', CodeTabs)
     app.component('JetBrainsPluginButton', JetBrainsPluginButton)

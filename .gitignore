@@ -16,6 +16,9 @@
 # Generated thumbnails
 *.thumb.jpg
 
+# Vite SSR temp files
+*.timestamp-*
+
 # Logs
 npm-debug.log*
 yarn-debug.log*

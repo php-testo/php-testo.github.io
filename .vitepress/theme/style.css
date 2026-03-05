@@ -23,6 +23,34 @@ html {
   --vp-c-brand-soft: rgba(230, 193, 153, 0.16);
 }
 
+/* Show theme toggle and language switcher directly in nav bar */
+.VPNavBarAppearance,
+.VPNavBarTranslations {
+  display: flex !important;
+  align-items: center;
+}
+
+.VPNavBarExtra {
+  display: none !important;
+}
+
+@media (max-width: 767px) {
+  .VPNavBarTitle .logo {
+    display: none !important;
+  }
+}
+
+/* Hide translations and appearance from hamburger menu (already in nav bar) */
+.VPNavScreen .appearance,
+.VPNavScreen .translations {
+  display: none !important;
+}
+
+.VPNavBar .menu + .translations::before,
+.VPNavBar .translations + .appearance::before {
+  display: none;
+}
+
 /* Wider content for all pages and blog styling */
 
 .VPDoc .container {
