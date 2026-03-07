@@ -26,17 +26,23 @@ hero:
       link: https://github.com/php-testo/testo
 
 features:
-  - title: Привычный ООП
-    details: Тесты — это классы без наследования от TestCase или функции. Код остаётся чистым.
+  - title: Чистый код
+    details: Без наследования от <code>TestCase</code> или вообще без классов.
+
+  - title: Для бэкенда
+    details: Забудь JS всяк сюда входящий.
 
   - title: Интеграция с IDE
-    details: Плагин для PhpStorm/IntelliJ IDEA с запуском, навигацией, отладкой и всем привычным workflow.
+    details: Плагин для PhpStorm/IntelliJ IDEA с запуском, навигацией, отладкой и привычным workflow.
+
+  - title: "#[Атрибуты]"
+    details: Вместо магических конвенций. Минимум бойлерплейта, максимум выразительности.
 
   - title: Компактное ядро
     details: Всё остальное — middleware и диспетчеры событий с безграничной кастомизацией.
 
   - title: Продуманный API
-    details: Раздельные фасады Assert (сейчас) и Expect (потом) с пайповыми ассертами для типобезопасных проверок.
+    details: Раздельные фасады <code>Assert</code> (сейчас) и <code>Expect</code> (потом) с пайповыми ассертами для типобезопасных проверок.
 ---
 
 <script setup>

@@ -27,17 +27,23 @@ hero:
       link: https://github.com/php-testo/testo
 
 features:
-  - title: Familiar OOP
-    details: Tests are classes without TestCase inheritance or functions. Code stays clean.
+  - title: Clean Code
+    details: No <code>TestCase</code> inheritance required — or no classes at all.
+
+  - title: Proudly PHP
+    details: Because it is a backend language, not <code>it()</code>.
 
   - title: IDE Integration
     details: PhpStorm/IntelliJ IDEA plugin with test running, navigation, debugging, and all the workflow you expect.
+
+  - title: "#[Attributes]"
+    details: Instead of magic conventions. Minimum boilerplate, maximum expressiveness.
 
   - title: Small Core
     details: Everything else is middleware and event dispatchers with unlimited customization.
 
   - title: Well-Designed API
-    details: Separate Assert (now) and Expect (later) facades with pipe assertions for type-safe checks.
+    details: Separate <code>Assert</code> (now) and <code>Expect</code> (later) facades with pipe assertions for type-safe checks.
 ---
 
 <script setup>
