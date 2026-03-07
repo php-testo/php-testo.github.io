@@ -52,14 +52,14 @@ return new ApplicationConfig(
 
 ## Написание первого теста
 
-Создайте тестовый класс в настроенной директории (например, `tests/CalculatorTest.php`):
+Создайте тестовый класс в настроенной директории (например, `tests/Unit/CalculatorTest.php`):
 
 ```php
 <?php
 
 declare(strict_types=1);
 
-namespace Tests;
+namespace Tests\Unit;
 
 use Testo\Assert;
 use Testo\Assert\ExpectException;
@@ -78,10 +78,9 @@ final class CalculatorTest
     }
 
     #[Test]
-    #[RetryPolicy(maxAttempts: 3)]
+    #[RetryPolicy(maxAttempts: 3)] // Повторяется до 3 раз при падении теста
     public function flakyApiCall(): void
     {
-        // Повторяет до 3 раз при падении теста
         $response = $this->makeExternalApiCall();
 
         Assert::same(200, $response->status);

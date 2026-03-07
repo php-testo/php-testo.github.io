@@ -57,14 +57,14 @@ In this example we defined two test suites: `Unit` for unit tests located in `te
 
 ## Writing Your First Test
 
-Create a test class in the configured test directory (e.g., `tests/CalculatorTest.php`):
+Create a test class in the configured test directory (e.g., `tests/Unit/CalculatorTest.php`):
 
 ```php
 <?php
 
 declare(strict_types=1);
 
-namespace Tests;
+namespace Tests\Unit;
 
 use Testo\Assert;
 use Testo\Assert\ExpectException;
@@ -83,10 +83,9 @@ final class CalculatorTest
     }
 
     #[Test]
-    #[RetryPolicy(maxAttempts: 3)]
+    #[RetryPolicy(maxAttempts: 3)] // Retries up to 3 times if test fails
     public function flakyApiCall(): void
     {
-        // Retries up to 3 times if test fails
         $response = $this->makeExternalApiCall();
 
         Assert::same(200, $response->status);
