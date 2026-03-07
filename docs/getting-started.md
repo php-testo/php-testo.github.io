@@ -43,9 +43,17 @@ return new ApplicationConfig(
                 include: ['tests/Unit'],
             ),
         ),
+        new SuiteConfig(
+            name: 'Source',
+            location: new FinderConfig(
+                include: ['src'],
+            ),
+        ),
     ],
 );
 ```
+
+In this example we defined two test suites: `Unit` for unit tests located in `tests/Unit`, and `Source` for [inline tests](inline-tests.md) and benchmarks right in the source code in the `src` folder.
 
 ## Writing Your First Test
 
