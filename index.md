@@ -44,6 +44,12 @@ features:
 
   - title: Well-Designed API
     details: Separate <code>Assert</code> (now) and <code>Expect</code> (later) facades with pipe assertions for type-safe checks.
+
+  - title: Async Friendly
+    details: Test leaks, fibers, and async code with built-in tools.
+
+  - title: "PHP >=8.2"
+    details: Works on all actively supported PHP versions.
 ---
 
 <script setup>

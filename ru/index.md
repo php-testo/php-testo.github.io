@@ -43,6 +43,12 @@ features:
 
   - title: Продуманный API
     details: Раздельные фасады <code>Assert</code> (сейчас) и <code>Expect</code> (потом) с пайповыми ассертами для типобезопасных проверок.
+
+  - title: Async Friendly
+    details: Тестирование утечек, файберов и асинхронного кода инструментами из коробки.
+
+  - title: "PHP >=8.2"
+    details: Работает на всех актуальных версиях PHP.
 ---
 
 <script setup>
