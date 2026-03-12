@@ -32,7 +32,7 @@ ru/           # Russian locale (same structure)
 - Avoid tautology in lists, fix typos
 - Small sections sometimes better integrated into existing ones
 
-**Markdown:** Use `::: tip`, `::: warning`, `::: info` blocks
+**Markdown:** Use `::: tip`, `::: warning`, `::: info`, `::: question` blocks
 
 ## Working with Content
 
@@ -107,6 +107,32 @@ llms_description: "Technical description of what LLM learns from this page"
 - NOT: `"Learn about test lifecycle management"`
 
 **When adding new doc pages:** add `llms_description` to the English version frontmatter. Do NOT add llms frontmatter to blog posts.
+
+## FAQ (`::: question`)
+
+Questions can be written anywhere in the article using `::: question` blocks. At build time, they are extracted from their original positions and grouped into collapsible FAQ accordions.
+
+**Syntax:**
+```md
+::: question Can I run tests without config?
+Yes, Testo looks for tests in the `tests` folder by default.
+:::
+```
+
+**Frontmatter `faqLevel`** controls where questions are rendered:
+
+```yaml
+---
+faqLevel: 1       # default — end of each h1 section (= end of page for most docs)
+faqLevel: 2       # end of each h2 section
+faqLevel: 0       # end of page (ignores headings)
+faqLevel: false   # no collection — questions stay in place as inline spoilers
+---
+```
+
+**Plugin:** `.vitepress/faq.ts` — markdown-it block rule + core rule, no external dependencies.
+
+**Styles:** `.vitepress/theme/style.css` — `.faq-section`, `.faq-item` classes.
 
 ## VitePress Commands
 

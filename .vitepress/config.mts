@@ -3,6 +3,7 @@ import { defineConfig, HeadConfig } from 'vitepress'
 import { generateRss, rssPlugin } from './rss'
 import { generateLlms, llmsPlugin } from './llms'
 import { isBlogPath } from './locales'
+import { faqPlugin } from './faq'
 
 const baseUrl = 'https://php-testo.github.io'
 
@@ -12,6 +13,12 @@ export default defineConfig({
 
   lastUpdated: false,
   cleanUrls: true,
+
+  markdown: {
+    config: (md) => {
+      md.use(faqPlugin)
+    },
+  },
   srcExclude: ['CLAUDE.md', 'README.md'],
   ignoreDeadLinks: [/feed\.xml$/],
 
