@@ -4,6 +4,7 @@ import { generateRss, rssPlugin } from './rss'
 import { generateLlms, llmsPlugin } from './llms'
 import { isBlogPath } from './locales'
 import { faqPlugin } from './faq'
+import { infoBlockPlugin } from './info-block'
 
 const baseUrl = 'https://php-testo.github.io'
 
@@ -17,6 +18,7 @@ export default defineConfig({
   markdown: {
     config: (md) => {
       md.use(faqPlugin)
+      md.use(infoBlockPlugin)
     },
   },
   srcExclude: ['CLAUDE.md', 'README.md'],
@@ -71,6 +73,7 @@ gtag('config', 'G-VYGDN3X0PR');`],
               items: [
                 { text: 'Why Testo?', link: '/docs/why-testo' },
                 { text: 'Getting Started', link: '/docs/getting-started' },
+                { text: 'Configuration', link: '/docs/configuration' },
               ],
             },
             {
@@ -124,6 +127,7 @@ gtag('config', 'G-VYGDN3X0PR');`],
               items: [
                 { text: 'Почему Testo?', link: '/ru/docs/why-testo' },
                 { text: 'Начало работы', link: '/ru/docs/getting-started' },
+                { text: 'Конфигурация', link: '/ru/docs/configuration' },
               ],
             },
             {
