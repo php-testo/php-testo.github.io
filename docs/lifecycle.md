@@ -4,7 +4,11 @@ llms_description: "#[BeforeEach], #[AfterEach], #[BeforeAll], #[AfterAll] lifecy
 
 # Lifecycle
 
-Lifecycle attributes define setup and teardown methods that run automatically at specific points during test execution.
+Lifecycle attributes let you run code before and after tests — for setting up the environment, cleaning up state, and managing resources.
+
+::: info
+This functionality is provided by the `\Testo\Lifecycle\LifecyclePlugin` plugin, included in the `SuitePlugins` default set.
+:::
 
 ## Class Instantiation
 

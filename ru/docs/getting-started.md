@@ -39,16 +39,22 @@ return new ApplicationConfig(
             ),
         ),
         new SuiteConfig(
-            name: 'Source',
+            name: 'Sources',
             location: new FinderConfig(
                 include: ['src'],
+            ),
+            plugins: SuitePlugins::only(
+                new InlineTestPlugin(),
+                new BenchmarkPlugin(),
             ),
         ),
     ],
 );
 ```
 
-В этом примере мы определили два набора тестов: `Unit` для юнит-тестов, расположенных в `tests/Unit`, и `Source` для [встроенных тестов](inline-tests.md) и бенчмарков прямо в коде в папке `src`.
+В этом примере мы определили два набора тестов: `Unit` для юнит-тестов, расположенных в `tests/Unit`, и `Sources` для [встроенных тестов](inline-tests.md) и [бенчмарков](benchmarks.md) прямо в коде проекта, в папке `src`.
+
+Чтобы узнать больше о конфигурации, посетите раздел [Конфигурация](configuration.md).
 
 ## Написание первого теста
 
