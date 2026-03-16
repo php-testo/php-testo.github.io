@@ -2,7 +2,7 @@
 
 By default, if no configuration file is provided, Testo will run tests from the `tests` folder with the default plugin set.
 
-To customize the configuration, create a `testo.php` file in the root of your project. The file must return an `ApplicationConfig` instance:
+To configure Testo, create a `testo.php` file in the root of your project. The file must return an `ApplicationConfig` instance:
 
 ```php
 <?php
@@ -16,7 +16,6 @@ return new ApplicationConfig(
     suites: [
         new SuiteConfig(
             name: 'Unit',
-            parallel: true,
             location: ['tests/Unit'],
         ),
         new SuiteConfig(
@@ -32,7 +31,6 @@ return new ApplicationConfig(
 The root configuration object:
 
 - `suites` — array of Test Suites. Must contain at least one element — an empty array will cause an error.
-- `src` — location of the project source code. Will be used for code coverage in the future.
 - `plugins` — application-level plugins. Loaded before Test Suites and act globally (see [Plugins](#plugins) section).
 
 All parameters and their default values are described in the class itself — your IDE will show hints.
@@ -60,7 +58,7 @@ new SuiteConfig(
 ),
 ```
 
-::: tip
+::: info
 Arrays in `location` and `plugins` are shorthands for `new FinderConfig(include: ...)` and `SuitePlugins::with(...)`. For more flexible configuration, use `FinderConfig` and `SuitePlugins` directly.
 :::
 
@@ -89,15 +87,22 @@ Testo is built on [plugins](plugins.md) — they define how tests are discovered
 If the `plugins` array is not specified, Testo uses the default plugin set.
 
 ::: question Which application plugins are enabled by default?
-- [FilterPlugin](plugins/filter.md)
-- TerminalPlugin
-- TeamcityPlugin
+You can check the default plugin list in the `ApplicationPlugins` class.
+
+Currently:
+- [Filter](plugins/filter.md)
+- **Terminal** and **Teamcity** depending on the `--teamcity` flag
 :::
 
 ::: question Which Test Suite plugins are enabled by default?
-- [LifecyclePlugin](plugins/lifecycle.md)
-- [InlineTestPlugin](plugins/inline.md)
-- [BenchmarkPlugin](plugins/bench.md)
+You can check the default plugin list in the `SuitePlugins` class.
+
+Currently:
+- [Assert](plugins/assert.md)
+- [Bench](plugins/bench.md)
+- [Inline](plugins/inline.md)
+- [Lifecycle](plugins/lifecycle.md)
+- [Test](plugins/test.md)
 :::
 
 ### Managing Plugins

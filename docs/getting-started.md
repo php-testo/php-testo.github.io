@@ -1,9 +1,9 @@
 ---
+faqLevel: 2
 llms_description: "Installation via Composer, testo.php configuration, writing first test class, running tests, IDE plugin setup"
 ---
 
 # Getting Started
-
 
 ## Installation
 
@@ -24,7 +24,7 @@ composer require --dev testo/testo
 
 By default, if no configuration file is provided, Testo will run tests from the `tests` folder.
 
-To customize the configuration, create a `testo.php` file in the root of your project:
+To configure Testo, create a `testo.php` file in the root of your project:
 
 ```php
 <?php
@@ -39,19 +39,11 @@ return new ApplicationConfig(
     suites: [
         new SuiteConfig(
             name: 'Unit',
-            location: new FinderConfig(
-                include: ['tests/Unit'],
-            ),
+            location: ['tests/Unit'],
         ),
         new SuiteConfig(
             name: 'Sources',
-            location: new FinderConfig(
-                include: ['src'],
-            ),
-            plugins: SuitePlugins::only(
-                new InlineTestPlugin(),
-                new BenchmarkPlugin(),
-            ),
+            location: ['src'],
         ),
     ],
 );
@@ -63,54 +55,49 @@ To learn more about configuration, visit the [Configuration](configuration.md) s
 
 ## Writing Your First Test
 
-Create a test class in the configured test directory (e.g., `tests/Unit/CalculatorTest.php`):
+Create a test class in the configured directory (e.g., `tests/Unit/MyFirstTest.php`) and add a method with the `#[Test]` attribute:
 
 ```php
-<?php
-
-declare(strict_types=1);
-
-namespace Tests\Unit;
-
-use Testo\Assert;
-use Testo\Assert\ExpectException;
-use Testo\Application\Attribute\Test;
-use Testo\Retry\RetryPolicy;
-
-final class CalculatorTest
+final class MyFirstTest
 {
     #[Test]
     public function dividesNumbers(): void
     {
         $result = 10 / 2;
 
-        Assert::same(5.0, $result);
-        Assert::notSame(5, $result); // Types matter!
+        Assert::same($result, 5.0);
+        Assert::notSame($result, 5); // Types matter
     }
+}
+```
 
-    #[Test]
-    #[RetryPolicy(maxAttempts: 3)] // Retries up to 3 times if test fails
-    public function flakyApiCall(): void
+The `#[Test]` attribute marks the method as a test, and the `Assert` facade checks assertions.
+Testo supports a wide range of assertions via `Assert` and expectations via `Expect`.
+
+Use attributes to extend test functionality.
+For example, `#[Retry]` retries a test on failure, and `#[ExpectException]` expects a specific exception:
+
+```php
+#[Test]
+final class MyFirstTest
+{
+    #[Retry(maxAttempts: 5)] // Retries up to 5 times if test fails
+    public function flakyTest(): void
     {
-        $response = $this->makeExternalApiCall();
-
-        Assert::same(200, $response->status);
+        Assert::same(mt_rand(0, 2), 2);
     }
 
-    #[Test]
     #[ExpectException(\RuntimeException::class)]
-    public function throwsException(): void
+    public function throwsException(): never
     {
         throw new \RuntimeException('Expected error');
     }
 }
 ```
 
-### Key Points
-
-- The `#[Test]` attribute marks test methods, and test classes don't need to inherit from a base class. See [Writing Tests](./writing-tests) for more options.
-- Use the `Assert` facade for assertions and `Expect` for expectations.
-- Testo provides multiple attributes to extend testing capabilities (retry policies, exception handling, and more).
+::: question Why `#[Test]` on a class?
+You can put `#[Test]` on a class — then all public methods with return type `void` or `never` become tests.
+:::
 
 ## Running Tests
 
@@ -124,7 +111,9 @@ You should see output showing the test results with detailed information about p
 
 ## IDE Support
 
-Testo comes with an official [IDEA plugin](https://plugins.jetbrains.com/plugin/28842-testo) for PhpStorm and IntelliJ IDEA.
+Testo comes with an official IDEA plugin for PhpStorm and IntelliJ IDEA.
+
+<JetBrainsPlugin />
 
 The plugin provides:
 - Running tests directly from the IDE

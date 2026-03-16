@@ -1,3 +1,7 @@
+---
+faqLevel: 2
+---
+
 # Начало работы
 
 ## Установка
@@ -34,19 +38,11 @@ return new ApplicationConfig(
     suites: [
         new SuiteConfig(
             name: 'Unit',
-            location: new FinderConfig(
-                include: ['tests/Unit'],
-            ),
+            location: ['tests/Unit'],
         ),
         new SuiteConfig(
             name: 'Sources',
-            location: new FinderConfig(
-                include: ['src'],
-            ),
-            plugins: SuitePlugins::only(
-                new InlineTestPlugin(),
-                new BenchmarkPlugin(),
-            ),
+            location: ['src'],
         ),
     ],
 );
@@ -58,54 +54,49 @@ return new ApplicationConfig(
 
 ## Написание первого теста
 
-Создайте тестовый класс в настроенной директории (например, `tests/Unit/CalculatorTest.php`):
+Создайте тестовый класс в настроенной директории (например, `tests/Unit/MyFirstTest.php`) и добавьте метод с атрибутом `#[Test]`:
 
 ```php
-<?php
-
-declare(strict_types=1);
-
-namespace Tests\Unit;
-
-use Testo\Assert;
-use Testo\Assert\ExpectException;
-use Testo\Application\Attribute\Test;
-use Testo\Retry\RetryPolicy;
-
-final class CalculatorTest
+final class MyFirstTest
 {
     #[Test]
     public function dividesNumbers(): void
     {
         $result = 10 / 2;
 
-        Assert::same(5.0, $result);
-        Assert::notSame(5, $result); // Типы важны!
+        Assert::same($result, 5.0);
+        Assert::notSame($result, 5); // Типы важны
     }
+}
+```
 
-    #[Test]
-    #[RetryPolicy(maxAttempts: 3)] // Повторяется до 3 раз при падении теста
-    public function flakyApiCall(): void
+Так, с помощью атрибута `#[Test]` мы помечаем метод как тестовый, а с помощью фасада `Assert` проверяем утверждения.
+Testo поддерживает множество различных утверждений через фасад `Assert` и ожиданий через фасад `Expect`.
+
+Используйте атрибуты для расширения функциональности тестов.
+Например, `#[Retry]` повторяет тест при его падении, а `#[ExpectException]` — ожидает определённое исключение:
+
+```php
+#[Test]
+final class MyFirstTest
+{
+    #[Retry(maxAttempts: 5)] // Повторяется до 5 раз при падении теста
+    public function flakyTest(): void
     {
-        $response = $this->makeExternalApiCall();
-
-        Assert::same(200, $response->status);
+        Assert::same(mt_rand(0, 2), 2);
     }
 
-    #[Test]
     #[ExpectException(\RuntimeException::class)]
-    public function throwsException(): void
+    public function throwsException(): never
     {
         throw new \RuntimeException('Expected error');
     }
 }
 ```
 
-### Ключевые моменты
-
-- Атрибут `#[Test]` помечает тестовые методы, при этом классам не нужно наследоваться от базового класса. Подробнее в разделе [Пишем тесты](./writing-tests).
-- Используйте фасад `Assert` для утверждений и `Expect` для ожиданий.
-- Testo предоставляет множество атрибутов для расширения возможностей тестирования (политики повторов, обработка исключений и другое).
+::: question Почему атрибут `#[Test]` на классе?
+Атрибутом `#[Test]` можно помечать классы, тогда все публичные методы с возвращаемым типом `void` или `never` будут считаться тестами.
+:::
 
 ## Запуск тестов
 
@@ -119,7 +110,9 @@ vendor/bin/testo
 
 ## Поддержка IDE
 
-Для PhpStorm и IntelliJ IDEA существует официальный [плагин IDEA](https://plugins.jetbrains.com/plugin/28842-testo).
+Для PhpStorm и IntelliJ IDEA существует официальный плагин IDEA.
+
+<JetBrainsPlugin />
 
 Плагин предоставляет:
 - Запуск тестов прямо из IDE

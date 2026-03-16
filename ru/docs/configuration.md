@@ -2,7 +2,7 @@
 
 По умолчанию, если конфигурационный файл не указан, Testo запустит тесты из папки `tests` с набором плагинов по умолчанию.
 
-Чтобы настроить конфигурацию, создайте файл `testo.php` в корне проекта. Файл должен возвращать экземпляр `ApplicationConfig`:
+Чтобы сконфигурировать Testo, создайте файл `testo.php` в корне проекта. Файл должен возвращать экземпляр `ApplicationConfig`:
 
 ```php
 <?php
@@ -16,7 +16,6 @@ return new ApplicationConfig(
     suites: [
         new SuiteConfig(
             name: 'Unit',
-            parallel: true,
             location: ['tests/Unit'],
         ),
         new SuiteConfig(
@@ -32,7 +31,6 @@ return new ApplicationConfig(
 Корневой объект конфигурации:
 
 - `suites` — массив Test Suite. Должен содержать хотя бы один элемент — пустой массив вызовет ошибку.
-- `src` — расположение исходного кода проекта. В будущем будет использоваться для покрытия кода тестами (code coverage).
 - `plugins` — плагины уровня приложения. Загружаются до загрузки Test Suite и действуют глобально (подробнее в разделе [Плагины](#плагины)).
 
 Все параметры и их значения по умолчанию описаны в самом классе — IDE покажет подсказки.
@@ -60,7 +58,7 @@ new SuiteConfig(
 ),
 ```
 
-::: tip
+::: info
 Массивы в `location` и `plugins` — сокращения для `new FinderConfig(include: ...)` и `SuitePlugins::with(...)`. Для более гибкой настройки используйте `FinderConfig` и `SuitePlugins` напрямую.
 :::
 
@@ -89,15 +87,22 @@ Testo построен на [плагинах](plugins.md) — именно он
 Если массив `plugins` не указан, Testo подключает набор плагинов по умолчанию.
 
 ::: question Какие плагины приложения подключаются по умолчанию?
-- [FilterPlugin](plugins/filter.md)
-- TerminalPlugin
-- TeamcityPlugin
+Вы можете посмотреть список плагинов по умолчанию в классе `ApplicationPlugins`.
+
+Сейчас это:
+- [Filter](plugins/filter.md)
+- **Terminal** и **Teamcity** в зависимости от флага `--teamcity`
 :::
 
 ::: question Какие плагины Test Suite подключаются по умолчанию?
-- [LifecyclePlugin](plugins/lifecycle.md)
-- [InlineTestPlugin](plugins/inline.md)
-- [BenchmarkPlugin](plugins/bench.md)
+Вы можете посмотреть список плагинов по умолчанию в классе `SuitePlugins`.
+
+Сейчас это:
+- [Assert](plugins/assert.md)
+- [Bench](plugins/bench.md)
+- [Inline](plugins/inline.md)
+- [Lifecycle](plugins/lifecycle.md)
+- [Test](plugins/test.md)
 :::
 
 ### Управление плагинами
