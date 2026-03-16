@@ -89,15 +89,15 @@ Testo is built on [plugins](plugins.md) — they define how tests are discovered
 If the `plugins` array is not specified, Testo uses the default plugin set.
 
 ::: question Which application plugins are enabled by default?
-- [FilterPlugin](filtering.md)
+- [FilterPlugin](plugins/filter.md)
 - TerminalPlugin
 - TeamcityPlugin
 :::
 
 ::: question Which Test Suite plugins are enabled by default?
-- [LifecyclePlugin](lifecycle.md)
-- [InlineTestPlugin](inline-tests.md)
-- [BenchmarkPlugin](benchmarks.md)
+- [LifecyclePlugin](plugins/lifecycle.md)
+- [InlineTestPlugin](plugins/inline.md)
+- [BenchmarkPlugin](plugins/bench.md)
 :::
 
 ### Managing Plugins

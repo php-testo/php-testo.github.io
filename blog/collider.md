@@ -139,7 +139,7 @@ but I want to draw your attention to how quick it is to benchmark something now!
 
 ![Shock](/blog/collider/img-04.png)
 
-Benchmarking right in your code without extra boilerplate. Like [inline tests](/docs/inline-tests.md), but for benchmarks.
+Benchmarking right in your code without extra boilerplate. Like [inline tests](/docs/plugins/inline.md), but for benchmarks.
 
 [Dragon Code](https://github.com/TheDragonCode/benchmark) once showed that benchmarks can be simple and convenient: instead of tons of boilerplate, just call a single class and pass closures for comparison.
 Testo takes this to the next level: from intent to result in just one attribute.

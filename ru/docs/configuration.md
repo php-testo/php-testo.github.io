@@ -89,15 +89,15 @@ Testo построен на [плагинах](plugins.md) — именно он
 Если массив `plugins` не указан, Testo подключает набор плагинов по умолчанию.
 
 ::: question Какие плагины приложения подключаются по умолчанию?
-- [FilterPlugin](filtering.md)
+- [FilterPlugin](plugins/filter.md)
 - TerminalPlugin
 - TeamcityPlugin
 :::
 
 ::: question Какие плагины Test Suite подключаются по умолчанию?
-- [LifecyclePlugin](lifecycle.md)
-- [InlineTestPlugin](inline-tests.md)
-- [BenchmarkPlugin](benchmarks.md)
+- [LifecyclePlugin](plugins/lifecycle.md)
+- [InlineTestPlugin](plugins/inline.md)
+- [BenchmarkPlugin](plugins/bench.md)
 :::
 
 ### Управление плагинами

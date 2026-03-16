@@ -57,7 +57,7 @@ return new ApplicationConfig(
 );
 ```
 
-In this example we defined two test suites: `Unit` for unit tests located in `tests/Unit`, and `Sources` for [inline tests](inline-tests.md) and [benchmarks](benchmarks.md) right in the project source code, in the `src` folder.
+In this example we defined two test suites: `Unit` for unit tests located in `tests/Unit`, and `Sources` for [inline tests](plugins/inline.md) and [benchmarks](plugins/bench.md) right in the project source code, in the `src` folder.
 
 To learn more about configuration, visit the [Configuration](configuration.md) section.
 
