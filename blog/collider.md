@@ -29,10 +29,10 @@ Here's my reasoning:
 
 > The array solution should be slower than the `for` loop, since extra resources go into computing hashes for the hash table when creating the array, and more memory is needed for intermediate values.
 
-Let's verify this: we'll write the functions and add the `#[BenchWith]` attribute to one of them.
+Let's verify this: we'll write the functions and add the `#[Bench]` attribute to one of them.
 
 ```php
-#[BenchWith(
+#[Bench(
     callables: [
         'in_array' => [self::class, 'sumInArray'],
     ],
@@ -56,7 +56,7 @@ public static function sumInArray(int $a, int $b): int
 }
 ```
 
-With the `#[BenchWith]` attribute, we're telling Testo that:
+With the `#[Bench]` attribute, we're telling Testo that:
 - we want to compare the performance of the current function (`sumInCycle`) with another function (`sumInArray`);
 - both functions will receive the same arguments: `1` and `5_000`;
 - to measure execution time, each function will be called 100 times in a row (`calls: 100`).
@@ -94,7 +94,7 @@ Statistics comes to the rescue with the [coefficient of variation](https://en.wi
 The smaller this coefficient, the more stable the results.
 
 All we need to do is collect more data spread over time — that is, rerun the benchmarks multiple times.
-The `#[BenchWith]` attribute has an `iterations` parameter responsible for the number of benchmark reruns.
+The `#[Bench]` attribute has an `iterations` parameter responsible for the number of benchmark reruns.
 
 Let's set `iterations: 10` and rerun:
 
@@ -135,7 +135,7 @@ Of course, you could experiment with a larger range, enable JIT, and prove that 
 but I want to draw your attention to how quick it is to benchmark something now!
 
 
-## BenchWith
+## Bench
 
 ![Shock](/blog/collider/img-04.png)
 
