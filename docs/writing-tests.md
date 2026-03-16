@@ -17,7 +17,7 @@ Testo doesn't care where a test lives, as long as it can be executed.
 Depending on the configured [plugins](plugins.md), Testo can discover tests in several ways:
 
 - **Explicit** — the [#\[Test\] attribute](plugins/test.md) marks a method, function, or class.
-- **Conventions** — [naming patterns](convention.md) like `testSomething()` methods or `*Test` classes.
+- **Conventions** — [naming patterns](plugins/convention.md) like `testSomething()` methods or `*Test` classes.
 - **Custom strategies** — you can implement your own test discovery, for example by function-call (like PEST) or by class parent, like PHPUnit.
 
 All approaches can be combined in one project or even in one Test Suite.

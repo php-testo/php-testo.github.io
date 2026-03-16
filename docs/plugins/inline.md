@@ -25,7 +25,7 @@ Inline tests work well for:
 - **Private helper methods** that you want to test without changing visibility
 - **Prototyping** when you need immediate validation without switching context
 
-For larger test suites (10+ cases) or tests that need explanation, consider writing separate tests with [DataProvider](./plugins/data.md).
+For larger test suites (10+ cases) or tests that need explanation, consider writing separate tests with [DataProvider](data.md).
 
 ## Configuration
 
