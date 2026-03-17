@@ -1,44 +1,153 @@
+---
+outline: [2, 3]
+---
+
 # Пишем тесты
 
 Testo не диктует, как и где писать тесты. Отдельные тесты в классах и функциях, встроенные тесты прямо на продакшн-коде, бенчмарки — все подходы можно комбинировать в одном проекте.
 
 **Подходы к написанию тестов**
 
-| Подход                                      | Обнаружение           | Когда использовать                           |
-|---------------------------------------------|-----------------------|----------------------------------------------|
-| [Отдельные тесты](#отдельные-тесты)         | `#[Test]` / конвенции | Unit, feature, integration                   |
-| [Встроенные тесты](#встроенные-тесты)       | `#[TestInline]`       | Простые проверки в коде приложения            |
-| [Бенчмарки](#бенчмарки)                     | `#[Bench]`            | Сравнение производительности                 |
+| Подход                                | Обнаружение           | Когда использовать                 |
+|---------------------------------------|-----------------------|------------------------------------|
+| [Отдельные тесты](#отдельные-тесты)   | `#[Test]` / конвенции | Unit, feature, integration         |
+| [Встроенные тесты](#встроенные-тесты) | `#[TestInline]`       | Простые проверки в коде приложения |
+| [Бенчмарки](#бенчмарки)               | `#[Bench]`            | Сравнение производительности       |
 
 ## Отдельные тесты
 
-Тесты в отдельных классах и функциях — основной способ. Тестовый код живёт отдельно от продакшн-кода, обычно в директории `tests/`.
+Чаще всего тесты пишутся в классах и функциях, отдельно от тестируемого кода, в директории `tests/`.
 
-Тесты пишутся в методах класса или в функциях. Testo находит их с помощью [плагина Test](plugins/test.md) (по атрибуту `#[Test]`) или [плагина Convention](plugins/convention.md) (по именованию). Convention не входит в набор плагинов по умолчанию — при необходимости его нужно [подключить](configuration.md).
+Хороший тест следует паттерну AAA — Arrange, Act, Assert:
 
 ::: code-group
-```php [#[Test] на классе]
-// tests/Unit/Order.php
-#[Test]
-final class Order
+```php [AAA]
+function calculatesOrderTotal(): void
 {
-    public function createsOrder(): void { /* ... */ }
+    // Arrange — подготовка
+    $order = new Order();
+    $order->addItem('Book', price: 15.0, quantity: 2);
+    $order->addItem('Pen', price: 3.0, quantity: 5);
 
-    public function calculatesTotal(): void { /* ... */ }
+    // Act — действие
+    $total = $order->total();
+
+    // Assert — проверка
+    Assert::same($total, 45.0);
 }
 ```
-```php [#[Test] на методе]
-// tests/Unit/Order.php
-final class Order
+```php [Исключение]
+function throwsOnNegativeAmount(): never
 {
-    #[Test]
-    public function createsOrder(): void { /* ... */ }
+    // Arrange
+    $account = new Account(balance: 100);
 
-    #[Test]
-    public function calculatesTotal(): void { /* ... */ }
+    // Assert — до действия
+    Expect::exception(InsufficientFundsException::class);
+
+    // Act
+    $account->withdraw(200);
 }
 ```
-```php [Конвенции]
+```php [Простой тест]
+// Для простых тестов AAA избыточен
+function defaultCurrencyIsUsd(): void
+{
+    Assert::same(new Money(100)->currency, 'USD');
+}
+```
+:::
+
+Для проверок Testo предоставляет два фасада из [плагина Assert](plugins/assert.md):
+
+- `Assert` — утверждения, проверяются здесь и сейчас. Поддерживает цепочки типизированных проверок.
+- `Expect` — ожидания, проверяются после завершения теста (исключения, утечки памяти).
+
+```php
+// Assert — утверждения
+Assert::same($user->name, 'John');
+Assert::true($user->isActive);
+Assert::string($email)->contains('@');
+
+// Assert — цепочка типизированных проверок
+Assert::string($response->body)
+    ->contains('success')
+    ->notContains('error');
+
+// Expect — ожидания поведения теста
+Expect::exception(\RuntimeException::class);
+Expect::notLeaks($connection);
+```
+
+### Атрибуты
+
+Вместо базовых классов или магических методов Testo делает ставку на атрибуты.
+
+- Атрибут `#[Test]` из [плагина Test](plugins/test.md) помечает методы и функции как отдельные тесты:
+
+    ::: code-group
+    ```php [Методы]
+    // tests/Unit/Order.php
+    final class Order
+    {
+        #[Test]
+        public function createsOrder(): void { /* ... */ }
+    
+        #[Test]
+        public function calculatesTotal(): void { /* ... */ }
+    }
+    ```
+    ```php [Функции]
+    // tests/Unit/order.php
+    #[Test]
+    function creates_order(): void { /* ... */ }
+    
+    #[Test]
+    function calculates_total(): void { /* ... */ }
+    ```
+    :::
+
+
+- Вместо копирования одного и того же теста для разных данных используйте атрибуты `#[DataSet]` и `#[DataProvider]` из плагина [Data](plugins/data.md), которые параметризуют тест разными наборами данных:
+
+    ```php
+    #[DataSet([1, 2, 3])]
+    #[DataSet([5, 5, 10])]
+    public function sum(int $a, int $b, int $expected): void { /* ... */ }
+    ```
+
+- А вместо `Expect::exception` можно использовать атрибут `#[ExpectException]`, который просто немного компактнее и добавляет наглядности:
+
+    ```php
+    #[ExpectException(\InsufficientFundsException::class)]
+    function throwsOnNegativeAmount(): never
+    {
+        new Account(balance: 100)->withdraw(200);
+    }
+    ```
+
+- Атрибут `#[Retry]` из плагина [Retry](plugins/retry.md) перезапустит тест при падении, пометив его как нестабильный:
+
+    ```php
+    #[Retry(maxAttempts: 3)]
+    public function flakyExternalService(): void { /* ... */ }
+    ```
+
+- Хуки жизненного цикла из плагина [Lifecycle](plugins/lifecycle.md) помогут подготовить окружение и очистить состояние между тестами:
+    - `#[BeforeTest]` — выполняется перед каждым тестом.
+    - `#[AfterTest]` — выполняется после каждого теста.
+    - `#[BeforeClass]` — выполняется один раз перед всеми тестами в классе.
+    - `#[AfterClass]` — выполняется один раз после всех тестов в классе.
+
+::: info
+Посетите страницы плагинов для получения подробной информации о каждом атрибуте и других интересных возможностях.
+:::
+
+### Конвенции именования
+
+[Плагин Convention](plugins/convention.md) находит тесты по паттернам именования — атрибуты не нужны. По умолчанию это суффикс `*Test` на классе и префикс `test*` на методах:
+
+```php
 // tests/Unit/OrderTest.php
 final class OrderTest
 {
@@ -49,42 +158,16 @@ final class OrderTest
     public function testAppliesDiscount(): void { /* ... */ }
 }
 ```
-```php [Функция]
-// tests/Unit/order.php
-#[Test]
-function creates_order(): void { /* ... */ }
 
-#[Test]
-function calculates_total(): void { /* ... */ }
-
-#[Test]
-function applies_discount(): void { /* ... */ }
-```
+::: info
+Convention не входит в набор плагинов по умолчанию — при необходимости его нужно [подключить](configuration.md).
 :::
 
-### Выразительнее с атрибутами
+### Практические советы
 
-Атрибуты убирают boilerplate и делают тесты легче для чтения. Вместо копирования теста для каждого набора данных — [провайдеры данных](plugins/data.md). Вместо `try/catch` — `#[ExpectException]`. Вместо ручных retry — [`#[Retry]`](plugins/retry.md):
-
-```php
-#[Test]
-#[DataSet([1, 2, 3])]
-#[DataSet([5, 5, 10])]
-public function sum(int $a, int $b, int $expected): void { /* ... */ }
-
-#[Test]
-#[ExpectException(\RuntimeException::class)]
-public function throwsOnInvalidInput(): never
-{
-    throw new \RuntimeException('Invalid input');
-}
-
-#[Test]
-#[Retry(maxAttempts: 3)]
-public function flakyExternalService(): void { /* ... */ }
-```
-
-Также будет полезен [плагин Lifecycle](plugins/lifecycle.md), добавляющий хуки `#[BeforeEach]`, `#[AfterEach]`, `#[BeforeAll]`, `#[AfterAll]` для подготовки окружения и очистки состояния между тестами.
+- **Называйте тесты как сценарии** — `calculatesDiscountForVipCustomer` понятнее, чем `testDiscount`. При падении имя теста — первое, что вы увидите.
+- **Один тест — один сценарий.** Несколько проверок в тесте — нормально, но несколько сценариев — нет. Если тест проверяет и создание, и удаление — разделите их.
+- **Придерживайтесь AAA** (Arrange, Act, Assert). При этом комментарии `// Arrange // Act // Assert` не обязательны: достаточно разделять блоки пустой строкой.
 
 ## Встроенные тесты
 
@@ -149,10 +232,10 @@ project/
 
 Каждый Suite — это не только отдельная папка, но и отдельный [SuiteConfig](configuration.md#suiteconfig) с нужным набором плагинов. Например:
 
-- **Unit** — быстрые изолированные тесты, можно запускать параллельно
-- **Feature** — требуют контейнер приложения, HTTP-клиент, базу данных
-- **Integration** — работают с реальными внешними сервисами, последовательный запуск
-- **Sources** — inline-тесты и бенчмарки в коде приложения
+- **Unit** — быстрые изолированные тесты, можно запускать параллельно.
+- **Feature** — требуют контейнер приложения, HTTP-клиент, базу данных.
+- **Integration** — работают с реальными внешними сервисами, последовательный запуск.
+- **Sources** — inline-тесты и бенчмарки в коде приложения.
 
 ```php
 return new ApplicationConfig(

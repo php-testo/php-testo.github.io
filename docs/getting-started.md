@@ -71,33 +71,7 @@ final class MyFirstTest
 }
 ```
 
-The `#[Test]` attribute marks the method as a test, and the `Assert` facade checks assertions.
-Testo supports a wide range of assertions via `Assert` and expectations via `Expect`.
-
-Use attributes to extend test functionality.
-For example, `#[Retry]` retries a test on failure, and `#[ExpectException]` expects a specific exception:
-
-```php
-#[Test]
-final class MyFirstTest
-{
-    #[Retry(maxAttempts: 5)] // Retries up to 5 times if test fails
-    public function flakyTest(): void
-    {
-        Assert::same(mt_rand(0, 2), 2);
-    }
-
-    #[ExpectException(\RuntimeException::class)]
-    public function throwsException(): never
-    {
-        throw new \RuntimeException('Expected error');
-    }
-}
-```
-
-::: question Why `#[Test]` on a class?
-You can put `#[Test]` on a class — then all public methods with return type `void` or `never` become tests.
-:::
+The `#[Test]` attribute marks the method as a test, and the `Assert` facade checks assertions. More about test approaches, attributes, and conventions — in [Writing Tests](writing-tests.md).
 
 ## Running Tests
 

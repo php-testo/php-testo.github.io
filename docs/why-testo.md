@@ -21,7 +21,7 @@ Testo was born from the need for an extensible testing framework that could adap
 
 ## Testo Philosophy
 
-### Developer's Full Control
+### Full Control for the Developer
 
 From Testo's perspective, **tests are the developer's property, not the framework's**. All metadata and operational data needed by the framework are stored and processed separately.
 
@@ -43,18 +43,19 @@ function simpleTest(): void
 
 Testo is built on a simple idea: **a small core with a set of DTOs and contracts, and all functionality is built on top of middleware and event system**.
 
-The core simply builds several pipelines from middleware, and then do whatever you want. Every framework feature is middleware or event handlers:
+The core simply builds several pipelines from middleware, and then do whatever you want. Every framework feature is middleware or event handlers, packaged into a plugin:
 - Attributes in general
 - Data providers
 - Inline testing
 - Assertion system (`Assert`, `Expect`)
 - CLI rendering and TeamCity
+- ...
 
 ### Well-Designed API
 
-Instead of a bloated `Assert` facade with ~2300 lines (as in PHPUnit), Testo provides:
-- **`Assert`** — for assertions (checked here and now)
-- **`Expect`** — for expectations (checked after test completion)
+Instead of a bloated `Assert` facade, Testo provides:
+- **`Assert`** — for assertions (checked here and now).
+- **`Expect`** — for expectations (checked after test completion).
 - **Pipe assertions** — grouping by types for cleaner code:
 
 ```php
@@ -74,12 +75,15 @@ Testo comes with a [PhpStorm/IntelliJ IDEA plugin](https://plugins.jetbrains.com
 
 ## Who Is Testo For?
 
-Testo is built for those who:
-- Develop **frameworks** and need deep test integration.
-- Create **SDKs** with specific testing requirements.
-- Build **complex systems** where PHPUnit doesn't provide the needed flexibility.
-- Want **full control** over testing infrastructure.
-- Prefer PHP syntax over JS.
+Testo is for anyone who loves PHP.
+
+Open-source developers can count on support for [current PHP versions](https://www.php.net/supported-versions.php).
+Framework and SDK authors get a powerful tool for building their own test environments through Testo integration.
+
+Developers on projects get clean tests without needing to learn new syntactic constructs or concepts.
+Flexible settings and the plugin system allow adapting Testo to any project requirements, from simple unit tests to complex integration scenarios.
+
+After all, I'm a framework, SDK, and high-load project developer myself, so I know all these pains firsthand.
 
 ## What's Next?
 

@@ -8,33 +8,44 @@ The `#[Test]` attribute explicitly marks a method, function, or class as a test.
 
 Can be placed on:
 
-- **Class** — all public methods with `void` return type become tests
+- **Class** — all public methods with `void` or `never` return type become tests
 - **Method** — only that method is a test
 - **Function** — the function is a test
 
-```php
+::: code-group
+```php [#[Test] on class]
+// tests/Unit/Order.php
 #[Test]
-final class OrderTest
+final class Order
 {
     public function createsOrder(): void { /* ... */ }
 
     public function calculatesTotal(): void { /* ... */ }
-
-    public function appliesDiscount(): void { /* ... */ }
 }
-
-final class UserTest
+```
+```php [#[Test] on method]
+// tests/Unit/Order.php
+final class Order
 {
     #[Test]
-    public function validatesEmail(): void { /* ... */ }
+    public function createsOrder(): void { /* ... */ }
 
     #[Test]
-    public function checksPermissions(): void { /* ... */ }
+    public function calculatesTotal(): void { /* ... */ }
 }
+```
+```php [Function]
+// tests/Unit/order.php
+#[Test]
+function creates_order(): void { /* ... */ }
 
 #[Test]
-function checks_environment(): void { /* ... */ }
+function calculates_total(): void { /* ... */ }
+
+#[Test]
+function applies_discount(): void { /* ... */ }
 ```
+:::
 
 ## When to Use
 

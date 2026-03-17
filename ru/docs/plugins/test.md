@@ -4,33 +4,44 @@
 
 Можно ставить на:
 
-- **Класс** — все публичные методы с возвращаемым типом `void` становятся тестами
+- **Класс** — все публичные методы с возвращаемым типом `void` или `never` становятся тестами
 - **Метод** — только этот метод является тестом
 - **Функцию** — функция является тестом
 
-```php
+::: code-group
+```php [#[Test] на классе]
+// tests/Unit/Order.php
 #[Test]
-final class OrderTest
+final class Order
 {
     public function createsOrder(): void { /* ... */ }
 
     public function calculatesTotal(): void { /* ... */ }
-
-    public function appliesDiscount(): void { /* ... */ }
 }
-
-final class UserTest
+```
+```php [#[Test] на методе]
+// tests/Unit/Order.php
+final class Order
 {
     #[Test]
-    public function validatesEmail(): void { /* ... */ }
+    public function createsOrder(): void { /* ... */ }
 
     #[Test]
-    public function checksPermissions(): void { /* ... */ }
+    public function calculatesTotal(): void { /* ... */ }
 }
+```
+```php [Функция]
+// tests/Unit/order.php
+#[Test]
+function creates_order(): void { /* ... */ }
 
 #[Test]
-function checks_environment(): void { /* ... */ }
+function calculates_total(): void { /* ... */ }
+
+#[Test]
+function applies_discount(): void { /* ... */ }
 ```
+:::
 
 ## Когда использовать
 

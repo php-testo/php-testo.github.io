@@ -1,5 +1,5 @@
 ---
-llms_description: "#[BeforeEach], #[AfterEach], #[BeforeAll], #[AfterAll] lifecycle hooks, execution order, priority, class instantiation behavior"
+llms_description: "#[BeforeTest], #[AfterTest], #[BeforeClass], #[AfterClass] lifecycle hooks, execution order, priority, class instantiation behavior"
 ---
 
 # Lifecycle
@@ -51,25 +51,25 @@ To control state between tests, use lifecycle attributes described below.
 
 ## Attributes
 
-| Attribute | When it runs | How often |
-|-----------|--------------|-----------|
-| `#[BeforeEach]` | Before each test method | Once per test |
-| `#[AfterEach]` | After each test method | Once per test |
-| `#[BeforeAll]` | Before all tests in the class | Once per test case |
-| `#[AfterAll]` | After all tests in the class | Once per test case |
+| Attribute        | When it runs                  | How often          |
+|------------------|-------------------------------|--------------------|
+| `#[BeforeTest]`  | Before each test method       | Once per test      |
+| `#[AfterTest]`   | After each test method        | Once per test      |
+| `#[BeforeClass]` | Before all tests in the class | Once per test case |
+| `#[AfterClass]`  | After all tests in the class  | Once per test case |
 
 ## Execution Order
 
 ```
-BeforeAll (once)
-├── BeforeEach
+BeforeClass (once)
+├── BeforeTest
 │   └── Test 1
-│   └── AfterEach
-├── BeforeEach
+│   └── AfterTest
+├── BeforeTest
 │   └── Test 2
-│   └── AfterEach
+│   └── AfterTest
 └── ...
-AfterAll (once)
+AfterClass (once)
 ```
 
 ## Basic Example
@@ -80,25 +80,25 @@ final class DatabaseTest
     private static Connection $connection;
     private Transaction $transaction;
 
-    #[BeforeAll]
+    #[BeforeClass]
     public static function connect(): void
     {
         self::$connection = new Connection();
     }
 
-    #[AfterAll]
+    #[AfterClass]
     public static function disconnect(): void
     {
         self::$connection->close();
     }
 
-    #[BeforeEach]
+    #[BeforeTest]
     public function beginTransaction(): void
     {
         $this->transaction = self::$connection->beginTransaction();
     }
 
-    #[AfterEach]
+    #[AfterTest]
     public function rollback(): void
     {
         $this->transaction->rollback();
@@ -118,19 +118,19 @@ final class DatabaseTest
 When you have multiple methods with the same lifecycle attribute, use `priority` to control execution order:
 
 ```php
-#[BeforeEach(priority: 100)]
+#[BeforeTest(priority: 100)]
 public function initializeConfig(): void
 {
     // Runs first (highest priority)
 }
 
-#[BeforeEach(priority: 50)]
+#[BeforeTest(priority: 50)]
 public function initializeLogger(): void
 {
     // Runs second
 }
 
-#[BeforeEach] // priority: 0 (default)
+#[BeforeTest] // priority: 0 (default)
 public function initializeService(): void
 {
     // Runs last
@@ -138,10 +138,3 @@ public function initializeService(): void
 ```
 
 Higher values execute first. Default priority is `0`.
-
-## Error Handling
-
-- Exception in `BeforeEach` — test is aborted
-- Exception in `AfterEach` — captured, but test result is preserved
-- Exception in `BeforeAll` — all tests in the class are aborted
-- Exception in `AfterAll` — captured after all tests complete

@@ -1,4 +1,5 @@
 ---
+outline: [2, 3]
 llms_description: "Test approaches: separate tests in classes/functions (#[Test], conventions), inline tests (#[TestInline]), benchmarks (#[Bench]), folder structure, suite configuration"
 ---
 
@@ -16,33 +17,138 @@ Testo doesn't dictate how or where to write tests. Separate tests in classes and
 
 ## Separate Tests
 
-Tests in dedicated classes and functions — the main approach. Test code lives separately from production code, usually in a `tests/` directory.
+Tests are most commonly written in classes and functions, separate from the code being tested, in a `tests/` directory.
 
-Tests are written in class methods or functions. Testo discovers them via the [Test plugin](plugins/test.md) (`#[Test]` attribute) or the [Convention plugin](plugins/convention.md) (by naming). Convention is not included in the default plugin set — [enable it](configuration.md) if needed.
+A good test follows the AAA pattern — Arrange, Act, Assert:
 
 ::: code-group
-```php [#[Test] on class]
-// tests/Unit/Order.php
-#[Test]
-final class Order
+```php [AAA]
+function calculatesOrderTotal(): void
 {
-    public function createsOrder(): void { /* ... */ }
+    // Arrange
+    $order = new Order();
+    $order->addItem('Book', price: 15.0, quantity: 2);
+    $order->addItem('Pen', price: 3.0, quantity: 5);
 
-    public function calculatesTotal(): void { /* ... */ }
+    // Act
+    $total = $order->total();
+
+    // Assert
+    Assert::same($total, 45.0);
 }
 ```
-```php [#[Test] on method]
-// tests/Unit/Order.php
-final class Order
+```php [Exception]
+function throwsOnNegativeAmount(): never
 {
-    #[Test]
-    public function createsOrder(): void { /* ... */ }
+    // Arrange
+    $account = new Account(balance: 100);
 
-    #[Test]
-    public function calculatesTotal(): void { /* ... */ }
+    // Assert — before action
+    Expect::exception(InsufficientFundsException::class);
+
+    // Act
+    $account->withdraw(200);
 }
 ```
-```php [Conventions]
+```php [Simple test]
+// For simple tests, AAA is overkill
+function defaultCurrencyIsUsd(): void
+{
+    Assert::same(new Money(100)->currency, 'USD');
+}
+```
+:::
+
+For checks, Testo provides two facades from the [Assert plugin](plugins/assert.md):
+
+- `Assert` — assertions, checked immediately. Supports chained typed checks.
+- `Expect` — expectations, checked after the test completes (exceptions, memory leaks).
+
+```php
+// Assert — assertions
+Assert::same($user->name, 'John');
+Assert::true($user->isActive);
+Assert::string($email)->contains('@');
+
+// Assert — chained typed checks
+Assert::string($response->body)
+    ->contains('success')
+    ->notContains('error');
+
+// Expect — test behavior expectations
+Expect::exception(\RuntimeException::class);
+Expect::notLeaks($connection);
+```
+
+### Attributes
+
+Instead of base classes or magic methods, Testo bets on attributes.
+
+- The `#[Test]` attribute from the [Test plugin](plugins/test.md) marks methods and functions as separate tests:
+
+    ::: code-group
+    ```php [Methods]
+    // tests/Unit/Order.php
+    final class Order
+    {
+        #[Test]
+        public function createsOrder(): void { /* ... */ }
+
+        #[Test]
+        public function calculatesTotal(): void { /* ... */ }
+    }
+    ```
+    ```php [Functions]
+    // tests/Unit/order.php
+    #[Test]
+    function creates_order(): void { /* ... */ }
+
+    #[Test]
+    function calculates_total(): void { /* ... */ }
+    ```
+    :::
+
+
+- Instead of copying the same test for different data, use `#[DataSet]` and `#[DataProvider]` from the [Data](plugins/data.md) plugin to parameterize a test with different data sets:
+
+    ```php
+    #[DataSet([1, 2, 3])]
+    #[DataSet([5, 5, 10])]
+    public function sum(int $a, int $b, int $expected): void { /* ... */ }
+    ```
+
+- Instead of `Expect::exception` you can use the `#[ExpectException]` attribute, which is slightly more compact and adds clarity:
+
+    ```php
+    #[ExpectException(\InsufficientFundsException::class)]
+    function throwsOnNegativeAmount(): never
+    {
+        new Account(balance: 100)->withdraw(200);
+    }
+    ```
+
+- The `#[Retry]` attribute from the [Retry](plugins/retry.md) plugin restarts a test on failure, marking it as flaky:
+
+    ```php
+    #[Retry(maxAttempts: 3)]
+    public function flakyExternalService(): void { /* ... */ }
+    ```
+
+- Lifecycle hooks from the [Lifecycle](plugins/lifecycle.md) plugin help set up the environment and clean state between tests:
+    - `#[BeforeTest]` — runs before each test.
+    - `#[AfterTest]` — runs after each test.
+    - `#[BeforeClass]` — runs once before all tests in the class.
+    - `#[AfterClass]` — runs once after all tests in the class.
+
+::: info
+Visit the plugin pages for detailed information about each attribute and other capabilities.
+:::
+
+### Naming Conventions
+
+The [Convention plugin](plugins/convention.md) discovers tests by naming patterns — no attributes needed. By default, `*Test` suffix on classes and `test*` prefix on methods:
+
+```php
 // tests/Unit/OrderTest.php
 final class OrderTest
 {
@@ -53,42 +159,16 @@ final class OrderTest
     public function testAppliesDiscount(): void { /* ... */ }
 }
 ```
-```php [Function]
-// tests/Unit/order.php
-#[Test]
-function creates_order(): void { /* ... */ }
 
-#[Test]
-function calculates_total(): void { /* ... */ }
-
-#[Test]
-function applies_discount(): void { /* ... */ }
-```
+::: info
+Convention is not included in the default plugin set — [enable it](configuration.md) if needed.
 :::
 
-### More expressive with attributes
+### Practical tips
 
-Attributes remove boilerplate and make tests easier to read. Instead of copying a test for each data set — [data providers](plugins/data.md). Instead of `try/catch` — `#[ExpectException]`. Instead of manual retry — [`#[Retry]`](plugins/retry.md):
-
-```php
-#[Test]
-#[DataSet([1, 2, 3])]
-#[DataSet([5, 5, 10])]
-public function sum(int $a, int $b, int $expected): void { /* ... */ }
-
-#[Test]
-#[ExpectException(\RuntimeException::class)]
-public function throwsOnInvalidInput(): never
-{
-    throw new \RuntimeException('Invalid input');
-}
-
-#[Test]
-#[Retry(maxAttempts: 3)]
-public function flakyExternalService(): void { /* ... */ }
-```
-
-The [Lifecycle plugin](plugins/lifecycle.md) is also useful — it adds `#[BeforeEach]`, `#[AfterEach]`, `#[BeforeAll]`, `#[AfterAll]` hooks for setting up the environment and cleaning state between tests.
+- **Name tests like scenarios** — `calculatesDiscountForVipCustomer` is clearer than `testDiscount`. When a test fails, the name is the first thing you'll see.
+- **One test — one scenario.** Multiple assertions in a test are fine, but multiple scenarios are not. If a test checks both creation and deletion — split it.
+- **Stick to AAA** (Arrange, Act, Assert). The `// Arrange // Act // Assert` comments are not required — just separate blocks with blank lines.
 
 ## Inline Tests
 
@@ -153,10 +233,10 @@ project/
 
 Each Suite is not just a separate folder, but a separate [SuiteConfig](configuration.md#suiteconfig) with its own set of plugins. For example:
 
-- **Unit** — fast isolated tests, can run in parallel
-- **Feature** — require application container, HTTP client, database
-- **Integration** — work with real external services, sequential execution
-- **Sources** — inline tests and benchmarks in application code
+- **Unit** — fast isolated tests, can run in parallel.
+- **Feature** — require application container, HTTP client, database.
+- **Integration** — work with real external services, sequential execution.
+- **Sources** — inline tests and benchmarks in application code.
 
 ```php
 return new ApplicationConfig(

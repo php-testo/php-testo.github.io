@@ -103,7 +103,7 @@ llms_description: "Technical description of what LLM learns from this page"
 
 **Guidelines for `llms_description`:**
 - List specific classes, attributes, methods — not vague descriptions
-- Example: `"#[BeforeEach], #[AfterEach], #[BeforeAll], #[AfterAll] lifecycle hooks, execution order, priority"`
+- Example: `"#[BeforeTest], #[AfterTest], #[BeforeClass], #[AfterClass] lifecycle hooks, execution order, priority"`
 - NOT: `"Learn about test lifecycle management"`
 
 **When adding new doc pages:** add `llms_description` to the English version frontmatter. Do NOT add llms frontmatter to blog posts.

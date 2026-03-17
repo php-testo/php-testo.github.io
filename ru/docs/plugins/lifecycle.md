@@ -47,25 +47,25 @@ final class ServiceTest
 
 ## Атрибуты
 
-| Атрибут | Когда выполняется | Как часто |
-|---------|-------------------|-----------|
-| `#[BeforeEach]` | Перед каждым тестовым методом | Один раз на тест |
-| `#[AfterEach]` | После каждого тестового метода | Один раз на тест |
-| `#[BeforeAll]` | Перед всеми тестами в классе | Один раз на тестовый класс |
-| `#[AfterAll]` | После всех тестов в классе | Один раз на тестовый класс |
+| Атрибут          | Когда выполняется              | Как часто                  |
+|------------------|--------------------------------|----------------------------|
+| `#[BeforeTest]`  | Перед каждым тестовым методом  | Один раз на тест           |
+| `#[AfterTest]`   | После каждого тестового метода | Один раз на тест           |
+| `#[BeforeClass]` | Перед всеми тестами в классе   | Один раз на тестовый класс |
+| `#[AfterClass]`  | После всех тестов в классе     | Один раз на тестовый класс |
 
 ## Порядок выполнения
 
 ```
-BeforeAll (один раз)
-├── BeforeEach
+BeforeClass (один раз)
+├── BeforeTest
 │   └── Тест 1
-│   └── AfterEach
-├── BeforeEach
+│   └── AfterTest
+├── BeforeTest
 │   └── Тест 2
-│   └── AfterEach
+│   └── AfterTest
 └── ...
-AfterAll (один раз)
+AfterClass (один раз)
 ```
 
 ## Базовый пример
@@ -76,25 +76,25 @@ final class DatabaseTest
     private static Connection $connection;
     private Transaction $transaction;
 
-    #[BeforeAll]
+    #[BeforeClass]
     public static function connect(): void
     {
         self::$connection = new Connection();
     }
 
-    #[AfterAll]
+    #[AfterClass]
     public static function disconnect(): void
     {
         self::$connection->close();
     }
 
-    #[BeforeEach]
+    #[BeforeTest]
     public function beginTransaction(): void
     {
         $this->transaction = self::$connection->beginTransaction();
     }
 
-    #[AfterEach]
+    #[AfterTest]
     public function rollback(): void
     {
         $this->transaction->rollback();
@@ -114,19 +114,19 @@ final class DatabaseTest
 Когда у вас несколько методов с одинаковым атрибутом жизненного цикла, используйте `priority` для управления порядком выполнения:
 
 ```php
-#[BeforeEach(priority: 100)]
+#[BeforeTest(priority: 100)]
 public function initializeConfig(): void
 {
     // Выполняется первым (наивысший приоритет)
 }
 
-#[BeforeEach(priority: 50)]
+#[BeforeTest(priority: 50)]
 public function initializeLogger(): void
 {
     // Выполняется вторым
 }
 
-#[BeforeEach] // priority: 0 (по умолчанию)
+#[BeforeTest] // priority: 0 (по умолчанию)
 public function initializeService(): void
 {
     // Выполняется последним
@@ -134,10 +134,3 @@ public function initializeService(): void
 ```
 
 Большие значения выполняются первыми. Приоритет по умолчанию — `0`.
-
-## Обработка ошибок
-
-- Исключение в `BeforeEach` — тест прерывается
-- Исключение в `AfterEach` — перехватывается, но результат теста сохраняется
-- Исключение в `BeforeAll` — все тесты в классе прерываются
-- Исключение в `AfterAll` — перехватывается после завершения всех тестов
