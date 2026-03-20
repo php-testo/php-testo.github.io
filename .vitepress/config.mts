@@ -6,8 +6,10 @@ import { isBlogPath } from './locales'
 import { faqPlugin } from './faq'
 import { infoBlockPlugin } from './info-block'
 import { funcBlockPlugin } from './func-block'
+import { preScanSignatures } from './func-registry'
 
 const baseUrl = 'https://php-testo.github.io'
+const srcDir = fileURLToPath(new URL('..', import.meta.url))
 
 export default defineConfig({
   title: 'Testo',
@@ -18,6 +20,7 @@ export default defineConfig({
 
   markdown: {
     config: (md) => {
+      preScanSignatures(srcDir)
       md.use(faqPlugin)
       md.use(infoBlockPlugin)
       md.use(funcBlockPlugin)

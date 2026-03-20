@@ -160,6 +160,7 @@ Assert::same($user->role, 'admin');
 **Attributes:**
 - `name` (required) — full method signature with types and return type. Supports FQN (`\Testo\Assert::method`) — namespace is stripped for display, only short class name shown.
 - `h` — heading level for auto-generated heading (`"3"` → `<h3>Assert::same</h3>`). Default: `"0"` (bold text, no heading). Heading text is extracted automatically: `Class::method` from the signature.
+- `compact` — compact rendering mode: signature + short + description inline, no card/sections. Good for simple methods in lists.
 
 **Inner tags (all optional):**
 - `<short>...</short>` — one-liner rendered between heading and signature box. Super brief summary of the method.
@@ -172,6 +173,27 @@ Assert::same($user->role, 'admin');
 <signature name="Assert::true(mixed $actual): void">
 </signature>
 ```
+
+## Inline References (`<func>`)
+
+For cross-referencing methods inline within text. Renders as Shiki-highlighted code with a hover tooltip showing the full signature and description.
+
+**Plugin:** `.vitepress/func-block.ts` — markdown-it inline rule. **Registry:** `.vitepress/func-registry.ts` — pre-scans all `.md` files at startup.
+
+**Syntax:**
+```html
+<func>\Testo\Assert::blank()</func>
+```
+
+Renders as `Assert::blank()` with syntax highlighting. On hover, shows a tooltip with the full signature and `<short>` description from the corresponding `<signature>` block.
+
+**Behavior:**
+- If the referenced `<signature>` has `h > 0` (navigable anchor), the reference is a clickable link
+- If `h="0"` or no `h`, the reference shows tooltip only (no link)
+- If FQN is not found in any `<signature>` block, renders as plain `<code>`
+- Locale-aware: EN pages reference EN signatures, RU pages reference RU signatures
+
+**Registry:** All `<signature>` blocks with FQN names (starting with `\`) are collected at build startup. The `<func>` tag content is matched by stripping arguments: `\Testo\Assert::blank()` matches `\Testo\Assert::blank(mixed $actual, string $message = ''): void`.
 
 ## VitePress Commands
 

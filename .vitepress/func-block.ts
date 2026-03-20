@@ -18,6 +18,7 @@
  */
 import type MarkdownIt from 'markdown-it'
 import { getLocaleByPath, type LocaleConfig } from './locales'
+import { getEntry } from './func-registry'
 
 interface Param {
   name: string
@@ -59,12 +60,68 @@ export function funcBlockPlugin(md: MarkdownIt) {
     return true
   })
 
-  md.renderer.rules['func_block'] = (tokens, idx) => {
-    return renderFuncBlock(md, tokens[idx].content, tokens[idx].meta?.locale)
+  md.renderer.rules['func_block'] = (tokens, idx, options, env) => {
+    return renderFuncBlock(md, tokens[idx].content, tokens[idx].meta?.locale, env)
+  }
+
+  // Inline rule: parse <func>..FQN..</func> references
+  md.inline.ruler.before('html_inline', 'func_ref', (state, silent) => {
+    if (state.src.slice(state.pos, state.pos + 6) !== '<func>') return false
+
+    const closeIdx = state.src.indexOf('</func>', state.pos + 6)
+    if (closeIdx === -1) return false
+
+    if (silent) return true
+
+    const token = state.push('func_ref', '', 0)
+    token.content = state.src.slice(state.pos + 6, closeIdx).trim()
+
+    const relativePath = state.env?.relativePath || ''
+    token.meta = { locale: getLocaleByPath('/' + relativePath) }
+
+    state.pos = closeIdx + 7
+    return true
+  })
+
+  // Renderer for <func> inline references
+  md.renderer.rules['func_ref'] = (tokens, idx) => {
+    const token = tokens[idx]
+    const rawFqn = token.content
+    const locale = token.meta?.locale
+
+    // Build display name: strip namespace, keep ()
+    const displayFqn = stripNamespace(rawFqn).display
+
+    // Look up in registry
+    const entry = getEntry(locale?.code ?? 'en', rawFqn)
+
+    if (entry) {
+      const sigHtml = highlightSignature(md, entry.signature)
+      // Highlight inline display using the full signature, then extract the short portion
+      const displayHtml = highlightFuncRef(md, displayFqn, entry.signature)
+      const shortHtml = entry.short ? md.renderInline(entry.short) : ''
+
+      const tooltip = `<span class="func-ref-tooltip">`
+        + `<code class="func-ref-tooltip-sig vp-code">${sigHtml}</code>`
+        + (shortHtml ? `<span class="func-ref-tooltip-short">${shortHtml}</span>` : '')
+        + `</span>`
+
+      // Link only if signature has a navigable anchor (h > 0)
+      if (entry.hasAnchor) {
+        const href = entry.pagePath + '#' + entry.slug
+        return `<a href="${href}" class="func-ref vp-code">${displayHtml}${tooltip}</a>`
+      }
+
+      // Tooltip without link
+      return `<span class="func-ref vp-code">${displayHtml}${tooltip}</span>`
+    }
+
+    // No match in registry — render as plain inline code
+    return `<code>${escapeHtml(displayFqn)}</code>`
   }
 }
 
-function renderFuncBlock(md: MarkdownIt, raw: string, locale?: LocaleConfig): string {
+function renderFuncBlock(md: MarkdownIt, raw: string, locale?: LocaleConfig, env?: any): string {
   // Parse name attribute (the full signature)
   const nameMatch = raw.match(/<signature\s+[^>]*name="([^"]*)"/)
   if (!nameMatch) return ''
@@ -122,12 +179,12 @@ function renderFuncBlock(md: MarkdownIt, raw: string, locale?: LocaleConfig): st
 
   // Build HTML output
   const sigHtml = highlightSignature(md, display)
-  const descHtml = description ? md.render(description) : ''
+  const descHtml = description ? md.render(description, env) : ''
 
   // Compact mode: everything inline, no section headers
   if (compact) {
     const shortHtml = short ? md.renderInline(short) : ''
-    const compactDescHtml = description ? md.render(description) : ''
+    const compactDescHtml = description ? md.render(description, env) : ''
 
     let html = '<div class="func-compact">'
 
@@ -146,7 +203,7 @@ function renderFuncBlock(md: MarkdownIt, raw: string, locale?: LocaleConfig): st
     }
 
     for (const ex of examples) {
-      html += `<div class="func-compact-example">${md.render(ex)}</div>`
+      html += `<div class="func-compact-example">${md.render(ex, env)}</div>`
     }
 
     html += '</div>\n'
@@ -189,7 +246,7 @@ function renderFuncBlock(md: MarkdownIt, raw: string, locale?: LocaleConfig): st
     html += '  <div class="func-section">\n'
     html += `    <p class="func-section-title">${escapeHtml(examplesLabel)}</p>\n`
     for (const ex of examples) {
-      html += `    <div class="func-example">${md.render(ex)}</div>\n`
+      html += `    <div class="func-example">${md.render(ex, env)}</div>\n`
     }
     html += '  </div>\n'
   }
@@ -241,6 +298,15 @@ function extractShortName(display: string): string {
   // Match just "functionName" before paren
   const funcMatch = display.match(/^([A-Za-z_]\w*)/)
   return funcMatch ? funcMatch[1] : display
+}
+
+/**
+ * Highlights a short func reference (e.g. `Assert::blank()`) by wrapping it
+ * as a PHP static call expression so Shiki can tokenize it properly.
+ */
+function highlightFuncRef(md: MarkdownIt, displayFqn: string, _fullSignature: string): string {
+  // displayFqn is e.g. "Assert::blank()" — valid PHP as a static method call
+  return highlightSignature(md, displayFqn) || escapeHtml(displayFqn)
 }
 
 /**

@@ -568,7 +568,7 @@ html {
 /* ===== FUNC BLOCK (API Reference) ===== */
 
 .func-compact {
-  margin: 24px 0;
+  margin: 32px 0;
   line-height: 1.7;
 }
 
@@ -601,14 +601,18 @@ html {
 }
 
 .func-compact-desc {
-  margin-top: 2px;
+  margin-top: 12px;
   padding-left: 8px;
   color: var(--vp-c-text-2);
   font-size: 0.9em;
 }
 
+.func-compact-desc p {
+  margin: 0;
+}
+
 .func-compact-params {
-  margin-top: 2px;
+  margin-top: 12px;
   padding-left: 8px;
   color: var(--vp-c-text-2);
   font-size: 0.9em;
@@ -689,4 +693,83 @@ html {
 .func-block .func-example {
   margin: 4px 0 0;
   padding-left: 16px;
+}
+
+/* ===== FUNC REFERENCE (Inline cross-references) ===== */
+
+.func-ref {
+  position: relative;
+  text-decoration: none;
+  font-family: var(--vp-font-family-mono);
+  font-size: var(--vp-code-font-size);
+  background: var(--vp-c-bg-soft);
+  padding: 2px 6px;
+  border-radius: 4px;
+  cursor: help;
+  transition: background 0.2s;
+}
+
+a.func-ref {
+  cursor: pointer;
+}
+
+a.func-ref {
+  color: inherit;
+  text-decoration: none;
+}
+
+a.func-ref:hover {
+  text-decoration: none;
+}
+
+.func-ref:hover {
+  background: var(--vp-c-brand-soft);
+}
+
+.func-ref-tooltip {
+  display: none;
+  position: fixed;
+  background: var(--vp-c-bg-elv);
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  padding: 10px 14px;
+  width: max-content;
+  max-width: 480px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  z-index: 100;
+  pointer-events: none;
+}
+
+.func-ref-tooltip.is-visible {
+  display: block;
+}
+
+.func-ref-tooltip-sig {
+  display: block;
+  font-family: var(--vp-font-family-mono);
+  font-size: 13px;
+  line-height: 1.5;
+  padding: 0 !important;
+  background: none !important;
+  white-space: nowrap;
+}
+
+a.func-ref .func-ref-tooltip-sig,
+a.func-ref .func-ref-tooltip-short {
+  color: var(--vp-c-text-2);
+}
+
+.func-ref-tooltip-short {
+  display: block;
+  margin-top: 6px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--vp-c-text-2);
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.func-ref-unlinked {
+  color: var(--vp-c-text-1);
 }
