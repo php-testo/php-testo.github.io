@@ -755,7 +755,9 @@ a.func-ref:hover {
 }
 
 a.func-ref .func-ref-tooltip-sig,
-a.func-ref .func-ref-tooltip-short {
+a.func-ref .func-ref-tooltip-short,
+a.func-ref:hover .func-ref-tooltip-sig,
+a.func-ref:hover .func-ref-tooltip-short {
   color: var(--vp-c-text-2);
 }
 
