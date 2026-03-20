@@ -22,29 +22,36 @@ function extractH1(content: string): string | null {
 
 function readPages(srcDir: string): PageInfo[] {
   const pages: PageInfo[] = []
-
   const docsDir = path.join(srcDir, 'docs')
-  if (existsSync(docsDir)) {
-    for (const file of readdirSync(docsDir).filter(f => f.endsWith('.md'))) {
-      const filePath = path.join(docsDir, file)
-      const raw = readFileSync(filePath, 'utf-8')
-      const { data: fm, content } = matter(raw)
+  if (!existsSync(docsDir)) return pages
 
-      if (fm.llms === false || !fm.llms_description) continue
+  function scan(dir: string) {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      if (entry.isDirectory()) {
+        scan(path.join(dir, entry.name))
+      } else if (entry.name.endsWith('.md')) {
+        const filePath = path.join(dir, entry.name)
+        const raw = readFileSync(filePath, 'utf-8')
+        const { data: fm, content } = matter(raw)
 
-      const slug = file.replace(/\.md$/, '')
-      const llmsValue = fm.llms ?? true
-      pages.push({
-        title: fm.title || extractH1(content) || slug,
-        llms_description: fm.llms_description,
-        url: `/docs/${slug}`,
-        srcPath: `docs/${file}`,
-        content: content.trim(),
-        section: llmsValue === 'optional' ? 'optional' : 'docs',
-      })
+        if (fm.llms === false || !fm.llms_description) continue
+
+        const relPath = path.relative(srcDir, filePath).replace(/\\/g, '/')
+        const url = '/' + relPath.replace(/\.md$/, '')
+        const llmsValue = fm.llms ?? true
+        pages.push({
+          title: fm.title || extractH1(content) || entry.name.replace(/\.md$/, ''),
+          llms_description: fm.llms_description,
+          url,
+          srcPath: relPath,
+          content: content.trim(),
+          section: llmsValue === 'optional' ? 'optional' : 'docs',
+        })
+      }
     }
   }
 
+  scan(docsDir)
   return pages
 }
 

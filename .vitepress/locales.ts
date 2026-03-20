@@ -13,6 +13,8 @@ export interface LocaleConfig {
   blogTitle: string
   blogDescription: string
   blogLabel: string   // Back button label: 'Blog', 'Блог', etc.
+  signatureParamsLabel: string    // 'Parameters:', 'Параметры:', etc.
+  signatureExamplesLabel: string  // 'Examples:', 'Примеры:', etc.
 }
 
 export const locales: LocaleConfig[] = [
@@ -22,6 +24,8 @@ export const locales: LocaleConfig[] = [
     blogTitle: 'Testo Blog',
     blogDescription: 'Updates from Testo - Modern PHP Testing Framework',
     blogLabel: 'Blog',
+    signatureParamsLabel: 'Parameters:',
+    signatureExamplesLabel: 'Examples:',
   },
   {
     code: 'ru',
@@ -29,6 +33,8 @@ export const locales: LocaleConfig[] = [
     blogTitle: 'Блог Testo',
     blogDescription: 'Новости Testo - современного PHP фреймворка для тестирования',
     blogLabel: 'Блог',
+    signatureParamsLabel: 'Параметры:',
+    signatureExamplesLabel: 'Примеры:',
   },
 ]
 

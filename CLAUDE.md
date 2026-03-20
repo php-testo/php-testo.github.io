@@ -134,6 +134,45 @@ faqLevel: false   # no collection — questions stay in place as inline spoilers
 
 **Styles:** `.vitepress/theme/style.css` — `.faq-section`, `.faq-item` classes.
 
+## API Signatures (`<signature>`)
+
+For documenting methods and functions in API reference pages. Renders a highlighted PHP signature box with description, parameters, and examples.
+
+**Plugin:** `.vitepress/func-block.ts` — markdown-it block rule, Shiki highlighting.
+
+**Styles:** `.vitepress/theme/style.css` — `.func-block`, `.func-sig` classes.
+
+**Full syntax:**
+```html
+<signature h="3" name="\Testo\Assert::same(mixed $actual, mixed $expected, string $message = ''): void">
+<short>Checks strict equality of two values.</short>
+<description>Uses `===` comparison. Unlike `equals()`, does not perform type coercion.</description>
+<param name="$actual">The value being checked.</param>
+<param name="$expected">The expected value.</param>
+<example>
+```php
+Assert::same($user->role, 'admin');
+```
+</example>
+</signature>
+```
+
+**Attributes:**
+- `name` (required) — full method signature with types and return type. Supports FQN (`\Testo\Assert::method`) — namespace is stripped for display, only short class name shown.
+- `h` — heading level for auto-generated heading (`"3"` → `<h3>Assert::same</h3>`). Default: `"0"` (bold text, no heading). Heading text is extracted automatically: `Class::method` from the signature.
+
+**Inner tags (all optional):**
+- `<short>...</short>` — one-liner rendered between heading and signature box. Super brief summary of the method.
+- `<description>...</description>` — detailed method description, supports full markdown (paragraphs, lists, code blocks, etc.). Rendered below the signature box.
+- `<param name="$foo">...</param>` — parameter description (inline markdown). Rendered under localized "Parameters:" / "Параметры:" label.
+- `<example>...</example>` — full markdown block (code fences, text, etc.). Multiple allowed. Rendered under localized "Examples:" / "Примеры:" label.
+
+**Minimal usage (no description, no params):**
+```html
+<signature name="Assert::true(mixed $actual): void">
+</signature>
+```
+
 ## VitePress Commands
 
 ```bash

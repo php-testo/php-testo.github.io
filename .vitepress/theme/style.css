@@ -559,3 +559,134 @@ html {
 .faq-answer > p:last-child {
   margin-bottom: 0;
 }
+
+.vp-doc h3,
+.vp-doc h4 {
+  margin-top: 48px;
+}
+
+/* ===== FUNC BLOCK (API Reference) ===== */
+
+.func-compact {
+  margin: 24px 0;
+  line-height: 1.7;
+}
+
+.func-compact-anchor {
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+  font-size: 0;
+  line-height: 0;
+}
+
+.func-compact .func-sig {
+  display: block;
+  font-family: var(--vp-font-family-mono);
+  font-size: var(--vp-code-font-size);
+  padding: 4px 8px !important;
+  background: var(--vp-c-bg-soft) !important;
+  border-radius: 6px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.func-compact-short {
+  display: block;
+  margin-top: 2px;
+  padding-left: 8px;
+  color: var(--vp-c-text-2);
+  font-size: 0.9em;
+}
+
+.func-compact-desc {
+  margin-top: 2px;
+  padding-left: 8px;
+  color: var(--vp-c-text-2);
+  font-size: 0.9em;
+}
+
+.func-compact-params {
+  margin-top: 2px;
+  padding-left: 8px;
+  color: var(--vp-c-text-2);
+  font-size: 0.9em;
+}
+
+.func-compact-params code {
+  color: var(--vp-c-brand-1);
+  background: none;
+  padding: 0;
+}
+
+.func-compact-example {
+  margin-top: 4px;
+  padding-left: 8px;
+}
+
+.func-short {
+  margin: 0 0 8px;
+  color: var(--vp-c-text-2);
+}
+
+.func-block {
+  margin: 12px 0 16px;
+}
+
+/* Signature — styled box */
+.func-block .func-sig {
+  display: block;
+  font-family: var(--vp-font-family-mono);
+  font-size: var(--vp-code-font-size);
+  line-height: 1.7;
+  padding: 12px 16px !important;
+  background: var(--vp-c-bg-soft) !important;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Description and params — inherit page styles */
+.func-block .func-desc {
+  margin: 8px 0 0;
+  padding-left: 16px;
+  /*color: var(--vp-c-text-2);*/
+}
+
+.func-block .func-section {
+  margin: 8px 0 0;
+}
+
+.func-block .func-section-title {
+  margin: 0;
+  font-weight: 600;
+}
+
+.func-block .func-params {
+  margin: 4px 0 0;
+  padding: 0;
+}
+
+.func-block .func-params dt {
+  margin-top: 8px;
+  padding-left: 16px;
+}
+
+.func-block .func-params dt code {
+  color: var(--vp-c-brand-1);
+  background: none;
+  padding: 0;
+}
+
+.func-block .func-params dd {
+  margin: 2px 0 0;
+  padding-left: 32px;
+  color: var(--vp-c-text-2);
+}
+
+.func-block .func-example {
+  margin: 4px 0 0;
+  padding-left: 16px;
+}

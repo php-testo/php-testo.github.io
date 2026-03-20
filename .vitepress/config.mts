@@ -5,6 +5,7 @@ import { generateLlms, llmsPlugin } from './llms'
 import { isBlogPath } from './locales'
 import { faqPlugin } from './faq'
 import { infoBlockPlugin } from './info-block'
+import { funcBlockPlugin } from './func-block'
 
 const baseUrl = 'https://php-testo.github.io'
 
@@ -19,6 +20,7 @@ export default defineConfig({
     config: (md) => {
       md.use(faqPlugin)
       md.use(infoBlockPlugin)
+      md.use(funcBlockPlugin)
     },
   },
   srcExclude: ['CLAUDE.md', 'README.md'],
@@ -87,6 +89,8 @@ gtag('config', 'G-VYGDN3X0PR');`],
                 { text: 'Data Providers', link: '/docs/plugins/data.md' },
                 { text: 'Lifecycle', link: '/docs/plugins/lifecycle.md' },
                 { text: 'Retry', link: '/docs/plugins/retry.md' },
+                { text: 'Assert & Expect', link: '/docs/plugins/assert.md' },
+                { text: 'Benchmarks', link: '/docs/plugins/bench.md' },
               ],
             },
             {
@@ -143,6 +147,8 @@ gtag('config', 'G-VYGDN3X0PR');`],
                 { text: 'Провайдеры данных', link: '/ru/docs/plugins/data.md' },
                 { text: 'Жизненный цикл', link: '/ru/docs/plugins/lifecycle.md' },
                 { text: 'Retry', link: '/ru/docs/plugins/retry.md' },
+                { text: 'Assert и Expect', link: '/ru/docs/plugins/assert.md' },
+                { text: 'Бенчмарки', link: '/ru/docs/plugins/bench.md' },
               ],
             },
             {
