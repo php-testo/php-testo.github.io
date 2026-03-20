@@ -374,7 +374,22 @@ public function throwsOnInvalidInput(): void
 You can narrow down the expected exception using chain methods:
 
 <signature compact h="4" name="\Testo\Assert\Api\ExpectedException::fromMethod(string $class, string $method): self">
-<short>Specifies that the exception should be thrown from a specific method (the throw point, not the creation point).</short>
+<short>Checks that the specified method is present in the exception's call stack.</short>
+<description>
+Can be called multiple times to require several methods in the call chain.
+
+::: info
+The call stack in an exception is captured at the moment of its creation, not when it is thrown. So this checks where the exception was created, not where it was rethrown via `throw`.
+:::
+</description>
+<example>
+```php
+// Make sure the exception originated in validation,
+// not rethrown from somewhere else
+Expect::exception(ValidationException::class)
+    ->fromMethod(UserValidator::class, 'validate');
+```
+</example>
 </signature>
 
 <signature compact h="4" name="\Testo\Assert\Api\ExpectedException::withMessage(string $message): self">

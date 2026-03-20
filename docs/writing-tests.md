@@ -117,7 +117,7 @@ Instead of base classes or magic methods, Testo bets on attributes.
     public function sum(int $a, int $b, int $expected): void { /* ... */ }
     ```
 
-- Instead of `Expect::exception` you can use the `#[ExpectException]` attribute, which is slightly more compact and adds clarity:
+- Instead of <func>\Testo\Expect::exception()</func> you can use the `#[ExpectException]` attribute, which is slightly more compact and adds clarity:
 
     ```php
     #[ExpectException(\InsufficientFundsException::class)]

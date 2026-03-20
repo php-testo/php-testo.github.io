@@ -373,7 +373,22 @@ public function throwsOnInvalidInput(): void
 С помощью цепочки методов можно уточнить, какое именно исключение ожидается:
 
 <signature compact h="4" name="\Testo\Assert\Api\ExpectedException::fromMethod(string $class, string $method): self">
-<short>Указывает, что исключение должно быть выброшено из конкретного метода (точка выброса, а не создания).</short>
+<short>Проверяет, что указанный метод присутствует в стеке вызовов исключения.</short>
+<description>
+Метод можно вызывать несколько раз, добавляя несколько мест для проверки.
+
+::: info
+Стек вызовов в исключении заполняется в момент его создания, а не выброса. Таким образом, мы проверяем именно место создания, а не проброс через `throw`.
+:::
+</description>
+<example>
+```php
+// Убеждаемся, что исключение возникло именно в валидации,
+// а не было проброшено откуда-то ещё
+Expect::exception(ValidationException::class)
+    ->fromMethod(UserValidator::class, 'validate');
+```
+</example>
 </signature>
 
 <signature compact h="4" name="\Testo\Assert\Api\ExpectedException::withMessage(string $message): self">

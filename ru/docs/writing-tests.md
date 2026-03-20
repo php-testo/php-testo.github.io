@@ -116,7 +116,7 @@ Expect::notLeaks($connection);
     public function sum(int $a, int $b, int $expected): void { /* ... */ }
     ```
 
-- А вместо `Expect::exception` можно использовать атрибут `#[ExpectException]`, который просто немного компактнее и добавляет наглядности:
+- А вместо <func>\Testo\Expect::exception()</func> можно использовать атрибут `#[ExpectException]`, который просто немного компактнее и добавляет наглядности:
 
     ```php
     #[ExpectException(\InsufficientFundsException::class)]
