@@ -25,6 +25,7 @@ interface PluginLabels {
   pluginClass: string
   includedIn: (set: string) => string
   notIncluded: string
+  noSetup: string
   github: string
 }
 
@@ -33,12 +34,14 @@ const labels: Record<string, PluginLabels> = {
     pluginClass: 'Plugin class',
     includedIn: (set) => `Included in <class>${set}</class> — enabled by default.`,
     notIncluded: 'Not included in default plugins.',
+    noSetup: 'The plugin does not require setup.',
     github: 'GitHub',
   },
   ru: {
     pluginClass: 'Класс плагина',
     includedIn: (set) => `Входит в <class>${set}</class> по умолчанию.`,
     notIncluded: 'Не входит в состав плагинов по умолчанию.',
+    noSetup: 'Плагин не требует настройки.',
     github: 'GitHub',
   },
 }
@@ -91,10 +94,10 @@ export function preScanPlugins(srcDir: string): void {
       const attrs = match[1]
       const fqn = parseAttr(attrs, 'class')
       const name = parseAttr(attrs, 'name')
-      if (!fqn || !name) continue
+      if (!name) continue
 
       const included = parseAttr(attrs, 'included')
-      registerPlugin(locale.code, { fqn, name, pagePath, included })
+      registerPlugin(locale.code, { fqn: fqn || name, name, pagePath, included })
     }
   }
 }
@@ -148,7 +151,7 @@ export function pluginBlockPlugin(md: MarkdownIt) {
 
     const fqn = parseAttr(line, 'class')
     const name = parseAttr(line, 'name')
-    if (!fqn || !name) return false
+    if (!name) return false
 
     const included = parseAttr(line, 'included')
     const github = parseAttr(line, 'github')
@@ -158,14 +161,30 @@ export function pluginBlockPlugin(md: MarkdownIt) {
     const locale = getLocaleByPath('/' + relativePath)
     const pagePath = '/' + relativePath.replace(/\.md$/, '').replace(/\/index$/, '/')
 
-    registerPlugin(locale.code, { fqn, name, pagePath, included })
+    registerPlugin(locale.code, { fqn: fqn || name, name, pagePath, included })
 
     const l = labels[locale.code] ?? labels.en
-    const statusHtml = included ? l.includedIn(included) : l.notIncluded
+
+    let statusHtml: string
+    if (included) {
+      statusHtml = l.includedIn(included)
+    } else if (fqn) {
+      statusHtml = l.notIncluded
+    } else {
+      statusHtml = l.noSetup
+    }
 
     let linksHtml = ''
     if (github) {
       linksHtml = ` <a href="${escapeHtml(github)}" target="_blank" rel="noopener">${l.github}</a>`
+    }
+
+    // Build inline content
+    let inlineContent: string
+    if (fqn) {
+      inlineContent = `${l.pluginClass}: <class>${fqn}</class>. ${statusHtml}${linksHtml}`
+    } else {
+      inlineContent = `${statusHtml}${linksHtml}`
     }
 
     // Open wrapper as raw HTML
@@ -175,7 +194,7 @@ export function pluginBlockPlugin(md: MarkdownIt) {
 
     // Inline content — <class> will be processed by inline rules
     const inlineToken = state.push('inline', '', 0)
-    inlineToken.content = `${l.pluginClass}: <class>${fqn}</class>. ${statusHtml}${linksHtml}`
+    inlineToken.content = inlineContent
     inlineToken.map = [startLine, startLine + 1]
     inlineToken.children = []
 

@@ -195,6 +195,63 @@ Renders as `Assert::blank()` with syntax highlighting. On hover, shows a tooltip
 
 **Registry:** All `<signature>` blocks with FQN names (starting with `\`) are collected at build startup. The `<func>` tag content is matched by stripping arguments: `\Testo\Assert::blank()` matches `\Testo\Assert::blank(mixed $actual, string $message = ''): void`.
 
+## Class References (`<class>`)
+
+For referencing PHP classes inline. Renders the short class name (without namespace) with a hover tooltip showing the full FQN.
+
+**Plugin:** `.vitepress/func-block.ts` — inline + block rules.
+
+**Syntax:**
+```html
+<class>\Testo\Assert</class>
+```
+
+Renders as `Assert` styled as inline code. On hover, shows a tooltip with the full class name `\Testo\Assert`.
+
+**Behavior:**
+- Works both inline (inside text) and at the start of a line (block rule wraps in paragraph)
+- Namespace is stripped for display: `\Testo\Assert\AssertPlugin` → `AssertPlugin`
+- Styled as inline `<code>` with `var(--vp-code-color)` and `var(--vp-code-bg)`
+
+**Styles:** `.vitepress/theme/style.css` — `.class-ref` class.
+
+## Plugin References (`<plugin>`)
+
+For linking to plugin documentation pages by name. Renders as a clickable link to the plugin's page.
+
+**Plugin:** `.vitepress/func-block.ts` — inline + block rules. **Registry:** `.vitepress/plugin-block.ts` — collects `<plugin-info>` blocks.
+
+**Syntax:**
+```html
+<plugin>Assert</plugin>
+```
+
+Renders as a link to the Assert plugin page. The name is matched case-insensitively against `<plugin-info>` blocks.
+
+**Behavior:**
+- Lookup by `name` attribute from `<plugin-info>` tags (case-insensitive)
+- If no match found, renders as plain text
+- Locale-aware: EN pages link to EN plugin pages, RU to RU
+
+## Plugin Info Card (`<plugin-info>`)
+
+Block-level tag for plugin documentation pages. Renders a styled info card with plugin class, inclusion status, and optional links. Also registers the plugin in the registry for `<plugin>` cross-references.
+
+**Plugin:** `.vitepress/plugin-block.ts` — markdown-it block rule + registry with pre-scan.
+
+**Syntax:**
+```html
+<plugin-info class="\Testo\Assert\AssertPlugin" name="Assert" included="\Testo\Application\Config\Plugin\SuitePlugins" />
+<plugin-info class="\Testo\Convention\ConventionPlugin" name="Convention" />
+<plugin-info class="\Testo\Filter\FilterPlugin" name="Filter" included="\Testo\Application\Config\Plugin\ApplicationPlugins" github="https://..." />
+```
+
+**Attributes:**
+- `class` (required) — FQN of the plugin class. Rendered as `<class>` with tooltip.
+- `name` (required) — human-readable plugin name. Used for `<plugin>` cross-references.
+- `included` — FQN of the plugin set (e.g. `\Testo\Application\Config\Plugin\SuitePlugins`). Rendered as `<class>` with tooltip. Omit if the plugin must be registered manually.
+- `github` — URL to plugin's GitHub page (optional).
+
 ## VitePress Commands
 
 ```bash

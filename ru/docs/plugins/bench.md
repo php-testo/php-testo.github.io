@@ -1,3 +1,10 @@
 # Бенчмарки
 
-<plugin-info class="\Testo\Bench\BenchmarkPlugin" name="Benchmark" included="\Testo\Application\Config\Plugin\SuitePlugins" />
+<plugin-info name="Bench" class="\Testo\Bench\BenchmarkPlugin" included="\Testo\Application\Config\Plugin\SuitePlugins" />
+
+
+
+
+::: question Зачем атрибуту нужен сам метод, если можно передать список равнозначных callable?
+Атрибут `#[Bench]` на методе задаёт **базовую реализацию** — эталон, с которым сравниваются остальные. Callable в параметре — это альтернативные реализации для сравнения. Это позволяет автоматически фейлить тест, если базовая реализация оказалась медленнее альтернативной, и использовать бенчмарки как проверки в CI.
+:::

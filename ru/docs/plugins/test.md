@@ -1,5 +1,8 @@
 # Атрибут Test
 
+<plugin-info name="Test" class="\Testo\Test\TestPlugin" included="\Testo\Application\Config\Plugin\SuitePlugins" />
+
+
 Атрибут `#[Test]` явно помечает метод, функцию или класс как тест.
 
 Можно ставить на:

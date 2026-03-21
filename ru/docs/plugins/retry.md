@@ -1,6 +1,6 @@
 # Retry
 
-<plugin-info class="\Testo\Retry\RetryPlugin" name="Retry" included="\Testo\Application\Config\Plugin\SuitePlugins" />
+<plugin-info name="Retry" />
 
 ::: tip Coming Soon
 :::

@@ -2,6 +2,8 @@
 
 Встроенные тесты позволяют писать тесты прямо на тестируемом методе с помощью атрибута `#[TestInline]`. Отдельный тестовый класс не нужен.
 
+<plugin-info name="Inline" class="\Testo\Inline\InlineTestPlugin" included="\Testo\Application\Config\Plugin\SuitePlugins" />
+
 ```php
 #[TestInline([1, 1], 2)]
 #[TestInline([40, 2], 42)]

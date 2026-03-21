@@ -1,6 +1,8 @@
 # Конвенции именования
 
-Testo может находить тесты по паттернам именования — атрибуты не нужны.
+Плагин обнаруживает тесты согласно конвенции по именованию классов, методов и функций без необходимости использования атрибутов.
+
+<plugin-info name="Convention" class="\Testo\Convention\NamingConventionPlugin" />
 
 Распознаваемые паттерны:
 
@@ -18,6 +20,21 @@ final class UserServiceTest
 }
 
 function testEmailValidator(): void { /* ... */ }
+```
+
+Вы можете настроить суффиксы и префиксы, а также разрешить или запретить обнаружение приватных методов:
+
+```php
+new SuiteConfig(
+    // ...
+    plugins: [
+        new NamingConventionPlugin(
+            caseSuffix: 'Test',
+            testPrefix: 'test',
+            allowPrivate: false,
+        ),
+    ]
+),
 ```
 
 ## Когда использовать
