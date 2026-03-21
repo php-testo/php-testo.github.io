@@ -47,15 +47,15 @@ The core simply builds several pipelines from middleware, and then do whatever y
 - Attributes in general
 - Data providers
 - Inline testing
-- Assertion system (`Assert`, `Expect`)
+- Assertion system (<class>\Testo\Assert</class>, <class>\Testo\Expect</class>)
 - CLI rendering and TeamCity
 - ...
 
 ### Well-Designed API
 
-Instead of a bloated `Assert` facade, Testo provides:
-- **`Assert`** — for assertions (checked here and now).
-- **`Expect`** — for expectations (checked after test completion).
+Instead of a single bloated <class>\PHPUnit\Framework\Assert</class> facade, Testo provides:
+- **<class>\Testo\Assert</class>** — for assertions (checked here and now).
+- **<class>\Testo\Expect</class>** — for expectations (checked after test completion).
 - **Pipe assertions** — grouping by types for cleaner code:
 
 ```php

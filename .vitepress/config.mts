@@ -6,6 +6,7 @@ import { isBlogPath } from './locales'
 import { faqPlugin } from './faq'
 import { infoBlockPlugin } from './info-block'
 import { funcBlockPlugin } from './func-block'
+import { pluginBlockPlugin, preScanPlugins } from './plugin-block'
 import { preScanSignatures } from './func-registry'
 
 const baseUrl = 'https://php-testo.github.io'
@@ -21,9 +22,11 @@ export default defineConfig({
   markdown: {
     config: (md) => {
       preScanSignatures(srcDir)
+      preScanPlugins(srcDir)
       md.use(faqPlugin)
       md.use(infoBlockPlugin)
       md.use(funcBlockPlugin)
+      md.use(pluginBlockPlugin)
     },
   },
   srcExclude: ['CLAUDE.md', 'README.md'],

@@ -709,6 +709,17 @@ html {
   transition: background 0.2s;
 }
 
+.class-ref {
+  color: var(--vp-code-color);
+  background: var(--vp-code-bg);
+  padding: 3px 6px;
+}
+
+.class-ref:hover {
+  color: var(--vp-c-brand-1);
+  background: var(--vp-c-brand-soft);
+}
+
 a.func-ref {
   cursor: pointer;
 }

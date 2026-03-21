@@ -1,8 +1,6 @@
 # Retry
 
-::: info
-За эту функциональность отвечает плагин `\Testo\Retry\RetryPlugin`, входящий в набор `SuitePlugins` по умолчанию.
-:::
+<plugin-info class="\Testo\Retry\RetryPlugin" name="Retry" included="\Testo\Application\Config\Plugin\SuitePlugins" />
 
 ::: tip Coming Soon
 :::

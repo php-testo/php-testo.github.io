@@ -2,9 +2,7 @@
 
 Атрибуты жизненного цикла позволяют выполнять код до и после тестов — для подготовки окружения, очистки состояния и управления ресурсами.
 
-::: info
-За эту функциональность отвечает плагин `\Testo\Lifecycle\LifecyclePlugin`, входящий в набор `SuitePlugins` по умолчанию.
-:::
+<plugin-info class="\Testo\Lifecycle\LifecyclePlugin" name="Lifecycle" included="\Testo\Application\Config\Plugin\SuitePlugins" />
 
 ## Инстанциирование класса
 

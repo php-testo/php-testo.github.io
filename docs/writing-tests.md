@@ -61,8 +61,8 @@ function defaultCurrencyIsUsd(): void
 
 For checks, Testo provides two facades from the [Assert plugin](plugins/assert.md):
 
-- `Assert` — assertions, checked immediately. Supports chained typed checks.
-- `Expect` — expectations, checked after the test completes (exceptions, memory leaks).
+- <class>\Testo\Assert</class> — assertions, checked immediately. Supports chained typed checks.
+- <class>\Testo\Expect</class> — expectations, checked after the test completes (exceptions, memory leaks).
 
 ```php
 // Assert — assertions

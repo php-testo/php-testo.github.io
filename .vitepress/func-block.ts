@@ -1,31 +1,238 @@
 /**
  * Function signature block plugin for markdown-it.
  *
- * Renders `<signature>` blocks as styled API reference cards
- * with Shiki-highlighted PHP signatures and parameter descriptions.
- *
- * Usage:
- *   <signature name="Assert::same(mixed $actual, mixed $expected, string $message = '')">
- *   <description>Method description.</description>
- *   <param name="$actual">The value being checked.</param>
- *   <param name="$expected">The expected value.</param>
- *   <example>
- *   ```php
- *   Assert::same($user->role, 'admin');
- *   ```
- *   </example>
- *   </signature>
+ * Tags:
+ *   <signature> — API reference card with Shiki-highlighted PHP signature
+ *   <func>      — inline/block cross-reference to a <signature> block (tooltip + link)
+ *   <class>     — inline/block tag rendering short class name with FQN tooltip
+ *   <plugin>    — inline/block link to a plugin page by name (from plugin-block registry)
  */
 import type MarkdownIt from 'markdown-it'
+import type StateInline from 'markdown-it/lib/rules_inline/state_inline.mjs'
+import type StateBlock from 'markdown-it/lib/rules_block/state_block.mjs'
 import { getLocaleByPath, type LocaleConfig } from './locales'
 import { getEntry } from './func-registry'
+import { getPluginEntry } from './plugin-block'
 
 interface Param {
   name: string
   desc: string
 }
 
+// ─── Helpers ─────────────────────────────────────────────
+
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+}
+
+function stripNamespace(signature: string): { display: string } {
+  const match = signature.match(/^\\?(?:[A-Za-z_]\w*\\)+(.*)$/)
+  return { display: match ? match[1] : signature }
+}
+
+function stripNamespaceShort(fqn: string): string {
+  const idx = fqn.lastIndexOf('\\')
+  return idx !== -1 ? fqn.slice(idx + 1) : fqn
+}
+
+function extractShortName(display: string): string {
+  const match = display.match(/^([A-Za-z_]\w*(?:::|->)[A-Za-z_]\w*)/)
+  if (match) return match[1]
+  const funcMatch = display.match(/^([A-Za-z_]\w*)/)
+  return funcMatch ? funcMatch[1] : display
+}
+
+function buildSlug(signature: string): string {
+  const fqnMatch = signature.match(/^\\?(.+?)\(/)
+  if (fqnMatch) {
+    return fqnMatch[1]
+      .replace(/\\/g, '-')
+      .replace(/::/g, '--')
+      .replace(/->/g, '--')
+      .toLowerCase()
+  }
+  const methodMatch = signature.match(/^([A-Za-z_]\w*)/)
+  return methodMatch ? methodMatch[1].toLowerCase() : 'unknown'
+}
+
+function highlightSignature(md: MarkdownIt, signature: string): string {
+  const fallback = escapeHtml(signature)
+  const highlight = md.options.highlight
+  if (!highlight) return fallback
+
+  try {
+    const result = highlight('<?php\n' + signature, 'php', '')
+    const codeMatch = result.match(/<code[^>]*>([\s\S]*?)<\/code>/)
+    if (!codeMatch) return fallback
+
+    let inner = codeMatch[1].trim()
+    const newlineIdx = inner.indexOf('\n')
+    if (newlineIdx !== -1) inner = inner.slice(newlineIdx + 1).trim()
+
+    const lineMatch = inner.match(/^<span class="line">([\s\S]*)<\/span>$/)
+    if (lineMatch) inner = lineMatch[1]
+
+    return inner || fallback
+  } catch {
+    return fallback
+  }
+}
+
+// ─── Inline tag renderers (return HTML string) ──────────
+
+function renderFuncRefHtml(md: MarkdownIt, rawFqn: string, locale?: LocaleConfig): string {
+  const displayFqn = stripNamespace(rawFqn).display
+  const entry = getEntry(locale?.code ?? 'en', rawFqn)
+
+  if (entry) {
+    const sigHtml = highlightSignature(md, entry.signature)
+    const displayHtml = highlightSignature(md, displayFqn) || escapeHtml(displayFqn)
+    const shortHtml = entry.short ? md.renderInline(entry.short) : ''
+
+    const tooltip = `<span class="func-ref-tooltip">`
+      + `<code class="func-ref-tooltip-sig vp-code">${sigHtml}</code>`
+      + (shortHtml ? `<span class="func-ref-tooltip-short">${shortHtml}</span>` : '')
+      + `</span>`
+
+    if (entry.hasAnchor) {
+      const href = entry.pagePath + '#' + entry.slug
+      return `<a href="${href}" class="func-ref vp-code">${displayHtml}${tooltip}</a>`
+    }
+
+    return `<span class="func-ref vp-code">${displayHtml}${tooltip}</span>`
+  }
+
+  return `<code>${escapeHtml(displayFqn)}</code>`
+}
+
+function renderKlassRefHtml(fqn: string): string {
+  const short = escapeHtml(stripNamespaceShort(fqn))
+  const tooltip = `<span class="func-ref-tooltip"><code class="func-ref-tooltip-sig vp-code">${escapeHtml(fqn)}</code></span>`
+  return `<span class="class-ref func-ref vp-code">${short}${tooltip}</span>`
+}
+
+function renderPluginRefHtml(name: string, locale?: LocaleConfig): string {
+  const entry = getPluginEntry(locale?.code ?? 'en', name)
+  if (entry) {
+    return `<a href="${escapeHtml(entry.pagePath)}" class="plugin-ref">${escapeHtml(entry.name)}</a>`
+  }
+  return escapeHtml(name)
+}
+
+// ─── Generic rule registration ──────────────────────────
+
+/**
+ * Register an inline rule that matches <tagName>...</tagName> and pushes a token.
+ */
+function registerInlineTag(
+  md: MarkdownIt,
+  tagName: string,
+  tokenType: string,
+  anchor: { after: string } | { before: string },
+  opts?: { withLocale?: boolean },
+) {
+  const openTag = `<${tagName}>`
+  const closeTag = `</${tagName}>`
+
+  const rule = (state: StateInline, silent: boolean) => {
+    if (state.src.slice(state.pos, state.pos + openTag.length) !== openTag) {
+        return false
+    }
+
+    const closeIdx = state.src.indexOf(closeTag, state.pos + openTag.length)
+    if (closeIdx === -1) return false
+
+    if (silent) return true
+
+    const token = state.push(tokenType, '', 0)
+    token.content = state.src.slice(state.pos + openTag.length, closeIdx).trim()
+
+    if (opts?.withLocale) {
+      const relativePath = state.env?.relativePath || ''
+      token.meta = { locale: getLocaleByPath('/' + relativePath) }
+    }
+
+    state.pos = closeIdx + closeTag.length
+    return true
+  }
+
+  if ('after' in anchor) {
+    md.inline.ruler.after(anchor.after, tokenType, rule)
+  } else {
+    md.inline.ruler.before(anchor.before, tokenType, rule)
+  }
+}
+
+/**
+ * Register a block rule that catches <tagName>...</tagName> at line start,
+ * renders the tag via renderContent(), and wraps the rest of the line in a paragraph.
+ */
+function registerBlockParagraphTag(
+  md: MarkdownIt,
+  ruleName: string,
+  tagName: string,
+  renderContent: (content: string, state: StateBlock, startLine: number) => string,
+) {
+  const openTag = `<${tagName}>`
+  const closeTag = `</${tagName}>`
+
+  md.block.ruler.before('html_block', ruleName, (state, startLine, _endLine, silent) => {
+    const pos = state.bMarks[startLine] + state.tShift[startLine]
+    const max = state.eMarks[startLine]
+    const line = state.src.slice(pos, max)
+
+    if (!line.startsWith(openTag)) return false
+
+    const closeIdx = line.indexOf(closeTag)
+    if (closeIdx === -1) return false
+
+    if (silent) return true
+
+    const content = line.slice(openTag.length, closeIdx).trim()
+    const afterTag = line.slice(closeIdx + closeTag.length)
+    const renderedHtml = renderContent(content, state, startLine)
+
+    const openToken = state.push('paragraph_open', 'p', 1)
+    openToken.map = [startLine, startLine + 1]
+
+    const inlineToken = state.push('inline', '', 0)
+    inlineToken.content = renderedHtml + afterTag
+    inlineToken.map = [startLine, startLine + 1]
+    inlineToken.children = []
+
+    state.push('paragraph_close', 'p', -1)
+
+    state.line = startLine + 1
+    return true
+  })
+}
+
+// ─── Plugin ──────────────────────────────────────────────
+
 export function funcBlockPlugin(md: MarkdownIt) {
+
+  // ── Block rules for inline tags at line start ──
+
+  registerBlockParagraphTag(md, 'class_block', 'class', (fqn) => renderKlassRefHtml(fqn))
+
+  registerBlockParagraphTag(md, 'func_line', 'func', (rawFqn, state) => {
+    const relativePath = state.env?.relativePath || ''
+    const locale = getLocaleByPath('/' + relativePath)
+    return renderFuncRefHtml(md, rawFqn, locale)
+  })
+
+  registerBlockParagraphTag(md, 'plugin_line', 'plugin', (name, state) => {
+    const relativePath = state.env?.relativePath || ''
+    const locale = getLocaleByPath('/' + relativePath)
+    return renderPluginRefHtml(name, locale)
+  })
+
+  // ── <signature> block rule (multi-line) ──
+
   md.block.ruler.before('html_block', 'func_block', (state, startLine, endLine, silent) => {
     const pos = state.bMarks[startLine] + state.tShift[startLine]
     const max = state.eMarks[startLine]
@@ -34,7 +241,6 @@ export function funcBlockPlugin(md: MarkdownIt) {
     if (!firstLine.startsWith('<signature ')) return false
     if (silent) return true
 
-    // Find closing </signature>
     let closeLine = -1
     for (let i = startLine; i < endLine; i++) {
       const ls = state.bMarks[i] + state.tShift[i]
@@ -52,7 +258,6 @@ export function funcBlockPlugin(md: MarkdownIt) {
     token.map = [startLine, closeLine + 1]
     token.block = true
 
-    // Resolve locale from file path for localized labels
     const relativePath = state.env?.relativePath || ''
     token.meta = { locale: getLocaleByPath('/' + relativePath) }
 
@@ -60,95 +265,56 @@ export function funcBlockPlugin(md: MarkdownIt) {
     return true
   })
 
-  md.renderer.rules['func_block'] = (tokens, idx, options, env) => {
+  md.renderer.rules['func_block'] = (tokens, idx, _options, env) => {
     return renderFuncBlock(md, tokens[idx].content, tokens[idx].meta?.locale, env)
   }
 
-  // Inline rule: parse <func>..FQN..</func> references
-  md.inline.ruler.before('html_inline', 'func_ref', (state, silent) => {
-    if (state.src.slice(state.pos, state.pos + 6) !== '<func>') return false
+  // ── Inline rules ──
 
-    const closeIdx = state.src.indexOf('</func>', state.pos + 6)
-    if (closeIdx === -1) return false
+  registerInlineTag(md, 'func', 'func_ref', { before: 'html_inline' }, { withLocale: true })
+  registerInlineTag(md, 'class', 'class_ref', { after: 'func_ref' })
+  registerInlineTag(md, 'plugin', 'plugin_ref', { after: 'class_ref' }, { withLocale: true })
 
-    if (silent) return true
+  // ── Inline renderers ──
 
-    const token = state.push('func_ref', '', 0)
-    token.content = state.src.slice(state.pos + 6, closeIdx).trim()
-
-    const relativePath = state.env?.relativePath || ''
-    token.meta = { locale: getLocaleByPath('/' + relativePath) }
-
-    state.pos = closeIdx + 7
-    return true
-  })
-
-  // Renderer for <func> inline references
   md.renderer.rules['func_ref'] = (tokens, idx) => {
-    const token = tokens[idx]
-    const rawFqn = token.content
-    const locale = token.meta?.locale
+    const { content, meta } = tokens[idx]
+    return renderFuncRefHtml(md, content, meta?.locale)
+  }
 
-    // Build display name: strip namespace, keep ()
-    const displayFqn = stripNamespace(rawFqn).display
+  md.renderer.rules['class_ref'] = (tokens, idx) => {
+    return renderKlassRefHtml(tokens[idx].content)
+  }
 
-    // Look up in registry
-    const entry = getEntry(locale?.code ?? 'en', rawFqn)
-
-    if (entry) {
-      const sigHtml = highlightSignature(md, entry.signature)
-      // Highlight inline display using the full signature, then extract the short portion
-      const displayHtml = highlightFuncRef(md, displayFqn, entry.signature)
-      const shortHtml = entry.short ? md.renderInline(entry.short) : ''
-
-      const tooltip = `<span class="func-ref-tooltip">`
-        + `<code class="func-ref-tooltip-sig vp-code">${sigHtml}</code>`
-        + (shortHtml ? `<span class="func-ref-tooltip-short">${shortHtml}</span>` : '')
-        + `</span>`
-
-      // Link only if signature has a navigable anchor (h > 0)
-      if (entry.hasAnchor) {
-        const href = entry.pagePath + '#' + entry.slug
-        return `<a href="${href}" class="func-ref vp-code">${displayHtml}${tooltip}</a>`
-      }
-
-      // Tooltip without link
-      return `<span class="func-ref vp-code">${displayHtml}${tooltip}</span>`
-    }
-
-    // No match in registry — render as plain inline code
-    return `<code>${escapeHtml(displayFqn)}</code>`
+  md.renderer.rules['plugin_ref'] = (tokens, idx) => {
+    const { content, meta } = tokens[idx]
+    return renderPluginRefHtml(content, meta?.locale)
   }
 }
 
+// ─── <signature> block renderer ─────────────────────────
+
 function renderFuncBlock(md: MarkdownIt, raw: string, locale?: LocaleConfig, env?: any): string {
-  // Parse name attribute (the full signature)
   const nameMatch = raw.match(/<signature\s+[^>]*name="([^"]*)"/)
   if (!nameMatch) return ''
   const signature = nameMatch[1]
 
-  // Parse heading level: h="3" etc., default h="0" for bold text instead of heading
   const hMatch = raw.match(/<signature\s+[^>]*h="([^"]*)"/)
   const headingLevel = hMatch ? parseInt(hMatch[1], 10) : 0
 
-  // Check for compact rendering mode
   const compact = /^<signature\s+[^>]*\bcompact\b/.test(raw)
 
-  // Extract body between opening tag and </signature>
   const openEnd = raw.indexOf('>')
   const closeStart = raw.lastIndexOf('</signature>')
   if (openEnd === -1 || closeStart === -1) return ''
   const body = raw.slice(openEnd + 1, closeStart)
 
-  // Extract <short> — one-liner rendered between heading and signature box
   const shortMatch = body.match(/<short>([\s\S]*?)<\/short>/)
   const short = shortMatch ? shortMatch[1].trim() : ''
 
-  // Extract <description> block (supports full markdown)
   const descMatch = body.match(/<description>([\s\S]*?)<\/description>/)
   const description = descMatch ? descMatch[1].trim() : ''
 
-  // Extract <param> tags
   const params: Param[] = []
   const paramRe = /<param\s+name="([^"]*)">([\s\S]*?)<\/param>/g
   let m: RegExpExecArray | null
@@ -156,7 +322,6 @@ function renderFuncBlock(md: MarkdownIt, raw: string, locale?: LocaleConfig, env
     params.push({ name: m[1], desc: m[2].trim() })
   }
 
-  // Extract <example> tags (full markdown blocks)
   const examples: string[] = []
   const exampleRe = /<example>([\s\S]*?)<\/example>/g
   let em: RegExpExecArray | null
@@ -164,31 +329,19 @@ function renderFuncBlock(md: MarkdownIt, raw: string, locale?: LocaleConfig, env
     examples.push(em[1].trim())
   }
 
-  // Strip namespace from signature for display
   const { display } = stripNamespace(signature)
-
-  // Extract short name for heading: "Class::method" or just "method"
   const shortName = extractShortName(display)
-
-  // Localized labels
   const paramsLabel = locale?.signatureParamsLabel ?? 'Parameters:'
   const examplesLabel = locale?.signatureExamplesLabel ?? 'Examples:'
-
-  // Build slug from FQN for unique heading IDs
   const slug = buildSlug(signature)
-
-  // Build HTML output
   const sigHtml = highlightSignature(md, display)
-  const descHtml = description ? md.render(description, env) : ''
 
-  // Compact mode: everything inline, no section headers
   if (compact) {
     const shortHtml = short ? md.renderInline(short) : ''
     const compactDescHtml = description ? md.render(description, env) : ''
 
     let html = '<div class="func-compact">'
 
-    // Hidden anchor for navigation when heading level is specified
     if (headingLevel > 0 && headingLevel <= 6) {
       html += `<h${headingLevel} id="${escapeHtml(slug)}" class="func-compact-anchor" tabindex="-1">${escapeHtml(shortName)} <a class="header-anchor" href="#${escapeHtml(slug)}" aria-label="Permalink to &quot;${escapeHtml(shortName)}&quot;">​</a></h${headingLevel}>`
     }
@@ -212,7 +365,6 @@ function renderFuncBlock(md: MarkdownIt, raw: string, locale?: LocaleConfig, env
 
   let html = ''
 
-  // Heading or bold text from short name
   if (headingLevel > 0 && headingLevel <= 6) {
     html += `<h${headingLevel} id="${escapeHtml(slug)}" tabindex="-1">${escapeHtml(shortName)} <a class="header-anchor" href="#${escapeHtml(slug)}" aria-label="Permalink to &quot;${escapeHtml(shortName)}&quot;">​</a></h${headingLevel}>\n`
   } else {
@@ -226,6 +378,7 @@ function renderFuncBlock(md: MarkdownIt, raw: string, locale?: LocaleConfig, env
   html += '<div class="func-block">\n'
   html += `  <code class="func-sig vp-code">${sigHtml}</code>\n`
 
+  const descHtml = description ? md.render(description, env) : ''
   if (descHtml) {
     html += `  <div class="func-desc">${descHtml}</div>\n`
   }
@@ -253,103 +406,4 @@ function renderFuncBlock(md: MarkdownIt, raw: string, locale?: LocaleConfig, env
 
   html += '</div>\n'
   return html
-}
-
-/**
- * Builds a unique slug from the signature's FQN.
- *
- * FQN signatures (e.g. `\Testo\Assert::string(...)`) produce slugs like `assert-string`.
- * Non-FQN signatures (e.g. `contains(...)`) fall back to the short method name.
- */
-function buildSlug(signature: string): string {
-  // Extract FQN path before the opening paren: \Testo\Assert::same(...) → Testo\Assert::same
-  const fqnMatch = signature.match(/^\\?(.+?)\(/)
-  if (fqnMatch) {
-    return fqnMatch[1]
-      .replace(/\\/g, '-')
-      .replace(/::/g, '--')   // double dash between class and method
-      .replace(/->/g, '--')
-      .toLowerCase()
-  }
-
-  // No FQN — use short method name
-  const methodMatch = signature.match(/^([A-Za-z_]\w*)/)
-  return methodMatch ? methodMatch[1].toLowerCase() : 'unknown'
-}
-
-/**
- * Strips namespace prefix from FQN signatures for display.
- * E.g. `\Testo\Assert::method(...)` → `Assert::method(...)`
- */
-function stripNamespace(signature: string): { display: string } {
-  const match = signature.match(/^\\?(?:[A-Za-z_]\w*\\)+(.*)$/)
-  return { display: match ? match[1] : signature }
-}
-
-/**
- * Extracts short name for heading from display signature.
- * E.g. `Assert::fail(string $message = ''): never` → `Assert::fail`
- */
-function extractShortName(display: string): string {
-  // Match "Class::method" or "Class->method" before the opening paren
-  const match = display.match(/^([A-Za-z_]\w*(?:::|->)[A-Za-z_]\w*)/)
-  if (match) return match[1]
-
-  // Match just "functionName" before paren
-  const funcMatch = display.match(/^([A-Za-z_]\w*)/)
-  return funcMatch ? funcMatch[1] : display
-}
-
-/**
- * Highlights a short func reference (e.g. `Assert::blank()`) by wrapping it
- * as a PHP static call expression so Shiki can tokenize it properly.
- */
-function highlightFuncRef(md: MarkdownIt, displayFqn: string, _fullSignature: string): string {
-  // displayFqn is e.g. "Assert::blank()" — valid PHP as a static method call
-  return highlightSignature(md, displayFqn) || escapeHtml(displayFqn)
-}
-
-/**
- * Highlights a PHP signature string using Shiki via markdown-it's highlight option.
- */
-function highlightSignature(md: MarkdownIt, signature: string): string {
-  const fallback = escapeHtml(signature)
-
-  const highlight = md.options.highlight
-  if (!highlight) return fallback
-
-  try {
-    // PHP grammar needs <?php prefix to activate proper tokenization
-    const result = highlight('<?php\n' + signature, 'php', '')
-
-    // Extract content between <code> and </code>
-    const codeMatch = result.match(/<code[^>]*>([\s\S]*?)<\/code>/)
-    if (!codeMatch) return fallback
-
-    let inner = codeMatch[1].trim()
-
-    // Remove first line (<?php) — Shiki separates lines by \n
-    const newlineIdx = inner.indexOf('\n')
-    if (newlineIdx !== -1) {
-      inner = inner.slice(newlineIdx + 1).trim()
-    }
-
-    // Unwrap <span class="line">...tokens...</span> → bare tokens
-    const lineMatch = inner.match(/^<span class="line">([\s\S]*)<\/span>$/)
-    if (lineMatch) {
-      inner = lineMatch[1]
-    }
-
-    return inner || fallback
-  } catch {
-    return fallback
-  }
-}
-
-function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
 }

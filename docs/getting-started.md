@@ -71,7 +71,7 @@ final class MyFirstTest
 }
 ```
 
-The `#[Test]` attribute marks the method as a test, and the `Assert` facade checks assertions. More about test approaches, attributes, and conventions — in [Writing Tests](writing-tests.md).
+The `#[Test]` attribute marks the method as a test, and the <class>\Testo\Assert</class> facade checks assertions. More about test approaches, attributes, and conventions — in [Writing Tests](writing-tests.md).
 
 ## Running Tests
 

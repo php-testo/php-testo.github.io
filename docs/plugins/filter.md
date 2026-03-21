@@ -6,13 +6,15 @@ llms_description: "Filter class API, name/path/suite filters, OR/AND combination
 
 This document describes the business logic of test filtering in Testo.
 
+<plugin-info name="Filter" class="\Testo\Filter\FilterPlugin" included="\Testo\Application\Config\Plugin\ApplicationPlugins" />
+
 ## Overview
 
-Testo provides a flexible filtering system that operates in multiple stages to progressively narrow down the test set. Filtering can be controlled programmatically via the `Filter` class or automatically from CLI arguments.
+Testo provides a flexible filtering system that operates in multiple stages to progressively narrow down the test set. Filtering can be controlled programmatically via the <class>\Testo\Common\Filter</class> class or automatically from CLI arguments.
 
 ## Filter Class
 
-The `Testo\Common\Filter` class is an immutable DTO containing test filtering criteria:
+The <class>\Testo\Common\Filter</class> class is an immutable DTO containing test filtering criteria:
 
 ```php
 $filter = new Filter(
@@ -53,7 +55,7 @@ $filter = new Filter(
 
 ### Usage with Application
 
-The `Filter` object can be passed to `Application::run()`:
+The <class>\Testo\Common\Filter</class> object can be passed to `Application::run()`:
 
 ```php
 $app = Application::createFromInput(/* ... */);
@@ -66,7 +68,7 @@ $filter = new Filter(
 $result = $app->run($filter);
 ```
 
-When running from CLI, the `Filter` is populated automatically from command arguments via `Filter::fromScope()`.
+When running from CLI, the <class>\Testo\Common\Filter</class> is populated automatically from command arguments via `Filter::fromScope()`.
 
 ## Filter Combination Logic
 

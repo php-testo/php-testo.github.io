@@ -2,13 +2,15 @@
 
 Этот документ описывает бизнес-логику фильтрации тестов в Testo.
 
+<plugin-info name="Filter" class="\Testo\Filter\FilterPlugin" included="\Testo\Application\Config\Plugin\ApplicationPlugins" />
+
 ## Обзор
 
-Testo предоставляет гибкую систему фильтрации, которая работает в несколько этапов для последовательного сужения набора тестов. Фильтрацией можно управлять программно через класс `Filter` или автоматически из аргументов CLI.
+Testo предоставляет гибкую систему фильтрации, которая работает в несколько этапов для последовательного сужения набора тестов. Фильтрацией можно управлять программно через класс <class>\Testo\Common\Filter</class> или автоматически из аргументов CLI.
 
 ## Класс Filter
 
-Класс `Testo\Common\Filter` представляет собой неизменяемый DTO, содержащий критерии фильтрации тестов:
+Класс <class>\Testo\Common\Filter</class> представляет собой неизменяемый DTO, содержащий критерии фильтрации тестов:
 
 ```php
 $filter = new Filter(
@@ -49,7 +51,7 @@ $filter = new Filter(
 
 ### Использование с Application
 
-Объект `Filter` может быть передан в `Application::run()`:
+Объект <class>\Testo\Common\Filter</class> может быть передан в `Application::run()`:
 
 ```php
 $app = Application::createFromInput(/* ... */);
@@ -62,7 +64,7 @@ $filter = new Filter(
 $result = $app->run($filter);
 ```
 
-При запуске из CLI объект `Filter` автоматически заполняется из аргументов команды через `Filter::fromScope()`.
+При запуске из CLI объект <class>\Testo\Common\Filter</class> автоматически заполняется из аргументов команды через `Filter::fromScope()`.
 
 ## Логика комбинирования фильтров
 

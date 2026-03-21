@@ -6,9 +6,7 @@ llms_description: "#[BeforeTest], #[AfterTest], #[BeforeClass], #[AfterClass] li
 
 Lifecycle attributes let you run code before and after tests — for setting up the environment, cleaning up state, and managing resources.
 
-::: info
-This functionality is provided by the `\Testo\Lifecycle\LifecyclePlugin` plugin, included in the `SuitePlugins` default set.
-:::
+<plugin-info class="\Testo\Lifecycle\LifecyclePlugin" name="Lifecycle" included="\Testo\Application\Config\Plugin\SuitePlugins" />
 
 ## Class Instantiation
 

@@ -5,18 +5,16 @@ llms_description: "How to write assertions in Testo tests. Two facades: Assert f
 
 # Assert
 
-Testo provides two facades for test assertions: `Assert` and `Expect`. Both are enabled automatically and available out of the box.
+The plugin provides assertion functionality in tests through the <class>\Testo\Assert</class> and <class>\Testo\Expect</class> facades.
 
-::: info
-This functionality is provided by the `\Testo\Assert\AssertPlugin` plugin, included in the `SuitePlugins` default set.
-:::
+<plugin-info class="\Testo\Assert\AssertPlugin" name="Assert" included="\Testo\Application\Config\Plugin\SuitePlugins" />
 
 ## Assert vs Expect
 
 The difference between the facades is **when** the check happens:
 
-- **Assert** — assertions. Checked immediately, right on the same line: "check and forget".
-- **Expect** — expectations. Registered during the test, but verified after the test finishes: "remember now, check later".
+- **<class>\Testo\Assert</class>** — assertions. Checked immediately, right on the same line: "check and forget".
+- **<class>\Testo\Expect</class>** — expectations. Registered during the test, but verified after the test finishes: "remember now, check later".
 
 This separation removes naming dissonance. When you see <func>\Testo\Expect::exception()</func> in a test, it's immediately clear that the check will happen later — after the test completes. While <func>\Testo\Assert::same()</func> fires right on that line.
 

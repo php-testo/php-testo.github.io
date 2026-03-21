@@ -2,7 +2,7 @@
 
 По умолчанию, если конфигурационный файл не указан, Testo запустит тесты из папки `tests` с набором плагинов по умолчанию.
 
-Чтобы сконфигурировать Testo, создайте файл `testo.php` в корне проекта. Файл должен возвращать экземпляр `ApplicationConfig`:
+Чтобы сконфигурировать Testo, создайте файл `testo.php` в корне проекта. Файл должен возвращать экземпляр <class>\Testo\Application\Config\ApplicationConfig</class>:
 
 ```php
 <?php
@@ -59,7 +59,7 @@ new SuiteConfig(
 ```
 
 ::: info
-Массивы в `location` и `plugins` — сокращения для `new FinderConfig(include: ...)` и `SuitePlugins::with(...)`. Для более гибкой настройки используйте `FinderConfig` и `SuitePlugins` напрямую.
+Массивы в `location` и `plugins` — сокращения для `new FinderConfig(include: ...)` и `SuitePlugins::with(...)`. Для более гибкой настройки используйте <class>\Testo\Application\Config\FinderConfig</class> и <class>\Testo\Application\Config\Plugin\SuitePlugins</class> напрямую.
 :::
 
 ::: question Можно ли отключить плагины Application-уровня для конкретного Test Suite?
@@ -87,7 +87,7 @@ Testo построен на [плагинах](plugins.md) — именно он
 Если массив `plugins` не указан, Testo подключает набор плагинов по умолчанию.
 
 ::: question Какие плагины приложения подключаются по умолчанию?
-Вы можете посмотреть список плагинов по умолчанию в классе `ApplicationPlugins`.
+Вы можете посмотреть список плагинов по умолчанию в классе <class>\Testo\Application\Config\Plugin\ApplicationPlugins</class>.
 
 Сейчас это:
 - [Filter](plugins/filter.md)
@@ -95,7 +95,7 @@ Testo построен на [плагинах](plugins.md) — именно он
 :::
 
 ::: question Какие плагины Test Suite подключаются по умолчанию?
-Вы можете посмотреть список плагинов по умолчанию в классе `SuitePlugins`.
+Вы можете посмотреть список плагинов по умолчанию в классе <class>\Testo\Application\Config\Plugin\SuitePlugins</class>.
 
 Сейчас это:
 - [Assert](plugins/assert.md)
@@ -107,7 +107,7 @@ Testo построен на [плагинах](plugins.md) — именно он
 
 ### Управление плагинами
 
-Для настройки плагинов используются фасады `SuitePlugins` и `ApplicationPlugins` (идентичный API):
+Для настройки плагинов используются фасады <class>\Testo\Application\Config\Plugin\SuitePlugins</class> и <class>\Testo\Application\Config\Plugin\ApplicationPlugins</class> (идентичный API):
 
 ::: code-group
 ```php [with()]

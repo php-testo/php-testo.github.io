@@ -2,7 +2,7 @@
 
 By default, if no configuration file is provided, Testo will run tests from the `tests` folder with the default plugin set.
 
-To configure Testo, create a `testo.php` file in the root of your project. The file must return an `ApplicationConfig` instance:
+To configure Testo, create a `testo.php` file in the root of your project. The file must return an <class>\Testo\Application\Config\ApplicationConfig</class> instance:
 
 ```php
 <?php
@@ -59,7 +59,7 @@ new SuiteConfig(
 ```
 
 ::: info
-Arrays in `location` and `plugins` are shorthands for `new FinderConfig(include: ...)` and `SuitePlugins::with(...)`. For more flexible configuration, use `FinderConfig` and `SuitePlugins` directly.
+Arrays in `location` and `plugins` are shorthands for `new FinderConfig(include: ...)` and `SuitePlugins::with(...)`. For more flexible configuration, use <class>\Testo\Application\Config\FinderConfig</class> and <class>\Testo\Application\Config\Plugin\SuitePlugins</class> directly.
 :::
 
 ::: question Can I disable application-level plugins for a specific Test Suite?
@@ -87,7 +87,7 @@ Testo is built on [plugins](plugins.md) — they define how tests are discovered
 If the `plugins` array is not specified, Testo uses the default plugin set.
 
 ::: question Which application plugins are enabled by default?
-You can check the default plugin list in the `ApplicationPlugins` class.
+You can check the default plugin list in the <class>\Testo\Application\Config\Plugin\ApplicationPlugins</class> class.
 
 Currently:
 - [Filter](plugins/filter.md)
@@ -95,7 +95,7 @@ Currently:
 :::
 
 ::: question Which Test Suite plugins are enabled by default?
-You can check the default plugin list in the `SuitePlugins` class.
+You can check the default plugin list in the <class>\Testo\Application\Config\Plugin\SuitePlugins</class> class.
 
 Currently:
 - [Assert](plugins/assert.md)
@@ -107,7 +107,7 @@ Currently:
 
 ### Managing Plugins
 
-Use the `SuitePlugins` and `ApplicationPlugins` facades to configure plugins (identical API):
+Use the <class>\Testo\Application\Config\Plugin\SuitePlugins</class> and <class>\Testo\Application\Config\Plugin\ApplicationPlugins</class> facades to configure plugins (identical API):
 
 ::: code-group
 ```php [with()]
