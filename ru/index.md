@@ -72,6 +72,7 @@ const declareTabs = [
   { name: 'Конвенция', slot: 'declare-convention', icon: 'testo-class' },
   { name: 'Inline', slot: 'declare-inline', icon: 'class' },
 ]
+
 </script>
 
 <div style="max-width: 700px; margin: 48px auto 0;">
@@ -94,8 +95,8 @@ Testo находится в фазе активной разработки и п
 
 Функции проверок разбиты на семантические группы:
 
-- Фасад `Assert::` — утверждения, выполняются сразу
-- Фасад `Expect::` — ожидания, откладываются до завершения теста
+- Фасад <class>\Testo\Assert</class> — утверждения, выполняются сразу
+- Фасад <class>\Testo\Expect</class> — ожидания, откладываются до завершения теста
 
 Пайповый синтаксис с группировкой по типу делает код лаконичным и типобезопасным.
 
@@ -186,7 +187,7 @@ public function testInvalidInput(): void
 Пишите тесты так, как удобно вам.
 
 - Тестами могут быть классы, функции или даже атрибуты прямо в продуктовом коде (Inline Tests).
-- Классам не нужно наследование от базового тестового класса. Код остаётся чистым.
+- Классы не нужно наследовать от базового тестового класса. Код остаётся чистым.
 - Обнаружение тестов по соглашениям об именовании или по явным атрибутам.
 
 </div>
@@ -297,6 +298,70 @@ final class Calculator
 
 </div>
 </div>
+</div>
+
+<div class="home-feature">
+
+## Бенчмарки одним атрибутом
+
+<HomeBench code-tab="Bench.php" result-tab="Результат">
+
+<template #description>
+
+Добавьте атрибут <attr>\Testo\Bench</attr> к методу, и Testo покажет, какая из реализаций работает быстрее. Со статистикой, фильтрацией выбросов и рекомендациями по стабильности.
+
+</template>
+
+<template #left>
+
+```php
+// Эталонный метод с атрибутом #[Bench]
+#[Bench(
+    callables: ['sumInCycle' => [self::class, 'sumInCycle']],
+    arguments: [1, 5_000],
+)]
+public static function sumInArray(int $a, int $b): int
+{
+    return \array_sum(\range($a, $b));
+}
+```
+
+</template>
+
+<template #right>
+
+```php
+// Альтернативная реализация
+public static function sumInCycle(int $a, int $b): int
+{
+    $result = 0;
+    for ($i = $a; $i <= $b; ++$i) {
+        $result += $i;
+    }
+    return $result;
+}
+```
+
+</template>
+
+<template #result>
+
+```
+Results for sumInArray:
++--------------------------+------------------------------------------------+---------+
+| BENCHMARK SETUP          | TIME RESULTS                                   | SUMMARY |
+| Name     | Iters | Calls | Mean              | Median            | RStDev | Place   |
++----------+-------+-------+-------------------+-------------------+--------+---------+
+| current  | 10    | 1000  | 11.65µs           | 11.58µs           | ±1.55% | 1st     |
+| in cycle | 10    | 1000  | 43.80µs (+275.8%) | 44.17µs (+281.5%) | ±1.67% | 2nd     |
++----------+-------+-------+-------------------+-------------------+--------+---------+
+
+```
+
+</template>
+
+</HomeBench>
+
 </div>
 
 <div class="sponsors-section">

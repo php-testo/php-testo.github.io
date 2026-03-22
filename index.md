@@ -73,6 +73,7 @@ const declareTabs = [
   { name: 'Convention', slot: 'declare-convention', icon: 'testo-class' },
   { name: 'Inline', slot: 'declare-inline', icon: 'class' },
 ]
+
 </script>
 
 <div style="max-width: 700px; margin: 48px auto 0;">
@@ -95,8 +96,8 @@ Want to support the project? [Star the repo](https://github.com/php-testo/testo)
 
 Assertion functions are split into semantic groups:
 
-- `Assert::` facade — assertions, executed immediately
-- `Expect::` facade — expectations, deferred until test completion
+- <class>\Testo\Assert</class> facade — assertions, executed immediately
+- <class>\Testo\Expect</class> facade — expectations, deferred until test completion
 
 Pipe syntax with type grouping keeps code concise and type-safe.
 
@@ -298,6 +299,69 @@ Full-featured workflow: run and re-run from gutter icons, navigation between tes
 
 </div>
 </div>
+</div>
+
+<div class="home-feature">
+
+## Benchmarks with a Single Attribute
+
+<HomeBench code-tab="Bench.php" result-tab="Result">
+
+<template #description>
+
+Add the <attr>\Testo\Bench</attr> attribute to a method, and Testo will show which implementation is faster. With statistics, outlier filtering, and stability recommendations.
+
+</template>
+
+<template #left>
+
+```php
+// Baseline method with the #[Bench] attribute
+#[Bench(
+    callables: [ 'sumInCycle' => [self::class, 'sumInCycle']],
+    arguments: [1, 5_000],
+)]
+public static function sumInArray(int $a, int $b): int
+{
+    return \array_sum(\range($a, $b));
+}
+```
+
+</template>
+
+<template #right>
+
+```php
+// Alternative implementation
+public static function sumInCycle(int $a, int $b): int
+{
+    $result = 0;
+    for ($i = $a; $i <= $b; ++$i) {
+        $result += $i;
+    }
+    return $result;
+}
+```
+
+</template>
+
+<template #result>
+
+```
+Results for sumInArray:
++--------------------------+------------------------------------------------+---------+
+| BENCHMARK SETUP          | TIME RESULTS                                   | SUMMARY |
+| Name     | Iters | Calls | Mean              | Median            | RStDev | Place   |
++----------+-------+-------+-------------------+-------------------+--------+---------+
+| current  | 10    | 1000  | 11.65µs           | 11.58µs           | ±1.55% | 1st     |
+| in cycle | 10    | 1000  | 43.80µs (+275.8%) | 44.17µs (+281.5%) | ±1.67% | 2nd     |
++----------+-------+-------+-------------------+-------------------+--------+---------+
+```
+
+</template>
+
+</HomeBench>
+
 </div>
 
 <div class="sponsors-section">

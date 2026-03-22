@@ -5,6 +5,7 @@ import DefaultTheme from 'vitepress/theme'
 import BlogSponsor from './BlogSponsor.vue'
 import GitHubStars from './GitHubStars.vue'
 import CodeTabs from './CodeTabs.vue'
+import HomeBench from './HomeBench.vue'
 import JetBrainsPluginButton from './JetBrainsPluginButton.vue'
 import JetBrainsPlugin from './JetBrainsPlugin.vue'
 import BlogPosts from './BlogPosts.vue'
@@ -82,6 +83,7 @@ export default {
   }),
   enhanceApp({ app, router }) {
     app.component('CodeTabs', CodeTabs)
+    app.component('HomeBench', HomeBench)
     app.component('JetBrainsPluginButton', JetBrainsPluginButton)
     app.component('JetBrainsPlugin', JetBrainsPlugin)
     app.component('BlogPosts', BlogPosts)
