@@ -136,13 +136,13 @@ faqLevel: false   # no collection — questions stay in place as inline spoilers
 
 ## API Signatures (`<signature>`)
 
-For documenting methods and functions in API reference pages. Renders a highlighted PHP signature box with description, parameters, and examples.
+For documenting methods, functions, and PHP attributes in API reference pages. Renders a highlighted PHP signature box with description, parameters, and examples.
 
 **Plugin:** `.vitepress/func-block.ts` — markdown-it block rule, Shiki highlighting.
 
 **Styles:** `.vitepress/theme/style.css` — `.func-block`, `.func-sig` classes.
 
-**Full syntax:**
+**Full syntax (function):**
 ```html
 <signature h="3" name="\Testo\Assert::same(mixed $actual, mixed $expected, string $message = ''): void">
 <short>Checks strict equality of two values.</short>
@@ -157,9 +157,18 @@ Assert::same($user->role, 'admin');
 </signature>
 ```
 
+**Attribute signature syntax:**
+```html
+<signature h="2" name="#[\Testo\Retry(int $maxAttempts = 3, bool $markFlaky = true)]">
+<short>Declares a retry policy for a test on failure.</short>
+</signature>
+```
+
+Attribute signatures are detected by the `#[` prefix in `name`. The `#[...]` wrapper is preserved in the rendered signature box. Headings display as `#[ShortName]` (e.g., `#[Retry]`). The inner FQN (without `#[...]`) is used for registry lookup and `<attr>` cross-references.
+
 **Attributes:**
-- `name` (required) — full method signature with types and return type. Supports FQN (`\Testo\Assert::method`) — namespace is stripped for display, only short class name shown.
-- `h` — heading level for auto-generated heading (`"3"` → `<h3>Assert::same</h3>`). Default: `"0"` (bold text, no heading). Heading text is extracted automatically: `Class::method` from the signature.
+- `name` (required) — full signature. For functions: FQN with types and return type (`\Testo\Assert::method`). For attributes: `#[\Namespace\AttrName(params)]`. Namespace is stripped for display.
+- `h` — heading level for auto-generated heading (`"3"` → `<h3>Assert::same</h3>` or `<h2>#[Retry]</h2>`). Default: `"0"` (bold text, no heading).
 - `compact` — compact rendering mode: signature + short + description inline, no card/sections. Good for simple methods in lists.
 
 **Inner tags (all optional):**
@@ -194,6 +203,25 @@ Renders as `Assert::blank()` with syntax highlighting. On hover, shows a tooltip
 - Locale-aware: EN pages reference EN signatures, RU pages reference RU signatures
 
 **Registry:** All `<signature>` blocks with FQN names (starting with `\`) are collected at build startup. The `<func>` tag content is matched by stripping arguments: `\Testo\Assert::blank()` matches `\Testo\Assert::blank(mixed $actual, string $message = ''): void`.
+
+## Attribute References (`<attr>`)
+
+For cross-referencing PHP attributes inline within text. Renders as `#[ShortName]` with Shiki highlighting and a hover tooltip showing the full signature and description.
+
+**Plugin:** `.vitepress/func-block.ts` — markdown-it inline + block rules. **Registry:** `.vitepress/func-registry.ts` — separate attribute registry (parallel to function registry).
+
+**Syntax:**
+```html
+<attr>\Testo\Retry</attr>
+```
+
+Takes the plain FQN (without `#[...]`) and renders as `#[Retry]` with syntax highlighting. On hover, shows a tooltip with the full attribute signature and `<short>` description from the corresponding `<signature>` block.
+
+**Behavior:**
+- Same linking/tooltip rules as `<func>`: link if `h > 0`, tooltip-only otherwise, plain `<code>` if not found
+- The `#[...]` wrapping is added automatically — always pass plain FQN in the tag
+- Locale-aware: EN pages reference EN signatures, RU pages reference RU signatures
+- Uses a separate registry from `<func>` to avoid FQN collisions
 
 ## Class References (`<class>`)
 
