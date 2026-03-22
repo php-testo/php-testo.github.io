@@ -305,12 +305,12 @@ You can determine the type of the JSON value at the start, after which type-spec
 <short>Checks that the JSON object contains the given keys.</short>
 </signature>
 
-<signature h="4" name="\Testo\Assert\Api\Json\JsonStructure::assertPath(string $path, callable $callback): static">
+<signature compact h="4" name="\Testo\Assert\Api\Json\JsonStructure::assertPath(string $path, callable $callback): static">
 <short>Checks a nested value at the given path.</short>
 <description>The callback receives a `JsonAbstract` for the value at the specified path, allowing you to build nested assertion chains.</description>
 </signature>
 
-<signature h="4" name="\Testo\Assert\Api\Json\JsonCommon::matchesType(string $type): static">
+<signature compact h="4" name="\Testo\Assert\Api\Json\JsonCommon::matchesType(string $type): static">
 <short>Validates the JSON structure against a Psalm type.</short>
 <description>Accepts an extended Psalm type annotation — for example, `'array{foo: bool, bar?: non-empty-string}'` or `'list<array{id: positive-int}>'`.</description>
 </signature>

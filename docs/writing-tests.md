@@ -9,11 +9,11 @@ Testo doesn't dictate how or where to write tests. Separate tests in classes and
 
 **Test Approaches**
 
-| Approach                          | Discovery               | When to use                       |
-|-----------------------------------|-------------------------|-----------------------------------|
-| [Separate tests](#separate-tests) | `#[Test]` / conventions | Unit, feature, integration        |
-| [Inline tests](#inline-tests)     | `#[TestInline]`         | Simple checks in application code |
-| [Benchmarks](#benchmarks)         | `#[Bench]`              | Performance comparison            |
+| Approach                          | Discovery                              | When to use                       |
+|-----------------------------------|----------------------------------------|-----------------------------------|
+| [Separate tests](#separate-tests) | <attr>\Testo\Test</attr> / conventions | Unit, feature, integration        |
+| [Inline tests](#inline-tests)     | <attr>\Testo\Inline\TestInline</attr>  | Simple checks in application code |
+| [Benchmarks](#benchmarks)         | <attr>\Testo\Bench</attr>              | Performance comparison            |
 
 ## Separate Tests
 
@@ -59,7 +59,7 @@ function defaultCurrencyIsUsd(): void
 ```
 :::
 
-For checks, Testo provides two facades from the [Assert plugin](plugins/assert.md):
+For checks, Testo provides two facades from the <plugin>Assert</plugin> plugin:
 
 - <class>\Testo\Assert</class> — assertions, checked immediately. Supports chained typed checks.
 - <class>\Testo\Expect</class> — expectations, checked after the test completes (exceptions, memory leaks).
@@ -84,7 +84,7 @@ Expect::notLeaks($connection);
 
 Instead of base classes or magic methods, Testo bets on attributes.
 
-- The `#[Test]` attribute from the [Test plugin](plugins/test.md) marks methods and functions as separate tests:
+- The <attr>\Testo\Test</attr> attribute from the <plugin>Test</plugin> plugin marks methods and functions as separate tests:
 
     ::: code-group
     ```php [Methods]
@@ -109,7 +109,7 @@ Instead of base classes or magic methods, Testo bets on attributes.
     :::
 
 
-- Instead of copying the same test for different data, use `#[DataSet]` and `#[DataProvider]` from the [Data](plugins/data.md) plugin to parameterize a test with different data sets:
+- Instead of copying the same test for different data, use <attr>\Testo\Data\DataSet</attr> and <attr>\Testo\Data\DataProvider</attr> from the <plugin>Data</plugin> plugin to parameterize a test with different data sets:
 
     ```php
     #[DataSet([1, 2, 3])]
@@ -117,7 +117,7 @@ Instead of base classes or magic methods, Testo bets on attributes.
     public function sum(int $a, int $b, int $expected): void { /* ... */ }
     ```
 
-- Instead of <func>\Testo\Expect::exception()</func> you can use the `#[ExpectException]` attribute, which is slightly more compact and adds clarity:
+- Instead of <func>\Testo\Expect::exception()</func> you can use the <attr>\Testo\Assert\ExpectException</attr> attribute, which is slightly more compact and adds clarity:
 
     ```php
     #[ExpectException(\InsufficientFundsException::class)]
@@ -127,18 +127,18 @@ Instead of base classes or magic methods, Testo bets on attributes.
     }
     ```
 
-- The `#[Retry]` attribute from the [Retry](plugins/retry.md) plugin restarts a test on failure, marking it as flaky:
+- The <attr>\Testo\Retry</attr> attribute from the <plugin>Retry</plugin> plugin restarts a test on failure, marking it as flaky:
 
     ```php
     #[Retry(maxAttempts: 3)]
     public function flakyExternalService(): void { /* ... */ }
     ```
 
-- Lifecycle hooks from the [Lifecycle](plugins/lifecycle.md) plugin help set up the environment and clean state between tests:
-    - `#[BeforeTest]` — runs before each test.
-    - `#[AfterTest]` — runs after each test.
-    - `#[BeforeClass]` — runs once before all tests in the class.
-    - `#[AfterClass]` — runs once after all tests in the class.
+- Lifecycle hooks from the <plugin>Lifecycle</plugin> plugin help set up the environment and clean state between tests:
+    - <attr>\Testo\Lifecycle\BeforeTest</attr> — runs before each test.
+    - <attr>\Testo\Lifecycle\AfterTest</attr> — runs after each test.
+    - <attr>\Testo\Lifecycle\BeforeClass</attr> — runs once before all tests in the class.
+    - <attr>\Testo\Lifecycle\AfterClass</attr> — runs once after all tests in the class.
 
 ::: info
 Visit the plugin pages for detailed information about each attribute and other capabilities.
@@ -146,7 +146,7 @@ Visit the plugin pages for detailed information about each attribute and other c
 
 ### Naming Conventions
 
-The [Convention plugin](plugins/convention.md) discovers tests by naming patterns — no attributes needed. By default, `*Test` suffix on classes and `test*` prefix on methods:
+The <plugin>Convention</plugin> plugin discovers tests by naming patterns — no attributes needed. By default, `*Test` suffix on classes and `test*` prefix on methods:
 
 ```php
 // tests/Unit/OrderTest.php
@@ -172,7 +172,7 @@ Convention is not included in the default plugin set — [enable it](configurati
 
 ## Inline Tests
 
-Tests directly on the method being tested using the `#[TestInline]` attribute from the [Inline plugin](plugins/inline.md) — even a separate test class is not needed:
+Tests directly on the method being tested using the <attr>\Testo\Inline\TestInline</attr> attribute from the <plugin>Inline</plugin> plugin — even a separate test class is not needed:
 
 ```php
 #[TestInline([1, 1], 2)]
@@ -190,7 +190,7 @@ Best for simple pure functions and quick prototyping.
 
 ## Benchmarks
 
-The `#[Bench]` attribute from the [Bench plugin](plugins/bench.md) compares function performance:
+The <attr>\Testo\Bench</attr> attribute from the <plugin>Bench</plugin> plugin compares function performance:
 
 ```php
 #[Bench(

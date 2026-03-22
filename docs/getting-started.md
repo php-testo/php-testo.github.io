@@ -55,7 +55,7 @@ To learn more about configuration, visit the [Configuration](configuration.md) s
 
 ## Writing Your First Test
 
-Create a test class in the configured directory (e.g., `tests/Unit/MyFirstTest.php`) and add a method with the `#[Test]` attribute:
+Create a test class in the configured directory (e.g., `tests/Unit/MyFirstTest.php`) and add a method with the <attr>\Testo\Test</attr> attribute:
 
 ```php
 final class MyFirstTest
@@ -71,7 +71,7 @@ final class MyFirstTest
 }
 ```
 
-The `#[Test]` attribute marks the method as a test, and the <class>\Testo\Assert</class> facade checks assertions. More about test approaches, attributes, and conventions — in [Writing Tests](writing-tests.md).
+The <attr>\Testo\Test</attr> attribute marks the method as a test, and the <class>\Testo\Assert</class> facade checks assertions. More about test approaches, attributes, and conventions — in [Writing Tests](writing-tests.md).
 
 ## Running Tests
 

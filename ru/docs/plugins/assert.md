@@ -304,12 +304,12 @@ Assert::object($event)
 <short>Проверяет, что JSON-объект содержит указанные ключи.</short>
 </signature>
 
-<signature h="4" name="\Testo\Assert\Api\Json\JsonStructure::assertPath(string $path, callable $callback): static">
+<signature compact h="4" name="\Testo\Assert\Api\Json\JsonStructure::assertPath(string $path, callable $callback): static">
 <short>Проверяет вложенное значение по указанному пути.</short>
 <description>Callback получает `JsonAbstract` для значения по указанному пути, что позволяет строить вложенные цепочки проверок.</description>
 </signature>
 
-<signature h="4" name="\Testo\Assert\Api\Json\JsonCommon::matchesType(string $type): static">
+<signature compact h="4" name="\Testo\Assert\Api\Json\JsonCommon::matchesType(string $type): static">
 <short>Валидирует структуру JSON по Psalm-типу.</short>
 <description>Принимает расширенную аннотацию типа Psalm — например, `'array{foo: bool, bar?: non-empty-string}'` или `'list<array{id: positive-int}>'`.</description>
 </signature>

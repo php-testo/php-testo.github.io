@@ -152,7 +152,7 @@ testo run --filter=UserTest --path="tests/Unit"
 
 **Возможные значения:**
 - `test` — обычные тесты (методы в классах)
-- `inline` — [встроенные тесты](/ru/docs/plugins/inline.md) (тесты через `#[TestInline]`)
+- `inline` — [встроенные тесты](/ru/docs/plugins/inline.md) (тесты через <attr>\Testo\Inline\TestInline</attr>)
 - `bench` — бенчмарки
 
 **Примеры:**

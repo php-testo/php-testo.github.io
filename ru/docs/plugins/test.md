@@ -3,7 +3,7 @@
 <plugin-info name="Test" class="\Testo\Test\TestPlugin" included="\Testo\Application\Config\Plugin\SuitePlugins" />
 
 
-Атрибут `#[Test]` явно помечает метод, функцию или класс как тест.
+Атрибут <attr>\Testo\Test</attr> явно помечает метод, функцию или класс как тест.
 
 Можно ставить на:
 
@@ -48,7 +48,7 @@ function applies_discount(): void { /* ... */ }
 
 ## Когда использовать
 
-Используйте `#[Test]`, когда:
+Используйте <attr>\Testo\Test</attr>, когда:
 
 - Хотите **явно** объявлять тесты без привязки к именам
 - Имя метода/функции не следует конвенции с префиксом `test`

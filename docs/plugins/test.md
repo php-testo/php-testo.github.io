@@ -4,7 +4,7 @@ llms_description: "#[Test] attribute on classes, methods, and functions for expl
 
 # Test Attribute
 
-The `#[Test]` attribute explicitly marks a method, function, or class as a test.
+The <attr>\Testo\Test</attr> attribute explicitly marks a method, function, or class as a test.
 
 Can be placed on:
 
@@ -49,7 +49,7 @@ function applies_discount(): void { /* ... */ }
 
 ## When to Use
 
-Use `#[Test]` when:
+Use <attr>\Testo\Test</attr> when:
 
 - You want **explicit** test declaration without relying on naming patterns
 - Your method/function name doesn't follow the `test` prefix convention

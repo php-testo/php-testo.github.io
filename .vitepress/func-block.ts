@@ -1,9 +1,10 @@
 /**
- * Function signature block plugin for markdown-it.
+ * Function/attribute signature block plugin for markdown-it.
  *
  * Tags:
- *   <signature> — API reference card with Shiki-highlighted PHP signature
- *   <func>      — inline/block cross-reference to a <signature> block (tooltip + link)
+ *   <signature> — API reference card with Shiki-highlighted PHP signature (functions and attributes)
+ *   <func>      — inline/block cross-reference to a function <signature> (tooltip + link)
+ *   <attr>      — inline/block cross-reference to an attribute <signature> (tooltip + link)
  *   <class>     — inline/block tag rendering short class name with FQN tooltip
  *   <plugin>    — inline/block link to a plugin page by name (from plugin-block registry)
  */
@@ -11,7 +12,7 @@ import type MarkdownIt from 'markdown-it'
 import type StateInline from 'markdown-it/lib/rules_inline/state_inline.mjs'
 import type StateBlock from 'markdown-it/lib/rules_block/state_block.mjs'
 import { getLocaleByPath, type LocaleConfig } from './locales'
-import { getEntry } from './func-registry'
+import { getEntry, getAttrEntry } from './func-registry'
 import { getPluginEntry } from './plugin-block'
 
 interface Param {
@@ -84,9 +85,17 @@ function highlightSignature(md: MarkdownIt, signature: string): string {
 
 // ─── Inline tag renderers (return HTML string) ──────────
 
-function renderFuncRefHtml(md: MarkdownIt, rawFqn: string, locale?: LocaleConfig): string {
-  const displayFqn = stripNamespace(rawFqn).display
-  const entry = getEntry(locale?.code ?? 'en', rawFqn)
+function renderRefHtml(
+  md: MarkdownIt,
+  rawFqn: string,
+  locale: LocaleConfig | undefined,
+  lookupEntry: typeof getEntry,
+  wrapDisplay?: (display: string) => string,
+  extraClass?: string,
+): string {
+  const baseDisplay = stripNamespace(rawFqn).display
+  const displayFqn = wrapDisplay ? wrapDisplay(baseDisplay) : baseDisplay
+  const entry = lookupEntry(locale?.code ?? 'en', rawFqn)
 
   if (entry) {
     const sigHtml = highlightSignature(md, entry.signature)
@@ -98,15 +107,25 @@ function renderFuncRefHtml(md: MarkdownIt, rawFqn: string, locale?: LocaleConfig
       + (shortHtml ? `<span class="func-ref-tooltip-short">${shortHtml}</span>` : '')
       + `</span>`
 
+    const cls = extraClass ? `func-ref ${extraClass} vp-code` : 'func-ref vp-code'
+
     if (entry.hasAnchor) {
       const href = entry.pagePath + '#' + entry.slug
-      return `<a href="${href}" class="func-ref vp-code">${displayHtml}${tooltip}</a>`
+      return `<a href="${href}" class="${cls}">${displayHtml}${tooltip}</a>`
     }
 
-    return `<span class="func-ref vp-code">${displayHtml}${tooltip}</span>`
+    return `<span class="${cls}">${displayHtml}${tooltip}</span>`
   }
 
   return `<code>${escapeHtml(displayFqn)}</code>`
+}
+
+function renderFuncRefHtml(md: MarkdownIt, rawFqn: string, locale?: LocaleConfig): string {
+  return renderRefHtml(md, rawFqn, locale, getEntry)
+}
+
+function renderAttrRefHtml(md: MarkdownIt, rawFqn: string, locale?: LocaleConfig): string {
+  return renderRefHtml(md, rawFqn, locale, getAttrEntry, (d) => '#[' + d + ']', 'attr-ref')
 }
 
 function renderKlassRefHtml(fqn: string): string {
@@ -231,6 +250,12 @@ export function funcBlockPlugin(md: MarkdownIt) {
     return renderPluginRefHtml(name, locale)
   })
 
+  registerBlockParagraphTag(md, 'attr_line', 'attr', (rawFqn, state) => {
+    const relativePath = state.env?.relativePath || ''
+    const locale = getLocaleByPath('/' + relativePath)
+    return renderAttrRefHtml(md, rawFqn, locale)
+  })
+
   // ── <signature> block rule (multi-line) ──
 
   md.block.ruler.before('html_block', 'func_block', (state, startLine, endLine, silent) => {
@@ -274,6 +299,7 @@ export function funcBlockPlugin(md: MarkdownIt) {
   registerInlineTag(md, 'func', 'func_ref', { before: 'html_inline' }, { withLocale: true })
   registerInlineTag(md, 'class', 'class_ref', { after: 'func_ref' })
   registerInlineTag(md, 'plugin', 'plugin_ref', { after: 'class_ref' }, { withLocale: true })
+  registerInlineTag(md, 'attr', 'attr_ref', { after: 'plugin_ref' }, { withLocale: true })
 
   // ── Inline renderers ──
 
@@ -289,6 +315,11 @@ export function funcBlockPlugin(md: MarkdownIt) {
   md.renderer.rules['plugin_ref'] = (tokens, idx) => {
     const { content, meta } = tokens[idx]
     return renderPluginRefHtml(content, meta?.locale)
+  }
+
+  md.renderer.rules['attr_ref'] = (tokens, idx) => {
+    const { content, meta } = tokens[idx]
+    return renderAttrRefHtml(md, content, meta?.locale)
   }
 }
 
@@ -329,11 +360,15 @@ function renderFuncBlock(md: MarkdownIt, raw: string, locale?: LocaleConfig, env
     examples.push(em[1].trim())
   }
 
-  const { display } = stripNamespace(signature)
-  const shortName = extractShortName(display)
+  const isAttr = signature.startsWith('#[')
+  const innerSig = isAttr ? signature.slice(2, -1) : signature
+  const { display: innerDisplay } = stripNamespace(innerSig)
+  const display = isAttr ? '#[' + innerDisplay + ']' : innerDisplay
+  const rawShortName = extractShortName(innerDisplay)
+  const shortName = isAttr ? '#[' + rawShortName + ']' : rawShortName
   const paramsLabel = locale?.signatureParamsLabel ?? 'Parameters:'
   const examplesLabel = locale?.signatureExamplesLabel ?? 'Examples:'
-  const slug = buildSlug(signature)
+  const slug = buildSlug(innerSig)
   const sigHtml = highlightSignature(md, display)
 
   if (compact) {

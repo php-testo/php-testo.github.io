@@ -1,8 +1,10 @@
 /**
- * Signature registry for cross-referencing `<func>` inline tags.
+ * Signature registry for cross-referencing `<func>` and `<attr>` inline tags.
  *
- * Pre-scans all .md files to collect `<signature>` blocks with FQN names and h > 0,
- * then provides lookup for inline `<func>` references to generate links and tooltips.
+ * Pre-scans all .md files to collect `<signature>` blocks with FQN names,
+ * then provides lookup for inline references to generate links and tooltips.
+ * Function signatures (e.g. `\Testo\Assert::same(...)`) and attribute signatures
+ * (e.g. `#[\Testo\MyAttr(...)]`) are stored in separate registries.
  */
 import { readFileSync, readdirSync, statSync } from 'fs'
 import { join, relative } from 'path'
@@ -19,6 +21,7 @@ export interface RegistryEntry {
 
 // locale code -> normalized FQN -> entry
 const registry = new Map<string, Map<string, RegistryEntry>>()
+const attrRegistry = new Map<string, Map<string, RegistryEntry>>()
 
 /**
  * Normalize FQN by stripping arguments and return type.
@@ -63,6 +66,7 @@ function stripNamespaceForDisplay(signature: string): string {
  */
 export function preScanSignatures(srcDir: string): void {
   registry.clear()
+  attrRegistry.clear()
   const mdFiles = collectMdFiles(srcDir)
 
   // Match all <signature> blocks with a name attribute
@@ -73,11 +77,6 @@ export function preScanSignatures(srcDir: string): void {
     const relPath = relative(srcDir, filePath).replace(/\\/g, '/')
     const locale = getLocaleByPath('/' + relPath)
     const pagePath = '/' + relPath.replace(/\.md$/, '').replace(/\/index$/, '/')
-
-    if (!registry.has(locale.code)) {
-      registry.set(locale.code, new Map())
-    }
-    const localeMap = registry.get(locale.code)!
 
     sigRe.lastIndex = 0
     let match: RegExpExecArray | null
@@ -90,10 +89,20 @@ export function preScanSignatures(srcDir: string): void {
       if (!nameMatch) continue
       const signature = nameMatch[1]
 
-      // Only collect FQN signatures (starting with \)
-      if (!signature.startsWith('\\')) continue
+      // Detect attribute signatures: #[\Namespace\Attr(...)]
+      const isAttr = signature.startsWith('#[')
+      const innerSig = isAttr ? signature.slice(2, -1) : signature
 
-      const fqn = normalizeFqn(signature)
+      // Only collect FQN signatures (starting with \)
+      if (!innerSig.startsWith('\\')) continue
+
+      const fqn = normalizeFqn(innerSig)
+      const targetRegistry = isAttr ? attrRegistry : registry
+
+      if (!targetRegistry.has(locale.code)) {
+        targetRegistry.set(locale.code, new Map())
+      }
+      const localeMap = targetRegistry.get(locale.code)!
 
       // Skip if already registered (first wins)
       if (localeMap.has(fqn)) continue
@@ -105,11 +114,13 @@ export function preScanSignatures(srcDir: string): void {
       const shortMatch = body.match(/<short>([\s\S]*?)<\/short>/)
       const short = shortMatch ? shortMatch[1].trim() : ''
 
+      const displaySig = stripNamespaceForDisplay(innerSig)
+
       localeMap.set(fqn, {
         fqn,
-        slug: buildSlugFromFqn(signature),
+        slug: buildSlugFromFqn(innerSig),
         pagePath,
-        signature: stripNamespaceForDisplay(signature),
+        signature: isAttr ? '#[' + displaySig + ']' : displaySig,
         short,
         hasAnchor,
       })
@@ -118,11 +129,19 @@ export function preScanSignatures(srcDir: string): void {
 }
 
 /**
- * Look up a signature entry by FQN and locale.
+ * Look up a function signature entry by FQN and locale.
  */
 export function getEntry(localeCode: string, rawFqn: string): RegistryEntry | undefined {
   const fqn = normalizeFqn(rawFqn)
   return registry.get(localeCode)?.get(fqn)
+}
+
+/**
+ * Look up an attribute signature entry by FQN and locale.
+ */
+export function getAttrEntry(localeCode: string, rawFqn: string): RegistryEntry | undefined {
+  const fqn = normalizeFqn(rawFqn)
+  return attrRegistry.get(localeCode)?.get(fqn)
 }
 
 /**

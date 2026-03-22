@@ -6,13 +6,25 @@ llms_description: "#[Bench] attribute for comparing implementation performance. 
 
 # Benchmarks
 
-The plugin lets you compare performance of multiple implementations using the `#[Bench]` attribute. The method with the attribute serves as the baseline, and alternative implementations are passed as parameters. Testo measures execution time, collects statistics, and determines which implementation is faster.
+The plugin lets you compare performance of multiple implementations using the <attr>\Testo\Bench</attr> attribute. The method with the attribute serves as the baseline, and alternative implementations are passed as parameters. Testo measures execution time, collects statistics, and determines which implementation is faster.
 
 <plugin-info name="Bench" class="\Testo\Bench\BenchmarkPlugin" included="\Testo\Application\Config\Plugin\SuitePlugins" />
 
+<signature h="2" name="#[\Testo\Bench(array $callables, array $arguments = [], int $warmup = 1, int $calls = 1_000, int $iterations = 10)]">
+<short>Declares a benchmark comparing the method's performance against alternative implementations.</short>
+<description>
+The method with the attribute serves as the baseline (`current` in the results table). Testo measures execution time of all implementations, collects statistics, and determines which is faster.
+</description>
+<param name="$callables">Alternative implementations to compare against the baseline. An associative array where the key is the display name in the results table, and the value is any valid PHP callable: `[Class::class, 'method']`, `'function'`, closures.</param>
+<param name="$arguments">Arguments passed to all functions — both the baseline and alternatives. All implementations receive the same inputs.</param>
+<param name="$warmup">Number of warmup calls before the actual benchmark. Eliminates cold-start overhead (lazy initialization, first-call allocations). Warmup results are discarded.</param>
+<param name="$calls">How many times each function is called per iteration. For very fast functions (microseconds), increase this value.</param>
+<param name="$iterations">How many times to repeat the measurement. Each iteration is an independent run of all `$calls` invocations, and results are averaged. Multiple iterations help filter out random spikes.</param>
+</signature>
+
 ## Basic Usage
 
-Say you want to find out what's faster: summing numbers with a `for` loop or via `array_sum`. Put the `#[Bench]` attribute on one method and specify the other in `callables`:
+Say you want to find out what's faster: summing numbers with a `for` loop or via `array_sum`. Put the <attr>\Testo\Bench</attr> attribute on one method and specify the other in `callables`:
 
 ```php
 #[Bench(
@@ -53,45 +65,6 @@ Results for sumInCycle:
 ```
 
 In the **Name** column, `current` refers to the method with the attribute (the baseline), and `sumInArray` is the alternative. The percentage in parentheses shows how much faster or slower an implementation is compared to the baseline: `(-70.0%)` means `sumInArray` ran 70% faster. The **Place** column is the final ranking.
-
-## Attribute Parameters
-
-### `callables`
-
-Alternative implementations to compare against the baseline. Passed as an associative array where the key is the display name in the results table, and the value is any valid PHP callable:
-
-```php
-callables: [
-    'array_sum' => [self::class, 'sumInArray'],
-    'formula'   => [self::class, 'sumLinear'],
-]
-```
-
-Supports the same callable formats as PHP: `[Class::class, 'method']`, `'function'`, closures.
-
-### `arguments`
-
-Arguments passed to all functions — both the baseline and alternatives. Every implementation receives the same inputs to ensure a fair comparison:
-
-```php
-arguments: [1, 5_000]
-```
-
-### `calls`
-
-How many times each function is called per iteration. By default, Testo calls the function multiple times in a row and measures the total time, so that a single call isn't too short for accurate measurement. For very fast functions (microseconds), you should increase this value:
-
-```php
-calls: 2000
-```
-
-### `iterations`
-
-How many times to repeat the measurement. Each iteration is an independent run of all `calls` invocations, and results are averaged across iterations. Multiple iterations are needed to filter out random spikes: background processes, OS activity, and other factors can affect any single measurement, but their impact is smoothed out through averaging:
-
-```php
-iterations: 10
-```
 
 ## Results
 
@@ -152,7 +125,7 @@ Recommendations:
 ```
 
 ::: question How do I read the results table?
-The `current` row is the method with the `#[Bench]` attribute (the baseline), and the other rows are alternative implementations.
+The `current` row is the method with the <attr>\Testo\Bench</attr> attribute (the baseline), and the other rows are alternative implementations.
 
 1. Check the **Rej.** column — how many iterations were rejected as anomalous. If more than one or two, the results aren't reliable yet: increase `calls` or `iterations`, close unnecessary processes, and rerun the test. If the column is missing, there were no outliers.
 2. Check **RStDev\*** (or **RStDev** if the extended table isn't shown). Aim for under 2%. If higher, the measurements aren't stable enough yet.
@@ -178,7 +151,7 @@ Testo automatically rejects anomalous measurements (outliers) and recalculates s
 
 ## Usage in CI
 
-A benchmark with the `#[Bench]` attribute is a full test that can run in CI. If the baseline implementation turns out slower than any of the alternatives, the test is considered failed.
+A benchmark with the <attr>\Testo\Bench</attr> attribute is a full test that can run in CI. If the baseline implementation turns out slower than any of the alternatives, the test is considered failed.
 
 Say you wrote your own serializer instead of the standard `json_encode` because it's faster for your data structures. The benchmark captures this as a fact. If after a refactor your implementation is no longer faster than the standard one — something has changed and it's worth investigating before it reaches production.
 

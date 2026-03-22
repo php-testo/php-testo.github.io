@@ -49,12 +49,12 @@ To control state between tests, use lifecycle attributes described below.
 
 ## Attributes
 
-| Attribute        | When it runs                  | How often          |
-|------------------|-------------------------------|--------------------|
-| `#[BeforeTest]`  | Before each test method       | Once per test      |
-| `#[AfterTest]`   | After each test method        | Once per test      |
-| `#[BeforeClass]` | Before all tests in the class | Once per test case |
-| `#[AfterClass]`  | After all tests in the class  | Once per test case |
+| Attribute                                 | When it runs                  | How often          |
+|-------------------------------------------|-------------------------------|--------------------|
+| <attr>\Testo\Lifecycle\BeforeTest</attr>  | Before each test method       | Once per test      |
+| <attr>\Testo\Lifecycle\AfterTest</attr>   | After each test method        | Once per test      |
+| <attr>\Testo\Lifecycle\BeforeClass</attr> | Before all tests in the class | Once per test case |
+| <attr>\Testo\Lifecycle\AfterClass</attr>  | After all tests in the class  | Once per test case |
 
 ## Execution Order
 

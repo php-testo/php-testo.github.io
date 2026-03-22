@@ -156,7 +156,7 @@ Filter tests by type. If specified, only tests of the matching type are run.
 
 **Possible values:**
 - `test` — regular tests (methods in classes)
-- `inline` — [inline tests](plugins/inline.md) (tests via `#[TestInline]`)
+- `inline` — [inline tests](plugins/inline.md) (tests via <attr>\Testo\Inline\TestInline</attr>)
 - `bench` — [benchmarks](plugins/bench.md)
 
 **Examples:**
