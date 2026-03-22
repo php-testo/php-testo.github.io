@@ -1,13 +1,18 @@
+---
+outline: [2, 3]
+---
+
 # Провайдеры данных
 
 Провайдеры данных позволяют запускать один тест с разными наборами входных данных. Каждый набор — отдельный запуск теста.
 
 <plugin-info name="Data" />
 
-## DataSet
-
-Самый простой способ — указать данные прямо над методом:
-
+<signature h="2" name="#[\Testo\Data\DataSet(array $arguments, ?string $name = null)]">
+<short>Объявляет набор аргументов для параметризованного теста. Можно использовать многократно — каждый атрибут создаёт отдельный запуск.</short>
+<param name="$arguments">Массив значений, передаваемых в тестовый метод.</param>
+<param name="$name">Метка для отображения в отчётах. Помогает понять, какой сценарий упал.</param>
+<example>
 ```php
 #[Test]
 #[DataSet([1, 1, 2])]
@@ -18,12 +23,9 @@ public function testSum(int $a, int $b, int $expected): void
     Assert::same($expected, $a + $b);
 }
 ```
-
-Каждый `DataSet` — массив аргументов, которые передаются в тестовый метод. Тест запустится три раза с разными значениями.
-
-### Метки датасетов
-
-Второй аргумент — опциональная метка. Отображается в отчётах и помогает понять, какой именно сценарий упал:
+</example>
+<example>
+С метками:
 
 ```php
 #[DataSet([1, 1, 2], 'positive numbers')]
@@ -31,11 +33,13 @@ public function testSum(int $a, int $b, int $expected): void
 #[DataSet([0, 0, 0], 'zeros')]
 public function testSum(int $a, int $b, int $expected): void { ... }
 ```
+</example>
+</signature>
 
-## DataProvider
-
-Для большого количества данных или динамической генерации используйте `DataProvider`. Он принимает метод или вызываемый объект, который возвращает тестовые данные:
-
+<signature h="2" name="#[\Testo\Data\DataProvider(callable|string $provider)]">
+<short>Предоставляет данные для параметризованного теста из метода или вызываемого объекта.</short>
+<param name="$provider">Источник данных: имя метода (`'method'`), callable (`[Class::class, 'method']`), замыкание или вызываемый объект. Должен возвращать `iterable`. Строковые ключи элементов становятся метками датасетов в отчётах.</param>
+<example>
 ```php
 #[Test]
 #[DataProvider('userDataProvider')]
@@ -50,13 +54,14 @@ public function userDataProvider(): iterable
     yield ['valid@example.com', true];
     yield ['invalid', false];
     yield ['test@domain.co.uk', true];
-    // ... 50 more cases
 }
 ```
+</example>
+</signature>
 
 ### Гибкие источники провайдеров
 
-`DataProvider` принимает различные типы вызываемых объектов:
+<attr>\Testo\Data\DataProvider</attr> принимает различные типы вызываемых объектов:
 
 **Имя метода из того же класса:**
 ```php
@@ -90,7 +95,7 @@ public function testUser($data): void { ... }
 ### Метки датасетов
 
 Метки задаются через строковые ключи массива:
-
+в
 ```php
 public function userDataProvider(): array
 {
@@ -102,12 +107,13 @@ public function userDataProvider(): array
 }
 ```
 
-## DataZip
-
-Объединяет несколько провайдеров попарно. Первый элемент из первого провайдера соединяется с первым элементом из второго, второй со вторым, и так далее.
-
-Типичный сценарий — тестирование связанных данных, где каждая пара образует осмысленный тест-кейс:
-
+<signature h="2" name="#[\Testo\Data\DataZip(DataProviderAttribute ...$providers)]">
+<short>Объединяет провайдеры попарно по индексу.</short>
+<description>
+Первый элемент из первого провайдера соединяется с первым из второго, второй со вторым, и так далее. Аргументы из всех провайдеров объединяются в один вызов теста.
+</description>
+<param name="$providers">Провайдеры данных для попарного объединения.</param>
+<example>
 ```php
 #[DataZip(
     new DataProvider('credentials'),
@@ -126,8 +132,8 @@ public function testUserPermissions(string $login, string $password, array $perm
 // 1. admin/secret → ['read', 'write', 'delete']
 // 2. guest/1234 → ['read']
 ```
-
-Аргументы из всех провайдеров объединяются в один вызов теста. В примере выше `credentials` даёт два аргумента (`$login`, `$password`), а `expectedPermissions` — один (`$permissions`).
+</example>
+</signature>
 
 ### Провайдеры разной длины
 
@@ -153,10 +159,10 @@ public function testTransform(string $input, string $output): void { ... }
 Метки датасетов соединяются через `|`. Если датасеты называются `admin` и `full-access`, в отчёте будет `admin|full-access`.
 :::
 
-## DataCross
-
-Создаёт все возможные комбинации значений из провайдеров (декартово произведение). Полезно для тестирования независимых параметров, которые могут сочетаться произвольным образом.
-
+<signature h="2" name="#[\Testo\Data\DataCross(DataProviderAttribute ...$providers)]">
+<short>Создаёт все возможные комбинации из провайдеров (декартово произведение).</short>
+<param name="$providers">Провайдеры данных для комбинирования.</param>
+<example>
 ```php
 #[DataCross(
     new DataProvider('browsers'),
@@ -177,31 +183,24 @@ public function testResponsiveLayout(string $browser, int $width, int $height): 
 // chrome × 1920×1080, chrome × 768×1024, chrome × 375×667,
 // firefox × 1920×1080, ...
 ```
+</example>
+</signature>
 
 ::: warning Следите за количеством комбинаций
-Число тестов растёт мультипликативно. Три провайдера по 5 элементов — это уже 125 тестов. Используйте `DataCross` осознанно.
+Число тестов растёт мультипликативно. Три провайдера по 5 элементов — это уже 125 тестов. Используйте <attr>\Testo\Data\DataCross</attr> осознанно.
 :::
 
 ::: tip Ключи в отчётах
 Метки соединяются через `×`. Датасеты `chrome` и `mobile` дадут ключ `chrome×mobile`.
 :::
 
-## DataUnion
-
-Для объединения данных из нескольких источников обычно достаточно перечислить атрибуты над методом:
-
-```php
-#[DataProvider('adminUsers')]
-#[DataProvider('regularUsers')]
-#[DataSet(['guest'], 'guest')]
-public function testUserCanLogin(string $username): void
-{
-    // Запустится для всех: adminUsers, затем regularUsers, затем guest
-}
-```
-
-`DataUnion` нужен, когда объединение должно произойти внутри другого атрибута — например, внутри `DataCross` или `DataZip`:
-
+<signature h="2" name="#[\Testo\Data\DataUnion(DataProviderAttribute ...$providers)]">
+<short>Объединяет данные из нескольких провайдеров в один последовательный набор.</short>
+<description>
+Для объединения данных обычно достаточно перечислить несколько <attr>\Testo\Data\DataProvider</attr> или <attr>\Testo\Data\DataSet</attr> над методом. <attr>\Testo\Data\DataUnion</attr> нужен, когда объединение должно произойти внутри другого атрибута — например, внутри <attr>\Testo\Data\DataCross</attr> или <attr>\Testo\Data\DataZip</attr>.
+</description>
+<param name="$providers">Провайдеры данных для объединения в один набор.</param>
+<example>
 ```php
 #[DataCross(
     new DataUnion(
@@ -215,12 +214,12 @@ public function testExport(string $format, int $compression): void
     // Все форматы (legacy + modern) скрещиваются с каждым уровнем сжатия
 }
 ```
-
-Без `DataUnion` пришлось бы либо создавать отдельный провайдер, объединяющий форматы, либо дублировать `DataCross` для каждого источника форматов.
+</example>
+</signature>
 
 ## Комбинирование провайдеров
 
-Внутри `DataZip`, `DataCross` и `DataUnion` можно использовать любые провайдеры данных — `DataProvider`, `DataSet`, а также вкладывать их друг в друга.
+Внутри <attr>\Testo\Data\DataZip</attr>, <attr>\Testo\Data\DataCross</attr> и <attr>\Testo\Data\DataUnion</attr> можно использовать любые провайдеры данных — <attr>\Testo\Data\DataProvider</attr>, <attr>\Testo\Data\DataSet</attr>, а также вкладывать их друг в друга.
 
 ### Смешивание типов
 
@@ -235,7 +234,7 @@ public function testExport(string $format, int $compression): void
 public function testMigration(string $driver, array $scenario): void { ... }
 ```
 
-Или компактнее через `DataProvider` для драйверов:
+Или компактнее через <attr>\Testo\Data\DataProvider</attr> для драйверов:
 
 ```php
 #[DataCross(

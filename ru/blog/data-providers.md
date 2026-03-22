@@ -50,12 +50,12 @@ public function testSum(int $a, int $b, int $c): void { ... }
 
 **Во-первых**, мне в PHPUnit не понравилось название атрибута `#[TestWith]`. Оно неплохо передаёт намерение (*протестировать с "этим"*), но что насчёт консистентности? Я бы так и не узнал об этом атрибуте, если бы не случайность (а вы знаете о нём?).
 
-::: tip ☝️ Было бы лучше, если бы такой атрибут вылезал в подсказках IDE при вводе слова "Data": рядом с `DataProvider`.
+::: tip ☝️ Было бы лучше, если бы такой атрибут вылезал в подсказках IDE при вводе слова "Data": рядом с <attr>\Testo\Data\DataProvider</attr>.
 :::
 
-Поэтому в Testo этот атрибут назван: `#[DataSet]`.
+Поэтому в Testo этот атрибут назван: <attr>\Testo\Data\DataSet</attr>.
 
-**Во-вторых**, в Testo нет отдельного атрибута `#[DataProviderExternal]`: надобность в нём просто исчезает, поскольку в `#[DataProvider]` можно просто передать любой `callable`.
+**Во-вторых**, в Testo нет отдельного атрибута `#[DataProviderExternal]`: надобность в нём просто исчезает, поскольку в <attr>\Testo\Data\DataProvider</attr> можно просто передать любой `callable`.
 
 **И в-третьих**, датасеты в Testo могут мержиться не только вертикально, но и горизонтально, и по-диагонали.
 
@@ -120,7 +120,7 @@ public function testSum(int $a, int $b, int $c): void { ... }
 
 ### Комбинирование провайдеров
 
-Вы, наверное, догадываетесь, что если Data-атрибуты (`#[DataSet]` и `#[DataProvider]`) повесить на функцию несколько раз, то это приведёт к увеличению коллекции датасетов подобно UNION запросу в SQL.
+Вы, наверное, догадываетесь, что если Data-атрибуты (<attr>\Testo\Data\DataSet</attr> и <attr>\Testo\Data\DataProvider</attr>) повесить на функцию несколько раз, то это приведёт к увеличению коллекции датасетов подобно UNION запросу в SQL.
 
 ```php
 #[DataSet([1, 1, 2])]
@@ -129,7 +129,7 @@ public function testSum(int $a, int $b, int $c): void { ... }
 public function testSum(int $a, int $b, int $c): void { ... }
 ```
 
-Тест запустится для всех датасетов последовательно: сначала `[1, 1, 2]` из `DataSet`, затем все из `dataSum`, затем все из `SomeClass::method()`.
+Тест запустится для всех датасетов последовательно: сначала `[1, 1, 2]` из <attr>\Testo\Data\DataSet</attr>, затем все из `dataSum`, затем все из `SomeClass::method()`.
 
 ::: info 🤔 Но что, если хочется соединить датасеты как-то поинтереснее?
 :::
@@ -171,18 +171,18 @@ public function testDeletePermission(string $user, bool $expected): void { ... }
 public function testResponsiveLayout(string $browser, int $width, int $height): void { ... }
 ```
 
-3 браузера × 3 разрешения = 9 тестов. Три провайдера по 5 элементов — уже 125 тестов. `DataCross` растёт быстро, используйте осознанно.
+3 браузера × 3 разрешения = 9 тестов. Три провайдера по 5 элементов — уже 125 тестов. <attr>\Testo\Data\DataCross</attr> растёт быстро, используйте осознанно.
 
 ### DataUnion
 
 ![DataUnion](/blog/data-providers/union.png)
 
-Атрибут `#[DataUnion]` Объединяет несколько провайдеров в один — просто склеивает датасеты в общую коллекцию наравне с тем, как если бы несколько `#[DataProvider]` были повешены на тест.
+Атрибут <attr>\Testo\Data\DataUnion</attr> объединяет несколько провайдеров в один — просто склеивает датасеты в общую коллекцию наравне с тем, как если бы несколько <attr>\Testo\Data\DataProvider</attr> были повешены на тест.
 
 ::: info 🫤 Стоп, а зачем отдельный атрибут?
 ::: 
 
-`DataUnion` нужен **внутри** `DataCross` или `DataZip`:
+<attr>\Testo\Data\DataUnion</attr> нужен **внутри** <attr>\Testo\Data\DataCross</attr> или <attr>\Testo\Data\DataZip</attr>:
 
 ```php
 #[DataCross(

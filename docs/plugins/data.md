@@ -6,10 +6,11 @@ llms_description: "Parameterized tests: #[DataSet], #[DataProvider] with callabl
 
 Data providers let you run one test with different sets of input data. Each set runs as a separate test.
 
-## DataSet
-
-The simplest way — specify data directly above the method:
-
+<signature h="2" name="#[\Testo\Data\DataSet(array $arguments, ?string $name = null)]">
+<short>Declares a set of arguments for a parameterized test. Can be used multiple times — each attribute creates a separate test run.</short>
+<param name="$arguments">Array of values passed to the test method.</param>
+<param name="$name">Label displayed in reports. Helps identify which scenario failed.</param>
+<example>
 ```php
 #[Test]
 #[DataSet([1, 1, 2])]
@@ -20,12 +21,9 @@ public function testSum(int $a, int $b, int $expected): void
     Assert::same($expected, $a + $b);
 }
 ```
-
-Each `DataSet` is an array of arguments passed to the test method. The test runs three times with different values.
-
-### Dataset Labels
-
-The second argument is an optional label. It appears in reports and helps identify which scenario failed:
+</example>
+<example>
+With labels:
 
 ```php
 #[DataSet([1, 1, 2], 'positive numbers')]
@@ -33,11 +31,13 @@ The second argument is an optional label. It appears in reports and helps identi
 #[DataSet([0, 0, 0], 'zeros')]
 public function testSum(int $a, int $b, int $expected): void { ... }
 ```
+</example>
+</signature>
 
-## DataProvider
-
-For large amounts of data or dynamic generation, use `DataProvider`. It accepts a method or callable that returns test data:
-
+<signature h="2" name="#[\Testo\Data\DataProvider(callable|string $provider)]">
+<short>Provides data for a parameterized test from a method or callable.</short>
+<param name="$provider">Data source: method name (`'method'`), callable (`[Class::class, 'method']`), closure, or invokable object. Must return `iterable`. String keys of elements become dataset labels in reports.</param>
+<example>
 ```php
 #[Test]
 #[DataProvider('userDataProvider')]
@@ -52,13 +52,14 @@ public function userDataProvider(): iterable
     yield ['valid@example.com', true];
     yield ['invalid', false];
     yield ['test@domain.co.uk', true];
-    // ... 50 more cases
 }
 ```
+</example>
+</signature>
 
 ### Flexible Provider Sources
 
-`DataProvider` accepts various callable types:
+<attr>\Testo\Data\DataProvider</attr> accepts various callable types:
 
 **Method name from the same class:**
 ```php
@@ -104,12 +105,13 @@ public function userDataProvider(): array
 }
 ```
 
-## DataZip
-
-Pairs up multiple providers element by element. The first item from the first provider joins with the first item from the second, second with second, and so on.
-
-Typical use case — testing related data where each pair forms a meaningful test case:
-
+<signature h="2" name="#[\Testo\Data\DataZip(DataProviderAttribute ...$providers)]">
+<short>Pairs up providers element by element.</short>
+<description>
+The first item from the first provider joins with the first from the second, second with second, and so on. Arguments from all providers merge into a single test call.
+</description>
+<param name="$providers">Data providers to pair up.</param>
+<example>
 ```php
 #[DataZip(
     new DataProvider('credentials'),
@@ -128,8 +130,8 @@ public function testUserPermissions(string $login, string $password, array $perm
 // 1. admin/secret → ['read', 'write', 'delete']
 // 2. guest/1234 → ['read']
 ```
-
-Arguments from all providers merge into a single test call. In the example above, `credentials` provides two arguments (`$login`, `$password`), while `expectedPermissions` provides one (`$permissions`).
+</example>
+</signature>
 
 ### Providers of Different Lengths
 
@@ -155,10 +157,10 @@ public function testTransform(string $input, string $output): void { ... }
 Dataset labels are joined with `|`. If datasets are named `admin` and `full-access`, the report shows `admin|full-access`.
 :::
 
-## DataCross
-
-Creates all possible combinations of values from providers (cartesian product). Useful for testing independent parameters that can combine in any way.
-
+<signature h="2" name="#[\Testo\Data\DataCross(DataProviderAttribute ...$providers)]">
+<short>Creates all possible combinations from providers (cartesian product).</short>
+<param name="$providers">Data providers to combine.</param>
+<example>
 ```php
 #[DataCross(
     new DataProvider('browsers'),
@@ -179,31 +181,24 @@ public function testResponsiveLayout(string $browser, int $width, int $height): 
 // chrome × 1920×1080, chrome × 768×1024, chrome × 375×667,
 // firefox × 1920×1080, ...
 ```
+</example>
+</signature>
 
 ::: warning Watch the Combination Count
-Test count grows multiplicatively. Three providers with 5 items each means 125 tests. Use `DataCross` mindfully.
+Test count grows multiplicatively. Three providers with 5 items each means 125 tests. Use <attr>\Testo\Data\DataCross</attr> mindfully.
 :::
 
 ::: tip Keys in Reports
 Labels are joined with `×`. Datasets `chrome` and `mobile` produce the key `chrome×mobile`.
 :::
 
-## DataUnion
-
-To combine data from multiple sources, you can simply list attributes above the method:
-
-```php
-#[DataProvider('adminUsers')]
-#[DataProvider('regularUsers')]
-#[DataSet(['guest'], 'guest')]
-public function testUserCanLogin(string $username): void
-{
-    // Runs for all: adminUsers, then regularUsers, then guest
-}
-```
-
-`DataUnion` is needed when combining must happen inside another attribute — for example, inside `DataCross` or `DataZip`:
-
+<signature h="2" name="#[\Testo\Data\DataUnion(DataProviderAttribute ...$providers)]">
+<short>Merges data from multiple providers into a single sequential set.</short>
+<description>
+To combine data from multiple sources, you can simply list multiple <attr>\Testo\Data\DataProvider</attr> or <attr>\Testo\Data\DataSet</attr> above the method. <attr>\Testo\Data\DataUnion</attr> is needed when combining must happen inside another attribute — for example, inside <attr>\Testo\Data\DataCross</attr> or <attr>\Testo\Data\DataZip</attr>.
+</description>
+<param name="$providers">Data providers to merge into a single set.</param>
+<example>
 ```php
 #[DataCross(
     new DataUnion(
@@ -217,12 +212,12 @@ public function testExport(string $format, int $compression): void
     // All formats (legacy + modern) are crossed with each compression level
 }
 ```
-
-Without `DataUnion`, you'd have to either create a separate provider that merges formats, or duplicate `DataCross` for each format source.
+</example>
+</signature>
 
 ## Combining Providers
 
-Inside `DataZip`, `DataCross`, and `DataUnion` you can use any data providers — `DataProvider`, `DataSet`, and even nest them within each other.
+Inside <attr>\Testo\Data\DataZip</attr>, <attr>\Testo\Data\DataCross</attr>, and <attr>\Testo\Data\DataUnion</attr> you can use any data providers — <attr>\Testo\Data\DataProvider</attr>, <attr>\Testo\Data\DataSet</attr>, and even nest them within each other.
 
 ### Mixing Types
 
@@ -237,7 +232,7 @@ Handy when some parameters are fixed while others come from a provider:
 public function testMigration(string $driver, array $scenario): void { ... }
 ```
 
-Or more compact with a `DataProvider` for drivers:
+Or more compact with a <attr>\Testo\Data\DataProvider</attr> for drivers:
 
 ```php
 #[DataCross(

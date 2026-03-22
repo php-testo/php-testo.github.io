@@ -50,12 +50,12 @@ Well, this article wouldn't exist if there was nothing to say.
 
 **First**, I didn't like the `#[TestWith]` attribute name in PHPUnit. It conveys the intent well (*test with "this"*), but what about consistency? I wouldn't have known about this attribute if not by chance (do you know about it?).
 
-::: tip ☝️ It would be better if this attribute appeared in IDE suggestions when typing "Data": next to `DataProvider`.
+::: tip ☝️ It would be better if this attribute appeared in IDE suggestions when typing "Data": next to <attr>\Testo\Data\DataProvider</attr>.
 :::
 
-That's why in Testo this attribute is named: `#[DataSet]`.
+That's why in Testo this attribute is named: <attr>\Testo\Data\DataSet</attr>.
 
-**Second**, Testo has no separate `#[DataProviderExternal]` attribute: the need for it simply disappears, since you can pass any `callable` to `#[DataProvider]`.
+**Second**, Testo has no separate `#[DataProviderExternal]` attribute: the need for it simply disappears, since you can pass any `callable` to <attr>\Testo\Data\DataProvider</attr>.
 
 **And third**, datasets in Testo can merge not only vertically, but also horizontally and diagonally.
 
@@ -120,7 +120,7 @@ Like PHPUnit, Testo expects data providers to return dataset collections: `itera
 
 ### Combining Providers
 
-You probably guessed that stacking multiple Data-attributes (`#[DataSet]` and `#[DataProvider]`) on a function will grow the dataset collection, similar to a UNION query in SQL.
+You probably guessed that stacking multiple Data-attributes (<attr>\Testo\Data\DataSet</attr> and <attr>\Testo\Data\DataProvider</attr>) on a function will grow the dataset collection, similar to a UNION query in SQL.
 
 ```php
 #[DataSet([1, 1, 2])]
@@ -129,7 +129,7 @@ You probably guessed that stacking multiple Data-attributes (`#[DataSet]` and `#
 public function testSum(int $a, int $b, int $c): void { ... }
 ```
 
-The test runs for all datasets sequentially: first `[1, 1, 2]` from `DataSet`, then all from `dataSum`, then all from `SomeClass::method()`.
+The test runs for all datasets sequentially: first `[1, 1, 2]` from <attr>\Testo\Data\DataSet</attr>, then all from `dataSum`, then all from `SomeClass::method()`.
 
 ::: info 🤔 But what if you want to combine datasets in more interesting ways?
 :::
@@ -171,18 +171,18 @@ Cartesian product — all possible combinations. Useful when parameters are inde
 public function testResponsiveLayout(string $browser, int $width, int $height): void { ... }
 ```
 
-3 browsers × 3 screen sizes = 9 tests. Three providers with 5 elements each — already 125 tests. `DataCross` grows fast, use wisely.
+3 browsers × 3 screen sizes = 9 tests. Three providers with 5 elements each — already 125 tests. <attr>\Testo\Data\DataCross</attr> grows fast, use wisely.
 
 ### DataUnion
 
 ![DataUnion](/blog/data-providers/union.png)
 
-The `#[DataUnion]` attribute merges multiple providers into one — simply concatenates datasets into a single collection, just like stacking multiple `#[DataProvider]` attributes on a test.
+The <attr>\Testo\Data\DataUnion</attr> attribute merges multiple providers into one — simply concatenates datasets into a single collection, just like stacking multiple <attr>\Testo\Data\DataProvider</attr> attributes on a test.
 
 ::: info 🫤 Wait, why a separate attribute?
 :::
 
-`DataUnion` is needed **inside** `DataCross` or `DataZip`:
+<attr>\Testo\Data\DataUnion</attr> is needed **inside** <attr>\Testo\Data\DataCross</attr> or <attr>\Testo\Data\DataZip</attr>:
 
 ```php
 #[DataCross(
