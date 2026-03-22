@@ -97,13 +97,13 @@ gtag('config', 'G-VYGDN3X0PR');`],
                 { text: '\#[Test]', link: '/docs/plugins/test.md' },
                 { text: 'Lifecycle', link: '/docs/plugins/lifecycle.md' },
                 { text: 'Convention', link: '/docs/plugins/convention.md' },
+                { text: 'Filter', link: '/docs/plugins/filter.md' },
               ],
             },
             {
               text: 'Guide',
               items: [
                 { text: 'CLI Reference', link: '/docs/cli-reference.md' },
-                { text: 'Filtering', link: '/docs/plugins/filter.md' },
               ],
             },
             {

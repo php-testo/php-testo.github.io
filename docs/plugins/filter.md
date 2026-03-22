@@ -4,18 +4,21 @@ llms_description: "Filter class API, name/path/suite filters, OR/AND combination
 
 # Test Filtering
 
-This document describes the business logic of test filtering in Testo.
+This document describes the internal logic of the filtering plugin: the algorithm, pipeline stages, and criteria combination. If you just need to filter tests when running — see the [CLI reference](../cli-reference.md).
 
 <plugin-info name="Filter" class="\Testo\Filter\FilterPlugin" included="\Testo\Application\Config\Plugin\ApplicationPlugins" />
 
 ## Overview
 
-Testo provides a flexible filtering system that operates in multiple stages to progressively narrow down the test set. Filtering can be controlled programmatically via the <class>\Testo\Common\Filter</class> class or automatically from CLI arguments.
+Testo provides a flexible filtering system that operates in multiple stages to progressively narrow down the test set. Filtering can be controlled programmatically via the <class>\Testo\Filter</class> class or automatically from CLI arguments.
 
-## Filter Class
-
-The <class>\Testo\Common\Filter</class> class is an immutable DTO containing test filtering criteria:
-
+<signature h="2" name="new \Testo\Filter(array $suites = [], array $names = [], array $paths = [], ?string $type = null)">
+<short>Immutable DTO containing test filtering criteria.</short>
+<param name="$suites">Test suite names to filter by.</param>
+<param name="$names">Class, method, or function names. Formats: `ClassName::methodName`, `Namespace\ClassName`, fragment `methodName`. Optional DataProvider indices via colon: `name:providerIndex:datasetIndex`.</param>
+<param name="$paths">File or directory paths. Supports glob patterns: `*`, `?`, `[abc]`.</param>
+<param name="$type">Test type: `test`, `inline`, `bench`, or other custom type. If not specified — all types are run.</param>
+<example>
 ```php
 $filter = new Filter(
     suites: ['Unit', 'Integration'],
@@ -24,48 +27,31 @@ $filter = new Filter(
     type: 'test',
 );
 ```
+</example>
+</signature>
 
-### Properties
+### Usage
 
-**`testSuites`**: `list<non-empty-string>`
-- Test suite names to filter by
-- Used in Stage 1 to determine which configuration scopes to load
-
-**`names`**: `list<non-empty-string>`
-- Class, method, or function names to filter by
-- Supports three formats:
-  - Method: `ClassName::methodName` or `Namespace\ClassName::methodName`
-  - FQN: `Namespace\ClassName` or `Namespace\functionName`
-  - Fragment: `methodName`, `functionName`, or `ShortClassName`
-- Optional DataProvider indices: `name:providerIndex:datasetIndex`
-  - Provides indices for data provider module
-  - Indices are 0-based and independent of dataset labels
-  - `datasetIndex` is optional (omit to pass only provider index)
-  - Examples: `UserTest::testLogin:0`, `testAuth:1:3`, `UserTest:0`
-
-**`paths`**: `list<non-empty-string>`
-- File or directory paths to filter by
-- Supports glob patterns: `*`, `?`, `[abc]`
-
-**`type`**: `?non-empty-string`
-- Test type to filter by
-- Possible values: `test` (regular tests), `inline` (inline tests), `bench` (benchmarks), or other custom types
-- If not specified — all test types are run
-- Middleware bound to a specific type won't enter the pipeline if the type doesn't match
-
-### Usage with Application
-
-The <class>\Testo\Common\Filter</class> object can be passed to `Application::run()`:
+**Via CLI options** — when creating via `Application::createFromInput()`, the plugin automatically creates <class>\Testo\Filter</class> from command options: `--filter`, `--path`, `--suite`, `--type`:
 
 ```php
-$app = Application::createFromInput(/* ... */);
+$app = Application::createFromInput(
+    inputOptions: ['filter' => ['UserTest'], 'suite' => ['Unit']],
+);
+$result = $app->run();
+```
 
-$filter = new Filter(
+**Via container** — register the <class>\Testo\Filter</class> object directly:
+
+```php
+$app = Application::createFromConfig($config);
+
+$app->getContainer()->set(Filter::class, new Filter(
     suites: ['Unit'],
     names: ['UserTest'],
-);
+));
 
-$result = $app->run($filter);
+$result = $app->run();
 ```
 
 When running from CLI, the <class>\Testo\Common\Filter</class> is populated automatically from command arguments via `Filter::fromScope()`.
@@ -103,7 +89,7 @@ $filter = new Filter(
 
 ## Name Filter Behavior
 
-The behavior of name filtering is implemented in `FilterInterceptor` and depends on the name format:
+The behavior of name filtering is implemented in <class>\Testo\Filter\Internal\FilterInterceptor</class> and depends on the name format:
 
 ### Method Format (`ClassName::methodName`)
 
@@ -145,28 +131,30 @@ $filter = new Filter(names: ['testLogin']);
 // Result: All classes with testLogin method, each with only that method
 ```
 
-### DataProvider Indices
+### Narrowing by DataProvider and DataSet
 
-When tests use data providers, names can include provider and dataset indices using colon separator. These indices become available to the data provider module.
+After the name, you can narrow down to a specific DataProvider via colon, and further to a specific DataSet within it via another colon.
 
 **Format:** `name:providerIndex:datasetIndex`
 
-- Indices are 0-based integers, independent of dataset labels
-- `datasetIndex` is optional - omit to pass only provider index
-- Works with all name formats (Method, FQN, Fragment)
+- The format maps to <class>\Testo\Filter\DataPointer</class> and is passed to the data provider module.
+- "Provider" here means any attribute that spawns a separate test: <attr>\Testo\Data\DataProvider</attr>, <attr>\Testo\Data\DataSet</attr>, <attr>\Testo\Inline\TestInline</attr>, <attr>\Testo\Bench\Bench</attr>, etc.
+- Indices are 0-based, independent of dataset labels.
+- `datasetIndex` is optional — you can specify only the provider.
+- Works with all name formats (method, FQN, fragment).
 
 **Examples:**
 ```php
-// Pass provider #0 index
+// First provider
 $filter = new Filter(names: ['UserTest::testLogin:0']);
 
-// Pass provider #0 and dataset #1 indices
+// First provider, second dataset
 $filter = new Filter(names: ['UserTest::testLogin:0:1']);
 
-// Pass provider #1 and dataset #3 indices, matching any test named 'testAuth'
+// Second provider, fourth dataset — for any test named testAuth
 $filter = new Filter(names: ['testAuth:1:3']);
 
-// Pass provider #0 index for entire UserTest class
+// First provider — for entire UserTest class
 $filter = new Filter(names: ['UserTest:0']);
 ```
 
@@ -227,7 +215,7 @@ Filtering operates in five stages:
 
 ## Pattern Matching
 
-`FilterInterceptor` uses whole-word boundary matching with regex:
+<class>\Testo\Filter\Internal\FilterInterceptor</class> uses whole-word boundary matching with regex:
 
 ```php
 private static function has(string $needle, string $haystack): bool

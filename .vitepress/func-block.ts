@@ -12,7 +12,7 @@ import type MarkdownIt from 'markdown-it'
 import type StateInline from 'markdown-it/lib/rules_inline/state_inline.mjs'
 import type StateBlock from 'markdown-it/lib/rules_block/state_block.mjs'
 import { getLocaleByPath, type LocaleConfig } from './locales'
-import { getEntry, getAttrEntry } from './func-registry'
+import { getEntry, getAttrEntry, getClassEntry } from './func-registry'
 import { getPluginEntry } from './plugin-block'
 
 interface Param {
@@ -128,10 +128,30 @@ function renderAttrRefHtml(md: MarkdownIt, rawFqn: string, locale?: LocaleConfig
   return renderRefHtml(md, rawFqn, locale, getAttrEntry, (d) => '#[' + d + ']', 'attr-ref')
 }
 
-function renderKlassRefHtml(fqn: string): string {
-  const short = escapeHtml(stripNamespaceShort(fqn))
+function renderKlassRefHtml(md: MarkdownIt, fqn: string, locale?: LocaleConfig): string {
+  const short = stripNamespaceShort(fqn)
+  const entry = getClassEntry(locale?.code ?? 'en', fqn)
+
+  if (entry) {
+    const sigHtml = highlightSignature(md, entry.signature)
+    const shortHtml = entry.short ? md.renderInline(entry.short) : ''
+
+    const tooltip = `<span class="func-ref-tooltip">`
+      + `<code class="func-ref-tooltip-sig vp-code">${sigHtml}</code>`
+      + (shortHtml ? `<span class="func-ref-tooltip-short">${shortHtml}</span>` : '')
+      + `</span>`
+
+    if (entry.hasAnchor) {
+      const href = entry.pagePath + '#' + entry.slug
+      return `<a href="${href}" class="class-ref func-ref vp-code">${escapeHtml(short)}${tooltip}</a>`
+    }
+
+    return `<span class="class-ref func-ref vp-code">${escapeHtml(short)}${tooltip}</span>`
+  }
+
+  // Fallback: FQN tooltip only
   const tooltip = `<span class="func-ref-tooltip"><code class="func-ref-tooltip-sig vp-code">${escapeHtml(fqn)}</code></span>`
-  return `<span class="class-ref func-ref vp-code">${short}${tooltip}</span>`
+  return `<span class="class-ref func-ref vp-code">${escapeHtml(short)}${tooltip}</span>`
 }
 
 function renderPluginRefHtml(name: string, locale?: LocaleConfig): string {
@@ -236,7 +256,11 @@ export function funcBlockPlugin(md: MarkdownIt) {
 
   // ── Block rules for inline tags at line start ──
 
-  registerBlockParagraphTag(md, 'class_block', 'class', (fqn) => renderKlassRefHtml(fqn))
+  registerBlockParagraphTag(md, 'class_block', 'class', (fqn, state) => {
+    const relativePath = state.env?.relativePath || ''
+    const locale = getLocaleByPath('/' + relativePath)
+    return renderKlassRefHtml(md, fqn, locale)
+  })
 
   registerBlockParagraphTag(md, 'func_line', 'func', (rawFqn, state) => {
     const relativePath = state.env?.relativePath || ''
@@ -297,7 +321,7 @@ export function funcBlockPlugin(md: MarkdownIt) {
   // ── Inline rules ──
 
   registerInlineTag(md, 'func', 'func_ref', { before: 'html_inline' }, { withLocale: true })
-  registerInlineTag(md, 'class', 'class_ref', { after: 'func_ref' })
+  registerInlineTag(md, 'class', 'class_ref', { after: 'func_ref' }, { withLocale: true })
   registerInlineTag(md, 'plugin', 'plugin_ref', { after: 'class_ref' }, { withLocale: true })
   registerInlineTag(md, 'attr', 'attr_ref', { after: 'plugin_ref' }, { withLocale: true })
 
@@ -309,7 +333,8 @@ export function funcBlockPlugin(md: MarkdownIt) {
   }
 
   md.renderer.rules['class_ref'] = (tokens, idx) => {
-    return renderKlassRefHtml(tokens[idx].content)
+    const { content, meta } = tokens[idx]
+    return renderKlassRefHtml(md, content, meta?.locale)
   }
 
   md.renderer.rules['plugin_ref'] = (tokens, idx) => {
@@ -361,9 +386,10 @@ function renderFuncBlock(md: MarkdownIt, raw: string, locale?: LocaleConfig, env
   }
 
   const isAttr = signature.startsWith('#[')
-  const innerSig = isAttr ? signature.slice(2, -1) : signature
+  const isClass = !isAttr && signature.startsWith('new ')
+  const innerSig = isAttr ? signature.slice(2, -1) : isClass ? signature.slice(4) : signature
   const { display: innerDisplay } = stripNamespace(innerSig)
-  const display = isAttr ? '#[' + innerDisplay + ']' : innerDisplay
+  const display = isAttr ? '#[' + innerDisplay + ']' : isClass ? 'new ' + innerDisplay : innerDisplay
   const rawShortName = extractShortName(innerDisplay)
   const shortName = isAttr ? '#[' + rawShortName + ']' : rawShortName
   const paramsLabel = locale?.signatureParamsLabel ?? 'Parameters:'

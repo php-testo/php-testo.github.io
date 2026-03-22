@@ -1,10 +1,12 @@
 /**
- * Signature registry for cross-referencing `<func>` and `<attr>` inline tags.
+ * Signature registry for cross-referencing `<func>`, `<attr>`, and `<class>` inline tags.
  *
  * Pre-scans all .md files to collect `<signature>` blocks with FQN names,
  * then provides lookup for inline references to generate links and tooltips.
- * Function signatures (e.g. `\Testo\Assert::same(...)`) and attribute signatures
- * (e.g. `#[\Testo\MyAttr(...)]`) are stored in separate registries.
+ * Three separate registries:
+ *   - functions/methods: signatures with `::` or `->` (e.g. `\Testo\Assert::same(...)`)
+ *   - attributes: signatures starting with `#[` (e.g. `#[\Testo\MyAttr(...)]`)
+ *   - classes: plain FQN signatures (e.g. `\Testo\Filter(...)`) — covers classes, enums, traits, interfaces
  */
 import { readFileSync, readdirSync, statSync } from 'fs'
 import { join, relative } from 'path'
@@ -22,6 +24,7 @@ export interface RegistryEntry {
 // locale code -> normalized FQN -> entry
 const registry = new Map<string, Map<string, RegistryEntry>>()
 const attrRegistry = new Map<string, Map<string, RegistryEntry>>()
+const classRegistry = new Map<string, Map<string, RegistryEntry>>()
 
 /**
  * Normalize FQN by stripping arguments and return type.
@@ -67,6 +70,7 @@ function stripNamespaceForDisplay(signature: string): string {
 export function preScanSignatures(srcDir: string): void {
   registry.clear()
   attrRegistry.clear()
+  classRegistry.clear()
   const mdFiles = collectMdFiles(srcDir)
 
   // Match all <signature> blocks with a name attribute
@@ -89,15 +93,24 @@ export function preScanSignatures(srcDir: string): void {
       if (!nameMatch) continue
       const signature = nameMatch[1]
 
-      // Detect attribute signatures: #[\Namespace\Attr(...)]
+      // Detect signature type by prefix:
+      // - #[...] → attribute
+      // - new ... → class/enum/trait/interface
+      // - otherwise → function/method
       const isAttr = signature.startsWith('#[')
-      const innerSig = isAttr ? signature.slice(2, -1) : signature
+      const isClass = !isAttr && signature.startsWith('new ')
+      const innerSig = isAttr ? signature.slice(2, -1) : isClass ? signature.slice(4) : signature
 
       // Only collect FQN signatures (starting with \)
       if (!innerSig.startsWith('\\')) continue
 
       const fqn = normalizeFqn(innerSig)
-      const targetRegistry = isAttr ? attrRegistry : registry
+
+      // Route to appropriate registry:
+      // - attributes (#[...]) → attrRegistry
+      // - functions/methods (:: or ->) → registry
+      // - classes/enums/traits/interfaces (plain FQN) → classRegistry
+      const targetRegistry = isAttr ? attrRegistry : isClass ? classRegistry : registry
 
       if (!targetRegistry.has(locale.code)) {
         targetRegistry.set(locale.code, new Map())
@@ -120,7 +133,8 @@ export function preScanSignatures(srcDir: string): void {
         fqn,
         slug: buildSlugFromFqn(innerSig),
         pagePath,
-        signature: isAttr ? '#[' + displaySig + ']' : displaySig,
+        signature: isAttr ? '#[' + displaySig + ']' : isClass ? 'new ' + displaySig : displaySig,
+
         short,
         hasAnchor,
       })
@@ -142,6 +156,14 @@ export function getEntry(localeCode: string, rawFqn: string): RegistryEntry | un
 export function getAttrEntry(localeCode: string, rawFqn: string): RegistryEntry | undefined {
   const fqn = normalizeFqn(rawFqn)
   return attrRegistry.get(localeCode)?.get(fqn)
+}
+
+/**
+ * Look up a class/enum/trait/interface signature entry by FQN and locale.
+ */
+export function getClassEntry(localeCode: string, rawFqn: string): RegistryEntry | undefined {
+  const fqn = normalizeFqn(rawFqn)
+  return classRegistry.get(localeCode)?.get(fqn)
 }
 
 /**
