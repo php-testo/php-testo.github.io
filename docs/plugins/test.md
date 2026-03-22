@@ -4,14 +4,16 @@ llms_description: "#[Test] attribute on classes, methods, and functions for expl
 
 # Test Attribute
 
-The <attr>\Testo\Test</attr> attribute explicitly marks a method, function, or class as a test.
+The plugin discovers tests by the <attr>\Testo\Test()</attr> attribute. This is the primary way to explicitly declare a method, function, or class as a test.
 
-Can be placed on:
+<plugin-info name="Test" class="\Testo\Test\TestPlugin" included="\Testo\Application\Config\Plugin\SuitePlugins" />
 
-- **Class** — all public methods with `void` or `never` return type become tests
-- **Method** — only that method is a test
-- **Function** — the function is a test
-
+<signature h="2" name="#[\Testo\Test()]">
+<short>Explicitly marks a method, function, or class as a test.</short>
+<description>
+Can be used on **classes**, **methods**, and **functions**. When applied to a class (Test Case), all public methods with a `void` or `never` return type become tests. Otherwise, only the marked element becomes a test.
+</description>
+<example>
 ::: code-group
 ```php [#[Test] on class]
 // tests/Unit/Order.php
@@ -46,11 +48,5 @@ function calculates_total(): void { /* ... */ }
 function applies_discount(): void { /* ... */ }
 ```
 :::
-
-## When to Use
-
-Use <attr>\Testo\Test</attr> when:
-
-- You want **explicit** test declaration without relying on naming patterns
-- Your method/function name doesn't follow the `test` prefix convention
-- You prefer attribute-based discovery over convention-based
+</example>
+</signature>

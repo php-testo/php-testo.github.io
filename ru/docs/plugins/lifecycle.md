@@ -1,3 +1,7 @@
+---
+outline: [2, 3]
+---
+
 # Жизненный цикл
 
 Атрибуты жизненного цикла позволяют выполнять код до и после тестов — для подготовки окружения, очистки состояния и управления ресурсами.
@@ -45,12 +49,25 @@ final class ServiceTest
 
 ## Атрибуты
 
-| Атрибут                                   | Когда выполняется              | Как часто                  |
-|-------------------------------------------|--------------------------------|----------------------------|
-| <attr>\Testo\Lifecycle\BeforeTest</attr>  | Перед каждым тестовым методом  | Один раз на тест           |
-| <attr>\Testo\Lifecycle\AfterTest</attr>   | После каждого тестового метода | Один раз на тест           |
-| <attr>\Testo\Lifecycle\BeforeClass</attr> | Перед всеми тестами в классе   | Один раз на тестовый класс |
-| <attr>\Testo\Lifecycle\AfterClass</attr>  | После всех тестов в классе     | Один раз на тестовый класс |
+<signature h="3" compact name="#[\Testo\Lifecycle\BeforeTest(int $priority = 0)]">
+<short>Выполняет метод перед каждым тестом в классе.</short>
+<param name="$priority">Приоритет выполнения. Чем больше значение, тем раньше выполняется метод.</param>
+</signature>
+
+<signature h="3" compact name="#[\Testo\Lifecycle\AfterTest(int $priority = 0)]">
+<short>Выполняет метод после каждого теста в классе.</short>
+<param name="$priority">Приоритет выполнения. Чем больше значение, тем раньше выполняется метод.</param>
+</signature>
+
+<signature h="3" compact name="#[\Testo\Lifecycle\BeforeClass(int $priority = 0)]">
+<short>Выполняет метод один раз перед всеми тестами в классе. Подходит для дорогой инициализации.</short>
+<param name="$priority">Приоритет выполнения. Чем больше значение, тем раньше выполняется метод.</param>
+</signature>
+
+<signature h="3" compact name="#[\Testo\Lifecycle\AfterClass(int $priority = 0)]">
+<short>Выполняет метод один раз после всех тестов в классе. Подходит для очистки ресурсов.</short>
+<param name="$priority">Приоритет выполнения. Чем больше значение, тем раньше выполняется метод.</param>
+</signature>
 
 ## Порядок выполнения
 

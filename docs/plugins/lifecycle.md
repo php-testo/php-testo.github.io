@@ -49,12 +49,25 @@ To control state between tests, use lifecycle attributes described below.
 
 ## Attributes
 
-| Attribute                                 | When it runs                  | How often          |
-|-------------------------------------------|-------------------------------|--------------------|
-| <attr>\Testo\Lifecycle\BeforeTest</attr>  | Before each test method       | Once per test      |
-| <attr>\Testo\Lifecycle\AfterTest</attr>   | After each test method        | Once per test      |
-| <attr>\Testo\Lifecycle\BeforeClass</attr> | Before all tests in the class | Once per test case |
-| <attr>\Testo\Lifecycle\AfterClass</attr>  | After all tests in the class  | Once per test case |
+<signature h="3" compact name="#[\Testo\Lifecycle\BeforeTest(int $priority = 0)]">
+<short>Runs a method before each test in the class.</short>
+<param name="$priority">Execution priority. Higher values run first.</param>
+</signature>
+
+<signature h="3" compact name="#[\Testo\Lifecycle\AfterTest(int $priority = 0)]">
+<short>Runs a method after each test in the class.</short>
+<param name="$priority">Execution priority. Higher values run first.</param>
+</signature>
+
+<signature h="3" compact name="#[\Testo\Lifecycle\BeforeClass(int $priority = 0)]">
+<short>Runs a method once before all tests in the class. Suitable for expensive setup.</short>
+<param name="$priority">Execution priority. Higher values run first.</param>
+</signature>
+
+<signature h="3" compact name="#[\Testo\Lifecycle\AfterClass(int $priority = 0)]">
+<short>Runs a method once after all tests in the class. Suitable for cleanup.</short>
+<param name="$priority">Execution priority. Higher values run first.</param>
+</signature>
 
 ## Execution Order
 
