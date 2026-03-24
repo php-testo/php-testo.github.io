@@ -749,6 +749,19 @@ a.func-ref:hover {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   z-index: 100;
   pointer-events: none;
+  user-select: none;
+
+  /* Reset inherited styles */
+  text-align: left;
+  text-decoration: none;
+  text-shadow: none;
+  text-indent: 0;
+  text-transform: none;
+  letter-spacing: normal;
+  word-spacing: normal;
+  font-style: normal;
+  font-weight: normal;
+  color: var(--vp-c-text-1);
 }
 
 .func-ref-tooltip.is-visible {
