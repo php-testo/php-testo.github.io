@@ -5,7 +5,9 @@ llms_description: "Convention-based test discovery: *Test class suffix, test* me
 
 # Naming Conventions
 
-Testo can discover tests by naming patterns — no attributes required.
+The plugin discovers tests by class, method, and function naming conventions — no attributes required.
+
+<plugin-info name="Convention" class="\Testo\Convention\NamingConventionPlugin" />
 
 Recognized patterns:
 
@@ -23,6 +25,21 @@ final class UserServiceTest
 }
 
 function testEmailValidator(): void { /* ... */ }
+```
+
+You can customize suffixes and prefixes, and allow or disallow private method discovery:
+
+```php
+new SuiteConfig(
+    // ...
+    plugins: [
+        new NamingConventionPlugin(
+            caseSuffix: 'Test',
+            testPrefix: 'test',
+            allowPrivate: false,
+        ),
+    ]
+),
 ```
 
 ## When to Use
