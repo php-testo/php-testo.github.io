@@ -76,15 +76,16 @@ const declareTabs = [
 
 </script>
 
-<div style="max-width: 700px; margin: 48px auto 0;">
-
-::: warning 🚧 Work in Progress
-Testo is still under active development and not ready for production use.
-Feel free to explore and experiment, but don't rely on it for real projects yet.
-
-Want to support the project? [Star the repo](https://github.com/php-testo/testo) or [become a sponsor](/sponsor).
-:::
-
+<div class="featured-post">
+<a href="/blog/beta-testo" class="featured-post-card">
+  <div class="featured-post-image">
+    <img src="/blog/beta-testo/img-0.jpg" alt="Beta Testing is Open!" />
+  </div>
+  <div class="featured-post-body">
+    <span class="featured-post-title">Beta Testing is Open!</span>
+    <p class="featured-post-description">Start testing with Testo today and help make it better before the release!</p>
+  </div>
+</a>
 </div>
 
 <div class="home-feature">
