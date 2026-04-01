@@ -17,7 +17,7 @@ ru/           # Russian locale (same structure)
 
 ## Style Guide
 
-**Tone:** Informal but technically accurate. Code examples over explanations.
+**Tone:** Informal but technically accurate. Write for newcomers to Testo — use full sentences, explain concepts before showing code. Avoid telegraphic style ("Register interceptor. Call next.") — context and motivation matter.
 
 **Home page rules:**
 - DON'T show code in features (text only, 1 sentence each)
@@ -34,6 +34,13 @@ ru/           # Russian locale (same structure)
 
 **Markdown:** Use `::: tip`, `::: warning`, `::: info`, `::: question` blocks
 
+**Cross-references in text:**
+- Use `<plugin>Name</plugin>` when referencing a Testo plugin by name (e.g., `<plugin>Assert</plugin>`)
+- Use `<class>\FQN</class>` when referencing PHP classes and interfaces (e.g., `<class>\Testo\Event\Test\TestFinished</class>`)
+- Use `<attr>\FQN</attr>` for any PHP attributes — user-facing (`<attr>\Testo\Retry</attr>`) and meta-attributes (`<attr>\Testo\Pipeline\Attribute\FallbackInterceptor</attr>`)
+- Use `<func>\FQN::method()</func>` for methods (e.g., `<func>\Testo\Assert::same()</func>`)
+- Do NOT use plain markdown links (`[Assert](./plugins/assert.md)`) when these tags are available
+
 ## Working with Content
 
 **Adding pages:**
@@ -46,6 +53,12 @@ ru/           # Russian locale (same structure)
 - This applies to content changes, NOT just translation quality fixes
 - If you modify `docs/page.md`, you MUST also update `ru/docs/page.md` with the translated version
 - Exception: Only fixing translation quality in `ru/` doesn't require touching English version
+
+**Translation quality:**
+- Each locale must read as if it were written natively — not as a translation from another language
+- Don't mirror source sentence structure; restructure for the target language's natural flow
+- Prefer active voice and short, direct sentences in both languages
+- When one locale is written first: rewrite for the other, don't translate word-for-word
 
 **Dead links:** Create stub with `::: tip Coming Soon` block
 
