@@ -1,5 +1,5 @@
 ---
-llms_description: "PSR-14 event system: TestSuite/TestCase/Test event hierarchy, lifecycle event ordering, polymorphic listeners, custom dispatchers"
+llms_description: "How to react to test lifecycle with events. PSR-14 event system with TestSuite/TestCase/Test hierarchy, event ordering rules, polymorphic listeners for catching multiple event types, custom event dispatchers."
 ---
 
 # Events

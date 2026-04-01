@@ -1,5 +1,5 @@
 ---
-llms_description: "Parameterized tests: #[DataSet], #[DataProvider] with callables, DataZip (pairing), DataCross (cartesian product), DataUnion (merging), nested combinations"
+llms_description: "Parameterized tests with data providers. #[DataSet] for inline data, #[DataProvider] with callables, #[DataZip] for pairing by index, #[DataCross] for cartesian product, #[DataUnion] for merging. Nested combinations and labeling."
 ---
 
 # Data Providers

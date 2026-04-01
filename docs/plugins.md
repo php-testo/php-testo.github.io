@@ -2,7 +2,7 @@
 faqLevel: 2
 outline: [2, 3]
 llms: true
-llms_description: "PluginConfigurator interface, creating plugins with interceptors and event listeners, FallbackInterceptor for attribute-based extensions"
+llms_description: "How to extend Testo with plugins. PluginConfigurator interface with three extension points: interceptors (InterceptorCollector), event listeners (EventListenerCollector, PSR-14), and container bindings (bind/set/make/get). Container scopes per Test Suite. Full examples: failure logger plugin, GitHub PR flaky reporter. Plugins without configurator via FallbackInterceptor."
 ---
 
 # Plugins

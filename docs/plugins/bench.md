@@ -1,7 +1,7 @@
 ---
 outline: [2, 3]
 faqLevel: 2
-llms_description: "#[Bench] attribute for comparing implementation performance. Attribute parameters: callables, arguments, calls, iterations. Results table: Mean, Median, RStDev, outlier rejection (Rej., Mean*, RStDev*), Warnings. Stability target RStDev < 2%. CI integration: test fails if baseline is slower than alternatives."
+llms_description: "How to benchmark and compare implementations with #[Bench] attribute. Parameters: callables, arguments, calls, iterations. Results table with Mean, Median, RStDev, outlier rejection. Stability target RStDev < 2%. CI integration for catching performance regressions."
 ---
 
 # Benchmarks

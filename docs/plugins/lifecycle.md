@@ -1,5 +1,5 @@
 ---
-llms_description: "#[BeforeTest], #[AfterTest], #[BeforeClass], #[AfterClass] lifecycle hooks, execution order, priority, class instantiation behavior"
+llms_description: "How to run code before and after tests. #[BeforeTest], #[AfterTest], #[BeforeClass], #[AfterClass] lifecycle hooks with priority ordering. Class instantiation behavior: one instance per test case, state preserved between tests."
 ---
 
 # Lifecycle

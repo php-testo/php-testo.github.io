@@ -1,5 +1,5 @@
 ---
-llms_description: "llms.txt support for AI agents, available endpoints (llms.txt, llms-full.txt), how to feed Testo context to LLMs for test generation"
+llms: false
 ---
 
 # AI Agents

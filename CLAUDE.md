@@ -112,12 +112,15 @@ llms_description: "Technical description of what LLM learns from this page"
 ```
 
 - `llms` — controls inclusion. Default is `true` (can be omitted). `"optional"` for secondary content, `false` to exclude
-- `llms_description` — short, technical description for LLM context. Lists key entities and concepts, not marketing text. Required for all included pages
+- `llms_description` — brief, informative note helping an LLM understand what the page covers. Required for all included pages
 
-**Guidelines for `llms_description`:**
-- List specific classes, attributes, methods — not vague descriptions
-- Example: `"#[BeforeTest], #[AfterTest], #[BeforeClass], #[AfterClass] lifecycle hooks, execution order, priority"`
-- NOT: `"Learn about test lifecycle management"`
+**Guidelines for `llms_description` (per [llmstxt.org](https://llmstxt.org) spec):**
+- Start with the page's purpose ("How to ...", "Parameterized tests with ..."), then mention key entities in context
+- Use concise, clear natural language — not a raw comma-separated list of class names
+- Include specific classes/attributes/methods, but woven into a readable sentence
+- Example: `"How to run code before/after tests. #[BeforeTest], #[AfterTest], #[BeforeClass], #[AfterClass] lifecycle hooks, execution order, priority, class instantiation behavior"`
+- NOT: `"Learn about test lifecycle management"` (too vague, no entities)
+- NOT: `"BeforeTest, AfterTest, BeforeClass, AfterClass, priority"` (raw list, no context)
 
 **When adding new doc pages:** add `llms_description` to the English version frontmatter. Do NOT add llms frontmatter to blog posts.
 

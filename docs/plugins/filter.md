@@ -1,5 +1,5 @@
 ---
-llms_description: "Filter class API, name/path/suite filters, OR/AND combination logic, 5-stage filtering pipeline, pattern matching behavior, DataProvider indices"
+llms_description: "How to filter which tests run. Filter class with name/path/suite/type filters, OR/AND combination logic, 5-stage filtering pipeline from files to DataProvider indices."
 ---
 
 # Test Filtering

@@ -1,5 +1,5 @@
 ---
-llms_description: "#[TestInline] attribute for testing methods in-place, private method testing, custom assertions, named arguments"
+llms_description: "How to test methods in-place with #[TestInline] attribute. Supports private methods, custom assertion closures, and named arguments. Good for pure functions where a separate test file is overkill."
 ---
 
 # Inline Tests

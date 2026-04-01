@@ -1,6 +1,6 @@
 ---
 llms: "optional"
-llms_description: "Convention-based test discovery: *Test class suffix, test* method/function prefix"
+llms_description: "Convention-based test discovery without attributes. NamingConventionPlugin with configurable *Test class suffix, test* method prefix, and allowPrivate option."
 ---
 
 # Naming Conventions

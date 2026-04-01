@@ -1,5 +1,5 @@
 ---
-llms_description: "#[Test] attribute on classes, methods, and functions for explicit test declaration"
+llms_description: "How to declare tests explicitly with #[Test] attribute. Works on classes (all public void methods become tests), individual methods, and standalone functions."
 ---
 
 # Test Attribute

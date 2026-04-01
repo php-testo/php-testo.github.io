@@ -1,5 +1,5 @@
 ---
-llms_description: "#[Retry] attribute for retrying failed tests, maxAttempts, markFlaky, class-level and method-level usage, flaky test detection"
+llms_description: "How to retry flaky tests. #[Retry] attribute with maxAttempts and markFlaky parameters. Works on methods, functions, and classes. Flaky status for tests that pass only on retry."
 ---
 
 # Retry

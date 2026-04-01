@@ -1,6 +1,6 @@
 ---
 faqLevel: 2
-llms_description: "Installation via Composer, testo.php configuration, writing first test class, running tests, IDE plugin setup"
+llms_description: "Getting started with Testo. Installation via Composer, testo.php configuration file, writing your first test class with #[Test], running tests from CLI, PhpStorm plugin setup."
 ---
 
 # Getting Started

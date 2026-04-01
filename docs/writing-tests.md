@@ -1,6 +1,6 @@
 ---
 outline: [2, 3]
-llms_description: "Test approaches: separate tests in classes/functions (#[Test], conventions), inline tests (#[TestInline]), benchmarks (#[Bench]), folder structure, suite configuration"
+llms_description: "How to write tests in Testo. Three approaches: separate tests in classes/functions (#[Test] attribute, naming conventions), inline tests (#[TestInline]) on the method itself, and benchmarks (#[Bench]). Folder structure and suite configuration."
 ---
 
 # Writing Tests
