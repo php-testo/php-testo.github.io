@@ -12,10 +12,10 @@ faqLevel: false
 
 Testo is a testing framework for PHP, built from scratch. Not a wrapper, not a fork, not an add-on — a fully independent architecture based on plugins, middlewares, and events.
 
-The result is a flexible tool with a pleasant API and capabilities that go beyond conventional testing — from inline tests right in `src` to benchmarks with a single attribute.
+What emerged is a flexible tool with a pleasant API and capabilities that go beyond conventional testing — from inline tests right in `src` to benchmarks with a single attribute.
 
 ::: question Why another testing framework?
-Existing solutions are built on architecture that has evolved over years and carries a lot of legacy. Getting something fundamentally new into them is extremely difficult. Testo started from a clean slate — giving us the freedom to make the right decisions without worrying about backwards compatibility.
+Existing solutions are built on architecture that has evolved over years and carries a lot of legacy baggage. Getting something fundamentally new into them is extremely difficult. Testo started from a clean slate — giving us the freedom to make the right decisions without worrying about backwards compatibility.
 :::
 
 ::: question What is Testo's philosophy?
@@ -37,7 +37,7 @@ You can shape Testo into exactly what you need. Everything you don't need can be
 :::
 
 ::: question Can I use Testo alongside other testing frameworks?
-Yes. Testo is fully independent and doesn't conflict with other tools — it doesn't even patch `nikic/php-parser` or [use it](https://github.com/sebastianbergmann/phpunit/issues/6381). You can install Testo alongside Codeception, PHPUnit, or Pest and start writing new tests with Testo without touching the existing ones.
+Yes. Testo is fully independent and doesn't conflict with other tools — it doesn't even patch `nikic/php-parser` or [use it](https://github.com/sebastianbergmann/phpunit/issues/6381). You can install Testo alongside Codeception, PHPUnit, or Pest and start writing new tests without touching the existing ones.
 :::
 
 ::: question Does Testo work with AI agents?
@@ -57,7 +57,7 @@ Testo uses familiar PHP and OOP syntax: no DSL, no magic methods, no unusual con
 
 A word about assertions. The xUnit family (PHPUnit, JUnit, NUnit) historically uses `$expected, $actual` argument order — an endless source of confusion.
 - `webmozart/assert` solved this simply: put `$actual` first.
-- Pest chose a fluent API like Jest: `expect($actual)->not()->toBe($expected)`, but at the cost of a magic DSL, atypical for PHP.
+- Pest chose a fluent API like Jest: `expect($actual)->not()->toBe($expected)`, but at the cost of a magic DSL, foreign to PHP.
 - Testo took the best of both approaches: intuitive argument order and typed chains that also streamlined the main facade. For example: `Assert::string($email)->contains('@')`. No magic, full IDE and static analysis support.
 :::
 
