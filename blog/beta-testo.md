@@ -10,35 +10,56 @@ faqLevel: false
 
 # Beta Testing is Open!
 
-## A little marketing
+Testo is a testing framework for PHP, built from scratch. Not a wrapper, not a fork, not an add-on — a fully independent architecture based on plugins, middlewares, and events.
 
-1. Testo plays nicely with any libraries and tools, causing no conflicts:
-   - No PHPUnit dependency. It's not another wrapper around it, it's a full-fledged framework built from scratch.
-   - Doesn't patch `nikic/php-parser` and doesn't even [use it](https://github.com/sebastianbergmann/phpunit/issues/6381).
-   - PHP 8.2+ for the widest version support.
+The result is a flexible tool with a pleasant API and capabilities that go beyond conventional testing — from inline tests right in `src` to benchmarks with a single attribute.
 
-2. AI agents can easily generate Testo tests. Just feed them `llms.txt` ([docs](/docs/ai-agents.md)).
+::: question Why another testing framework?
+Existing solutions are built on architecture that has evolved over years and carries a lot of legacy. Getting something fundamentally new into them is extremely difficult. Testo started from a clean slate — giving us the freedom to make the right decisions without worrying about backwards compatibility.
+:::
 
-3. Thanks to the plugin system, you can shape Testo into exactly what you need. No limitations beyond immutability.
-   - Every Testo feature is a plugin that can be enabled or disabled at will.
-   - Writing your own plugin? A couple dozen lines of code and it's up and running.
-   - Each Test Suite can have its own set of plugins.
+::: question What is Testo's philosophy?
+Give the developer full control without imposing anything.
+Testo doesn't dictate how to write tests. It provides tools and extension mechanisms, and you decide how to use them. Everything you don't need can be disabled. Everything that's missing can be added.
 
-4. Go beyond conventional testing:
-   - Need to test right inside `src`? There are already [inline tests](/docs/plugins/inline.md) and [benchmarks](/docs/plugins/bench.md) for that.
-   - Want to create a custom attribute with cool logic? Easy. <attr>\Testo\Retry</attr> is a great example.
-   - The pipeline and middleware system, event system, and plugins give you full control over how the framework behaves.
+Testo is built on respect.
+- PHP 8.2+ — the widest version support among testing frameworks. If your project can't jump to the latest PHP, that's no reason to go without updates and security fixes.
+- A new PHP release doesn't mean a new major framework release.
+- No <abbr title="Closing issues without resolution just to zero out the counter.">Zero Issues</abbr> policy — Testo aims to solve problems, not sweep them under the rug.
+:::
 
-5. Made by a developer for developers.
-   - No legacy like abstract `TestCase`.
-   - Minimal boilerplate thanks to attributes.
-   - Type safety even in assertions.
-   - Familiar OOP and PHP syntax, no magic or DSL.
+::: question How is Testo different from PHPUnit and Pest?
+**Extensibility.**
+Inline tests, benchmarks, retry — these are all regular plugins built on the same mechanisms available to you. Writing your own plugin takes a couple dozen lines of code. Want to create a custom attribute with cool logic? Easy — <attr>\Testo\Retry</attr> is a great example.
 
-6. A fully featured [PHPStorm plugin](https://plugins.jetbrains.com/plugin/28842-testo) is also available.
+**Flexibility.**
+You can shape Testo into exactly what you need. Everything you don't need can be disabled. Each Test Suite can have its own set of plugins.
+:::
 
+::: question Can I use Testo alongside other testing frameworks?
+Yes. Testo is fully independent and doesn't conflict with other tools — it doesn't even patch `nikic/php-parser` or [use it](https://github.com/sebastianbergmann/phpunit/issues/6381). You can install Testo alongside Codeception, PHPUnit, or Pest and start writing new tests with Testo without touching the existing ones.
+:::
 
-**Ready to give it a try?**
+::: question Does Testo work with AI agents?
+Yes. Testo provides `llms.txt` and `llms-full.txt` — special files for AI agents describing the framework's API. Feed them to your agent, and it will start writing Testo tests right away. Learn more in the [documentation](/docs/ai-agents.md).
+:::
+
+::: question Is there IDE support?
+PHPStorm has a full-featured [plugin](https://plugins.jetbrains.com/plugin/28842-testo) — test execution, navigation, and results displayed right in the IDE.
+:::
+
+::: question How ready is Testo for use?
+Beta testing is underway. The public API has stabilized, documentation is being written, and the PHPStorm plugin works. Before the release, we still need to refine reports, add parallel execution, and a few other things.
+:::
+
+::: question Is it hard to switch from PHPUnit?
+Testo uses familiar PHP and OOP syntax: no DSL, no magic methods, no unusual constructs. **If you write PHP, you already know Testo's syntax.** It's not a drop-in replacement for PHPUnit yet, but the learning curve is minimal.
+
+A word about assertions. The xUnit family (PHPUnit, JUnit, NUnit) historically uses `$expected, $actual` argument order — an endless source of confusion.
+- `webmozart/assert` solved this simply: put `$actual` first.
+- Pest chose a fluent API like Jest: `expect($actual)->not()->toBe($expected)`, but at the cost of a magic DSL, atypical for PHP.
+- Testo took the best of both approaches: intuitive argument order and typed chains that also streamlined the main facade. For example: `Assert::string($email)->contains('@')`. No magic, full IDE and static analysis support.
+:::
 
 ## Installation and Setup
 
@@ -131,9 +152,7 @@ final class OrderTest
 }
 ```
 
-The <class>\Testo\Assert</class> facade uses an intuitive argument order: `$actual` (the value being checked) first, then `$expected` (the expected value). This differs from the legacy xUnit approach.
-
-And here's what typed assertion chains look like:
+Here's what typed assertion chains look like:
 
 ```php
 Assert::string($email)->contains('@');
@@ -148,6 +167,11 @@ Assert::array($items)
 Assert::json($response->body())
     ->isObject()
     ->hasKeys('data', 'meta');
+
+Expect::exception(PaymentException::class)
+    ->fromMethod(PaymentGateway::class, 'charge')
+    ->withMessageContaining('insufficient funds')
+    ->withCode(402);
 ```
 
 ### Inline Tests
