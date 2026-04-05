@@ -5,9 +5,9 @@ import { generateLlms, llmsPlugin } from './llms'
 import { isBlogPath } from './locales'
 import { faqPlugin } from './faq'
 import { infoBlockPlugin } from './info-block'
-import { funcBlockPlugin } from './func-block'
+import { funcBlockPlugin } from './signature'
 import { pluginBlockPlugin, preScanPlugins } from './plugin-block'
-import { preScanSignatures } from './func-registry'
+import { preScanSignatures } from './signature-registry'
 
 const baseUrl = 'https://php-testo.github.io'
 const srcDir = fileURLToPath(new URL('..', import.meta.url))

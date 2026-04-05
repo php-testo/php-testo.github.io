@@ -560,9 +560,18 @@ html {
   margin-bottom: 0;
 }
 
-.vp-doc h3,
-.vp-doc h4 {
+.vp-doc h2 {
+  margin-top: 64px;
+  border-top: none;
+  padding-top: 0;
+}
+
+.vp-doc h3 {
   margin-top: 48px;
+}
+
+.vp-doc h4 {
+  margin-top: 40px;
 }
 
 /* ===== FUNC BLOCK (API Reference) ===== */
@@ -785,6 +794,19 @@ a.func-ref .func-ref-tooltip-short,
 a.func-ref:hover .func-ref-tooltip-sig,
 a.func-ref:hover .func-ref-tooltip-short {
   color: var(--vp-c-text-2);
+}
+
+.func-ref-tooltip-case-name {
+  display: block;
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--vp-c-brand-1);
+}
+
+.func-ref-tooltip-case-name + .func-ref-tooltip-short {
+  margin-top: 2px;
 }
 
 .func-ref-tooltip-short {

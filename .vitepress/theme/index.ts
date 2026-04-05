@@ -14,12 +14,32 @@ import { isBlogPath, getBlogBackLink, localNavBackKey } from '../locales'
 import './style.css'
 
 function setupFuncRefTooltips() {
+  let activeTooltip: HTMLElement | null = null
+  let activeRef: Element | null = null
+
+  function hideTooltip() {
+    if (activeTooltip && activeRef) {
+      activeTooltip.classList.remove('is-visible')
+      activeRef.appendChild(activeTooltip)
+      activeTooltip = null
+      activeRef = null
+    }
+  }
+
   document.addEventListener('mouseenter', (e) => {
     const ref = (e.target as Element).closest?.('.func-ref')
     if (!ref) return
 
+    // Clean up previous tooltip if any
+    hideTooltip()
+
     const tip = ref.querySelector('.func-ref-tooltip') as HTMLElement
     if (!tip) return
+
+    // Move tooltip to body to avoid inheriting parent background opacity
+    activeTooltip = tip
+    activeRef = ref
+    document.body.appendChild(tip)
 
     const rect = ref.getBoundingClientRect()
     const gap = 8
@@ -57,10 +77,8 @@ function setupFuncRefTooltips() {
 
   document.addEventListener('mouseleave', (e) => {
     const ref = (e.target as Element).closest?.('.func-ref')
-    if (!ref) return
-
-    const tip = ref.querySelector('.func-ref-tooltip') as HTMLElement
-    if (tip) tip.classList.remove('is-visible')
+    if (!ref || ref !== activeRef) return
+    hideTooltip()
   }, true)
 }
 

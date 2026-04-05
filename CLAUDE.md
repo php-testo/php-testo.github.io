@@ -37,6 +37,7 @@ ru/           # Russian locale (same structure)
 **Cross-references in text:**
 - Use `<plugin>Name</plugin>` when referencing a Testo plugin by name (e.g., `<plugin>Assert</plugin>`)
 - Use `<class>\FQN</class>` when referencing PHP classes and interfaces (e.g., `<class>\Testo\Event\Test\TestFinished</class>`)
+- Use `<enum>\FQN</enum>` when referencing PHP enums (e.g., `<enum>\Testo\Codecov\Config\CoverageLevel</enum>`)
 - Use `<attr>\FQN</attr>` for any PHP attributes — user-facing (`<attr>\Testo\Retry</attr>`) and meta-attributes (`<attr>\Testo\Pipeline\Attribute\FallbackInterceptor</attr>`)
 - Use `<func>\FQN::method()</func>` for methods (e.g., `<func>\Testo\Assert::same()</func>`)
 - Do NOT use plain markdown links (`[Assert](./plugins/assert.md)`) when these tags are available
@@ -182,6 +183,19 @@ Assert::same($user->role, 'admin');
 
 Attribute signatures are detected by the `#[` prefix in `name`. The `#[...]` wrapper is preserved in the rendered signature box. Headings display as `#[ShortName]` (e.g., `#[Retry]`). The inner FQN (without `#[...]`) is used for registry lookup and `<attr>` cross-references.
 
+**Enum signature syntax:**
+```html
+<signature h="2" name="enum \Testo\Codecov\Config\CoverageMode">
+<short>Determines whether to collect coverage.</short>
+<description>Detailed description with markdown support.</description>
+<case name="Available">**Default.** Coverage is collected if extension is available.</case>
+<case name="Required">Coverage is mandatory. Throws if no extension installed.</case>
+<case name="Disabled">Coverage fully disabled, zero overhead.</case>
+</signature>
+```
+
+Enum signatures are detected by the `enum ` prefix in `name`. Headings display as `CoverageMode` (namespace stripped). The `<case>` tag is only valid inside enum signatures.
+
 **Attributes:**
 - `name` (required) — full signature. For functions: FQN with types and return type (`\Testo\Assert::method`). For attributes: `#[\Namespace\AttrName(params)]`. Namespace is stripped for display.
 - `h` — heading level for auto-generated heading (`"3"` → `<h3>Assert::same</h3>` or `<h2>#[Retry]</h2>`). Default: `"0"` (bold text, no heading).
@@ -192,6 +206,7 @@ Attribute signatures are detected by the `#[` prefix in `name`. The `#[...]` wra
 - `<description>...</description>` — detailed method description, supports full markdown (paragraphs, lists, code blocks, etc.). Rendered below the signature box.
 - `<param name="$foo">...</param>` — parameter description (inline markdown). Rendered under localized "Parameters:" / "Параметры:" label.
 - `<example>...</example>` — full markdown block (code fences, text, etc.). Multiple allowed. Rendered under localized "Examples:" / "Примеры:" label.
+- `<case name="CaseName">...</case>` — enum case description (inline markdown). Only valid inside enum signatures. Rendered as a list of enum values.
 
 **Minimal usage (no description, no params):**
 ```html
@@ -238,6 +253,21 @@ Takes the plain FQN (without `#[...]`) and renders as `#[Retry]` with syntax hig
 - The `#[...]` wrapping is added automatically — always pass plain FQN in the tag
 - Locale-aware: EN pages reference EN signatures, RU pages reference RU signatures
 - Uses a separate registry from `<func>` to avoid FQN collisions
+
+## Enum References (`<enum>`)
+
+For referencing PHP enums inline. Renders the short enum name (without namespace) with a hover tooltip showing the full FQN, similar to `<class>`.
+
+**Syntax:**
+```html
+<enum>\Testo\Codecov\Config\CoverageLevel</enum>
+```
+
+Renders as `CoverageLevel` styled as inline code. On hover, shows a tooltip with the full enum name. If a corresponding `<signature name="enum \...">` block exists with `h > 0`, the reference is a clickable link.
+
+**Behavior:**
+- Same display rules as `<class>`: namespace stripped, tooltip with full FQN
+- Locale-aware: EN pages reference EN signatures, RU pages reference RU signatures
 
 ## Class References (`<class>`)
 

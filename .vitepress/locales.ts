@@ -15,6 +15,7 @@ export interface LocaleConfig {
   blogLabel: string   // Back button label: 'Blog', 'Блог', etc.
   signatureParamsLabel: string    // 'Parameters:', 'Параметры:', etc.
   signatureExamplesLabel: string  // 'Examples:', 'Примеры:', etc.
+  signatureCasesLabel: string     // 'Cases:', 'Значения:', etc.
 }
 
 export const locales: LocaleConfig[] = [
@@ -26,6 +27,7 @@ export const locales: LocaleConfig[] = [
     blogLabel: 'Blog',
     signatureParamsLabel: 'Parameters:',
     signatureExamplesLabel: 'Examples:',
+    signatureCasesLabel: 'Cases:',
   },
   {
     code: 'ru',
@@ -35,6 +37,7 @@ export const locales: LocaleConfig[] = [
     blogLabel: 'Блог',
     signatureParamsLabel: 'Параметры:',
     signatureExamplesLabel: 'Примеры:',
+    signatureCasesLabel: 'Значения:',
   },
 ]
 

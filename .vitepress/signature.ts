@@ -12,12 +12,26 @@ import type MarkdownIt from 'markdown-it'
 import type StateInline from 'markdown-it/lib/rules_inline/state_inline.mjs'
 import type StateBlock from 'markdown-it/lib/rules_block/state_block.mjs'
 import { getLocaleByPath, type LocaleConfig } from './locales'
-import { getEntry, getAttrEntry, getClassEntry } from './func-registry'
+import { getEntry, getAttrEntry, getClassEntry, getEnumCaseEntry } from './signature-registry'
 import { getPluginEntry } from './plugin-block'
 
 interface Param {
   name: string
   desc: string
+}
+
+interface EnumCase {
+  name: string
+  value: string
+  desc: string
+}
+
+interface MethodBlock {
+  signature: string
+  short: string
+  description: string
+  params: Param[]
+  examples: string[]
 }
 
 // ─── Helpers ─────────────────────────────────────────────
@@ -56,8 +70,16 @@ function buildSlug(signature: string): string {
       .replace(/->/g, '--')
       .toLowerCase()
   }
-  const methodMatch = signature.match(/^([A-Za-z_]\w*)/)
-  return methodMatch ? methodMatch[1].toLowerCase() : 'unknown'
+  // FQN without parentheses (e.g. attributes: \Testo\Codecov\CoversNothing)
+  const fqnPlain = signature.match(/^\\?(.+)/)
+  if (fqnPlain) {
+    return fqnPlain[1]
+      .replace(/\\/g, '-')
+      .replace(/::/g, '--')
+      .replace(/->/g, '--')
+      .toLowerCase()
+  }
+  return 'unknown'
 }
 
 function highlightSignature(md: MarkdownIt, signature: string): string {
@@ -160,6 +182,73 @@ function renderPluginRefHtml(name: string, locale?: LocaleConfig): string {
     return `<a href="${escapeHtml(entry.pagePath)}" class="plugin-ref">${escapeHtml(entry.name)}</a>`
   }
   return escapeHtml(name)
+}
+
+function renderEnumRefHtml(md: MarkdownIt, rawFqn: string, locale?: LocaleConfig): string {
+  const localeCode = locale?.code ?? 'en'
+  const hasCasePart = rawFqn.includes('::')
+
+  if (hasCasePart) {
+    // <enum>\Testo\Codecov\Config\CoverageMode::Available</enum>
+    const caseEntry = getEnumCaseEntry(localeCode, rawFqn)
+    if (caseEntry) {
+      const enumShort = stripNamespaceShort(caseEntry.enumFqn)
+      const displayText = enumShort + '::' + caseEntry.caseName
+      const displayHtml = highlightSignature(md, displayText) || escapeHtml(displayText)
+      const sigHtml = highlightSignature(md, caseEntry.enumSignature)
+      const descHtml = md.renderInline(caseEntry.description)
+
+      const enumShortHtml = caseEntry.enumShort ? md.renderInline(caseEntry.enumShort) : ''
+
+      const tooltip = `<span class="func-ref-tooltip">`
+        + `<code class="func-ref-tooltip-sig vp-code">${sigHtml}</code>`
+        + (enumShortHtml ? `<span class="func-ref-tooltip-short">${enumShortHtml}</span>` : '')
+        + `<span class="func-ref-tooltip-case-name">${escapeHtml(caseEntry.caseName)}</span>`
+        + `<span class="func-ref-tooltip-short">${descHtml}</span>`
+        + `</span>`
+
+      const cls = 'func-ref enum-ref vp-code'
+
+      if (caseEntry.hasAnchor) {
+        const href = caseEntry.pagePath + '#' + caseEntry.slug
+        return `<a href="${href}" class="${cls}">${displayHtml}${tooltip}</a>`
+      }
+
+      return `<span class="${cls}">${displayHtml}${tooltip}</span>`
+    }
+
+    // Fallback: no case entry found, try enum class
+    const [enumPart, casePart] = rawFqn.split('::')
+    const classEntry = getClassEntry(localeCode, enumPart)
+    if (classEntry) {
+      const enumShort = stripNamespaceShort(enumPart)
+      const displayText = enumShort + '::' + casePart
+      const displayHtml = highlightSignature(md, displayText) || escapeHtml(displayText)
+      const sigHtml = highlightSignature(md, classEntry.signature)
+      const shortHtml = classEntry.short ? md.renderInline(classEntry.short) : ''
+
+      const tooltip = `<span class="func-ref-tooltip">`
+        + `<code class="func-ref-tooltip-sig vp-code">${sigHtml}</code>`
+        + (shortHtml ? `<span class="func-ref-tooltip-short">${shortHtml}</span>` : '')
+        + `</span>`
+
+      const cls = 'func-ref enum-ref vp-code'
+
+      if (classEntry.hasAnchor) {
+        const href = classEntry.pagePath + '#' + classEntry.slug
+        return `<a href="${href}" class="${cls}">${displayHtml}${tooltip}</a>`
+      }
+
+      return `<span class="${cls}">${displayHtml}${tooltip}</span>`
+    }
+
+    // No registry info at all
+    const shortDisplay = stripNamespaceShort(enumPart) + '::' + casePart
+    return `<code>${escapeHtml(shortDisplay)}</code>`
+  }
+
+  // No :: — just enum class reference, delegate to <class> rendering
+  return renderKlassRefHtml(md, rawFqn, locale)
 }
 
 // ─── Generic rule registration ──────────────────────────
@@ -280,6 +369,12 @@ export function funcBlockPlugin(md: MarkdownIt) {
     return renderAttrRefHtml(md, rawFqn, locale)
   })
 
+  registerBlockParagraphTag(md, 'enum_line', 'enum', (rawFqn, state) => {
+    const relativePath = state.env?.relativePath || ''
+    const locale = getLocaleByPath('/' + relativePath)
+    return renderEnumRefHtml(md, rawFqn, locale)
+  })
+
   // ── <signature> block rule (multi-line) ──
 
   md.block.ruler.before('html_block', 'func_block', (state, startLine, endLine, silent) => {
@@ -324,6 +419,7 @@ export function funcBlockPlugin(md: MarkdownIt) {
   registerInlineTag(md, 'class', 'class_ref', { after: 'func_ref' }, { withLocale: true })
   registerInlineTag(md, 'plugin', 'plugin_ref', { after: 'class_ref' }, { withLocale: true })
   registerInlineTag(md, 'attr', 'attr_ref', { after: 'plugin_ref' }, { withLocale: true })
+  registerInlineTag(md, 'enum', 'enum_ref', { after: 'attr_ref' }, { withLocale: true })
 
   // ── Inline renderers ──
 
@@ -345,6 +441,11 @@ export function funcBlockPlugin(md: MarkdownIt) {
   md.renderer.rules['attr_ref'] = (tokens, idx) => {
     const { content, meta } = tokens[idx]
     return renderAttrRefHtml(md, content, meta?.locale)
+  }
+
+  md.renderer.rules['enum_ref'] = (tokens, idx) => {
+    const { content, meta } = tokens[idx]
+    return renderEnumRefHtml(md, content, meta?.locale)
   }
 }
 
@@ -387,15 +488,79 @@ function renderFuncBlock(md: MarkdownIt, raw: string, locale?: LocaleConfig, env
 
   const isAttr = signature.startsWith('#[')
   const isClass = !isAttr && signature.startsWith('new ')
-  const innerSig = isAttr ? signature.slice(2, -1) : isClass ? signature.slice(4) : signature
+  const isEnum = !isAttr && !isClass && signature.startsWith('enum ')
+  const innerSig = isAttr ? signature.slice(2, -1) : isClass ? signature.slice(4) : isEnum ? signature.slice(5) : signature
   const { display: innerDisplay } = stripNamespace(innerSig)
-  const display = isAttr ? '#[' + innerDisplay + ']' : isClass ? 'new ' + innerDisplay : innerDisplay
+  const display = isAttr ? '#[' + innerDisplay + ']' : isClass ? 'new ' + innerDisplay : isEnum ? 'enum ' + innerDisplay : innerDisplay
   const rawShortName = extractShortName(innerDisplay)
   const shortName = isAttr ? '#[' + rawShortName + ']' : rawShortName
   const paramsLabel = locale?.signatureParamsLabel ?? 'Parameters:'
   const examplesLabel = locale?.signatureExamplesLabel ?? 'Examples:'
+  const casesLabel = locale?.signatureCasesLabel ?? 'Cases:'
   const slug = buildSlug(innerSig)
   const sigHtml = highlightSignature(md, display)
+
+  // ── Enum rendering ──
+  if (isEnum) {
+    // Parse <case> tags
+    const cases: EnumCase[] = []
+    const caseRe = /<case\s+([^>]*)>([\s\S]*?)<\/case>/g
+    let cm: RegExpExecArray | null
+    while ((cm = caseRe.exec(body)) !== null) {
+      const caseAttrs = cm[1]
+      const caseNameMatch = caseAttrs.match(/\bname="([^"]*)"/)
+      if (!caseNameMatch) continue
+      const valueMatch = caseAttrs.match(/\bvalue="([^"]*)"/)
+      cases.push({
+        name: caseNameMatch[1],
+        value: valueMatch ? valueMatch[1] : '',
+        desc: cm[2].trim(),
+      })
+    }
+
+    // Parse <method> tags
+    const methods: MethodBlock[] = []
+    const methodRe = /<method\s+([^>]*)>([\s\S]*?)<\/method>/g
+    let mm: RegExpExecArray | null
+    while ((mm = methodRe.exec(body)) !== null) {
+      const methodAttrs = mm[1]
+      const methodBody = mm[2]
+      const methodNameMatch = methodAttrs.match(/\bname="([^"]*)"/)
+      if (!methodNameMatch) continue
+
+      const methodShortMatch = methodBody.match(/<short>([\s\S]*?)<\/short>/)
+      const methodDescMatch = methodBody.match(/<description>([\s\S]*?)<\/description>/)
+
+      const methodParams: Param[] = []
+      const mpRe = /<param\s+name="([^"]*)">([\s\S]*?)<\/param>/g
+      let mp: RegExpExecArray | null
+      while ((mp = mpRe.exec(methodBody)) !== null) {
+        methodParams.push({ name: mp[1], desc: mp[2].trim() })
+      }
+
+      const methodExamples: string[] = []
+      const meRe = /<example>([\s\S]*?)<\/example>/g
+      let me_: RegExpExecArray | null
+      while ((me_ = meRe.exec(methodBody)) !== null) {
+        methodExamples.push(me_[1].trim())
+      }
+
+      methods.push({
+        signature: methodNameMatch[1],
+        short: methodShortMatch ? methodShortMatch[1].trim() : '',
+        description: methodDescMatch ? methodDescMatch[1].trim() : '',
+        params: methodParams,
+        examples: methodExamples,
+      })
+    }
+
+    return renderEnumBlock(md, {
+      headingLevel, slug, shortName, short, description, sigHtml,
+      cases, methods, params, examples,
+      paramsLabel, examplesLabel, casesLabel,
+      innerDisplay,
+    }, env)
+  }
 
   if (compact) {
     const shortHtml = short ? md.renderInline(short) : ''
@@ -456,6 +621,127 @@ function renderFuncBlock(md: MarkdownIt, raw: string, locale?: LocaleConfig, env
     html += '  </div>\n'
   }
 
+  if (examples.length > 0) {
+    html += '  <div class="func-section">\n'
+    html += `    <p class="func-section-title">${escapeHtml(examplesLabel)}</p>\n`
+    for (const ex of examples) {
+      html += `    <div class="func-example">${md.render(ex, env)}</div>\n`
+    }
+    html += '  </div>\n'
+  }
+
+  html += '</div>\n'
+  return html
+}
+
+// ─── Enum block renderer ──────────────────────────────
+
+interface EnumRenderData {
+  headingLevel: number
+  slug: string
+  shortName: string
+  short: string
+  description: string
+  sigHtml: string
+  cases: EnumCase[]
+  methods: MethodBlock[]
+  params: Param[]
+  examples: string[]
+  paramsLabel: string
+  examplesLabel: string
+  casesLabel: string
+  innerDisplay: string
+}
+
+function renderEnumBlock(md: MarkdownIt, data: EnumRenderData, env?: any): string {
+  const {
+    headingLevel, slug, shortName, short, description, sigHtml,
+    cases, methods, params, examples,
+    paramsLabel, examplesLabel, casesLabel, innerDisplay,
+  } = data
+
+  let html = ''
+
+  if (headingLevel > 0 && headingLevel <= 6) {
+    html += `<h${headingLevel} id="${escapeHtml(slug)}" tabindex="-1">${escapeHtml(shortName)} <a class="header-anchor" href="#${escapeHtml(slug)}" aria-label="Permalink to &quot;${escapeHtml(shortName)}&quot;">​</a></h${headingLevel}>\n`
+  } else {
+    html += `<p class="func-title"><strong>${escapeHtml(shortName)}</strong></p>\n`
+  }
+
+  if (short) {
+    html += `<p class="func-short">${md.renderInline(short)}</p>\n`
+  }
+
+  html += '<div class="func-block">\n'
+  html += `  <code class="func-sig vp-code">${sigHtml}</code>\n`
+
+  const descHtml = description ? md.render(description, env) : ''
+  if (descHtml) {
+    html += `  <div class="func-desc">${descHtml}</div>\n`
+  }
+
+  // Cases section
+  if (cases.length > 0) {
+    html += '  <div class="func-section">\n'
+    html += `    <p class="func-section-title">${escapeHtml(casesLabel)}</p>\n`
+    html += '    <dl class="func-params enum-cases">\n'
+    for (const c of cases) {
+      const caseSlug = slug + '--' + c.name.toLowerCase()
+      const caseLabel = escapeHtml(c.name)
+      const valueHtml = c.value ? ` <span class="enum-case-value">= ${escapeHtml(c.value)}</span>` : ''
+      html += `      <dt id="${escapeHtml(caseSlug)}"><code>${caseLabel}</code>${valueHtml}</dt>\n`
+      html += `      <dd>${md.renderInline(c.desc)}</dd>\n`
+    }
+    html += '    </dl>\n'
+    html += '  </div>\n'
+  }
+
+  // Params section (if enum constructor has params beyond cases)
+  if (params.length > 0) {
+    html += '  <div class="func-section">\n'
+    html += `    <p class="func-section-title">${escapeHtml(paramsLabel)}</p>\n`
+    html += '    <dl class="func-params">\n'
+    for (const p of params) {
+      html += `      <dt><code>${escapeHtml(p.name)}</code></dt>\n`
+      html += `      <dd>${md.renderInline(p.desc)}</dd>\n`
+    }
+    html += '    </dl>\n'
+    html += '  </div>\n'
+  }
+
+  // Methods section
+  if (methods.length > 0) {
+    for (const m of methods) {
+      const methodDisplay = innerDisplay + '::' + m.signature
+      const methodSigHtml = highlightSignature(md, methodDisplay)
+      const methodBaseName = m.signature.match(/^([A-Za-z_]\w*)/)
+      const methodSlug = slug + '--' + (methodBaseName ? methodBaseName[1].toLowerCase() : 'unknown')
+
+      html += '  <div class="func-compact enum-method">\n'
+      html += `    <h${Math.min((headingLevel || 2) + 1, 6)} id="${escapeHtml(methodSlug)}" class="func-compact-anchor" tabindex="-1">${escapeHtml(innerDisplay + '::' + (methodBaseName?.[1] ?? m.signature))} <a class="header-anchor" href="#${escapeHtml(methodSlug)}" aria-label="Permalink to &quot;${escapeHtml(m.signature)}&quot;">​</a></h${Math.min((headingLevel || 2) + 1, 6)}>\n`
+      html += `    <code class="func-sig vp-code">${methodSigHtml}</code>\n`
+
+      if (m.short) {
+        html += `    <span class="func-compact-short">${md.renderInline(m.short)}</span>\n`
+      }
+      if (m.description) {
+        html += `    <div class="func-compact-desc">${md.render(m.description, env)}</div>\n`
+      }
+
+      if (m.params.length > 0) {
+        const inline = m.params.map(p => `<code>${escapeHtml(p.name)}</code> → ${md.renderInline(p.desc)}`).join('; ')
+        html += `    <div class="func-compact-params">${inline}</div>\n`
+      }
+
+      for (const ex of m.examples) {
+        html += `    <div class="func-compact-example">${md.render(ex, env)}</div>\n`
+      }
+
+      html += '  </div>\n'
+    }
+  }
+
+  // Examples section
   if (examples.length > 0) {
     html += '  <div class="func-section">\n'
     html += `    <p class="func-section-title">${escapeHtml(examplesLabel)}</p>\n`
