@@ -563,7 +563,7 @@ function renderFuncBlock(md: MarkdownIt, raw: string, locale?: LocaleConfig, env
   }
 
   if (compact) {
-    const shortHtml = short ? md.renderInline(short) : ''
+    const shortHtml = short ? md.renderInline(short, env) : ''
     const compactDescHtml = description ? md.render(description, env) : ''
 
     let html = '<div class="func-compact">'
@@ -577,7 +577,7 @@ function renderFuncBlock(md: MarkdownIt, raw: string, locale?: LocaleConfig, env
     if (compactDescHtml) html += `<div class="func-compact-desc">${compactDescHtml}</div>`
 
     if (params.length > 0) {
-      const inline = params.map(p => `<code>${escapeHtml(p.name)}</code> -> ${md.renderInline(p.desc)}`).join('; ')
+      const inline = params.map(p => `<code>${escapeHtml(p.name)}</code> -> ${md.renderInline(p.desc, env)}`).join('; ')
       html += `<div class="func-compact-params">${inline}</div>`
     }
 
@@ -598,7 +598,7 @@ function renderFuncBlock(md: MarkdownIt, raw: string, locale?: LocaleConfig, env
   }
 
   if (short) {
-    html += `<p class="func-short">${md.renderInline(short)}</p>\n`
+    html += `<p class="func-short">${md.renderInline(short, env)}</p>\n`
   }
 
   html += '<div class="func-block">\n'
@@ -615,7 +615,7 @@ function renderFuncBlock(md: MarkdownIt, raw: string, locale?: LocaleConfig, env
     html += '    <dl class="func-params">\n'
     for (const p of params) {
       html += `      <dt><code>${escapeHtml(p.name)}</code></dt>\n`
-      html += `      <dd>${md.renderInline(p.desc)}</dd>\n`
+      html += `      <dd>${md.renderInline(p.desc, env)}</dd>\n`
     }
     html += '    </dl>\n'
     html += '  </div>\n'
@@ -669,7 +669,7 @@ function renderEnumBlock(md: MarkdownIt, data: EnumRenderData, env?: any): strin
   }
 
   if (short) {
-    html += `<p class="func-short">${md.renderInline(short)}</p>\n`
+    html += `<p class="func-short">${md.renderInline(short, env)}</p>\n`
   }
 
   html += '<div class="func-block">\n'
@@ -690,7 +690,7 @@ function renderEnumBlock(md: MarkdownIt, data: EnumRenderData, env?: any): strin
       const caseLabel = escapeHtml(c.name)
       const valueHtml = c.value ? ` <span class="enum-case-value">= ${escapeHtml(c.value)}</span>` : ''
       html += `      <dt id="${escapeHtml(caseSlug)}"><code>${caseLabel}</code>${valueHtml}</dt>\n`
-      html += `      <dd>${md.renderInline(c.desc)}</dd>\n`
+      html += `      <dd>${md.renderInline(c.desc, env)}</dd>\n`
     }
     html += '    </dl>\n'
     html += '  </div>\n'
@@ -703,7 +703,7 @@ function renderEnumBlock(md: MarkdownIt, data: EnumRenderData, env?: any): strin
     html += '    <dl class="func-params">\n'
     for (const p of params) {
       html += `      <dt><code>${escapeHtml(p.name)}</code></dt>\n`
-      html += `      <dd>${md.renderInline(p.desc)}</dd>\n`
+      html += `      <dd>${md.renderInline(p.desc, env)}</dd>\n`
     }
     html += '    </dl>\n'
     html += '  </div>\n'
@@ -722,14 +722,14 @@ function renderEnumBlock(md: MarkdownIt, data: EnumRenderData, env?: any): strin
       html += `    <code class="func-sig vp-code">${methodSigHtml}</code>\n`
 
       if (m.short) {
-        html += `    <span class="func-compact-short">${md.renderInline(m.short)}</span>\n`
+        html += `    <span class="func-compact-short">${md.renderInline(m.short, env)}</span>\n`
       }
       if (m.description) {
         html += `    <div class="func-compact-desc">${md.render(m.description, env)}</div>\n`
       }
 
       if (m.params.length > 0) {
-        const inline = m.params.map(p => `<code>${escapeHtml(p.name)}</code> → ${md.renderInline(p.desc)}`).join('; ')
+        const inline = m.params.map(p => `<code>${escapeHtml(p.name)}</code> → ${md.renderInline(p.desc, env)}`).join('; ')
         html += `    <div class="func-compact-params">${inline}</div>\n`
       }
 
