@@ -261,7 +261,7 @@ The public API has stabilized, but there are still a few things to finish:
 - Fine-tune minor things in benchmarks and internals.
 - Organizational matters like splitting the monorepo and finishing the documentation.
 
-Code coverage and mocks might also make it to the release, but no promises.
+<plugin>Code coverage</plugin> and mocks might also make it to the release, but no promises.
 
 You can help by testing and providing feedback to make the release as smooth as possible.
 Head to [GitHub Issues](https://github.com/php-testo/testo/issues) with ideas, questions, and problems. Let's figure it out together!

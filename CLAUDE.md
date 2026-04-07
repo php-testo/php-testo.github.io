@@ -37,7 +37,7 @@ ru/           # Russian locale (same structure)
 **Cross-references in text:**
 - Use `<plugin>Name</plugin>` when referencing a Testo plugin by name (e.g., `<plugin>Assert</plugin>`)
 - Use `<class>\FQN</class>` when referencing PHP classes and interfaces (e.g., `<class>\Testo\Event\Test\TestFinished</class>`)
-- Use `<enum>\FQN</enum>` when referencing PHP enums (e.g., `<enum>\Testo\Codecov\Config\CoverageLevel</enum>`)
+- Use `<enum>\FQN</enum>` when referencing PHP enums (e.g., `<enum>\Testo\Codecov\Config\CoverageLevel</enum>`). For specific enum cases use `<enum>\FQN::Case</enum>` (e.g., `<enum>\Testo\Codecov\Config\CoverageMode::Always</enum>`) — do NOT use backtick-wrapped `CoverageMode::Always` in prose
 - Use `<attr>\FQN</attr>` for any PHP attributes — user-facing (`<attr>\Testo\Retry</attr>`) and meta-attributes (`<attr>\Testo\Pipeline\Attribute\FallbackInterceptor</attr>`)
 - Use `<func>\FQN::method()</func>` for methods (e.g., `<func>\Testo\Assert::same()</func>`)
 - Do NOT use plain markdown links (`[Assert](./plugins/assert.md)`) when these tags are available
@@ -261,12 +261,15 @@ For referencing PHP enums inline. Renders the short enum name (without namespace
 **Syntax:**
 ```html
 <enum>\Testo\Codecov\Config\CoverageLevel</enum>
+<enum>\Testo\Codecov\Config\CoverageMode::Always</enum>
 ```
 
-Renders as `CoverageLevel` styled as inline code. On hover, shows a tooltip with the full enum name. If a corresponding `<signature name="enum \...">` block exists with `h > 0`, the reference is a clickable link.
+The first form renders as `CoverageLevel` — same as `<class>`. The second form renders as `CoverageMode::Always` with a tooltip showing the enum's short description and the case description. If a corresponding `<signature name="enum \...">` block exists with `h > 0`, the reference is a clickable link.
 
 **Behavior:**
-- Same display rules as `<class>`: namespace stripped, tooltip with full FQN
+- Enum reference (no `::`): namespace stripped, tooltip with full FQN and `<short>` description
+- Enum case reference (with `::`): tooltip shows enum signature, enum `<short>`, case name, and case description
+- Always use `<enum>` tags for enum values in prose — never backtick-wrapped names like `` `CoverageMode::Always` ``
 - Locale-aware: EN pages reference EN signatures, RU pages reference RU signatures
 
 ## Class References (`<class>`)

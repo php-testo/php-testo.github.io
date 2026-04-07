@@ -242,9 +242,11 @@ function renderEnumRefHtml(md: MarkdownIt, rawFqn: string, locale?: LocaleConfig
       return `<span class="${cls}">${displayHtml}${tooltip}</span>`
     }
 
-    // No registry info at all
-    const shortDisplay = stripNamespaceShort(enumPart) + '::' + casePart
-    return `<code>${escapeHtml(shortDisplay)}</code>`
+    // No registry info — show FQN tooltip like <class> fallback
+    const enumShort = stripNamespaceShort(enumPart)
+    const shortDisplay = enumShort + '::' + casePart
+    const fqnTooltip = `<span class="func-ref-tooltip"><code class="func-ref-tooltip-sig vp-code">${escapeHtml(rawFqn)}</code></span>`
+    return `<span class="class-ref func-ref vp-code">${escapeHtml(shortDisplay)}${fqnTooltip}</span>`
   }
 
   // No :: — just enum class reference, delegate to <class> rendering
