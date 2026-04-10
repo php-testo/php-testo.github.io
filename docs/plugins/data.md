@@ -6,6 +6,8 @@ llms_description: "Parameterized tests with data providers. #[DataSet] for inlin
 
 Data providers let you run one test with different sets of input data. Each set runs as a separate test.
 
+<plugin-info name="Data" />
+
 <signature h="2" name="#[\Testo\Data\DataSet(array $arguments, ?string $name = null)]">
 <short>Declares a set of arguments for a parameterized test. Can be used multiple times — each attribute creates a separate test run.</short>
 <param name="$arguments">Array of values passed to the test method.</param>

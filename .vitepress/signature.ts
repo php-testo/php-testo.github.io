@@ -12,8 +12,8 @@ import type MarkdownIt from 'markdown-it'
 import type StateInline from 'markdown-it/lib/rules_inline/state_inline.mjs'
 import type StateBlock from 'markdown-it/lib/rules_block/state_block.mjs'
 import { getLocaleByPath, type LocaleConfig } from './locales'
-import { getEntry, getAttrEntry, getClassEntry, getEnumCaseEntry } from './signature-registry'
-import { getPluginEntry } from './plugin-block'
+import { getEntry, getAttrEntry, getClassEntry, getEnumCaseEntry, getAllAttrEntries, type RegistryEntry } from './signature-registry'
+import { getPluginEntry, getPluginByPagePath } from './plugin-block'
 
 interface Param {
   name: string
@@ -376,6 +376,28 @@ export function funcBlockPlugin(md: MarkdownIt) {
     const locale = getLocaleByPath('/' + relativePath)
     return renderEnumRefHtml(md, rawFqn, locale)
   })
+
+  // ── <attributes-list /> block rule ──
+
+  md.block.ruler.before('html_block', 'attributes_list', (state, startLine, _endLine, silent) => {
+    const pos = state.bMarks[startLine] + state.tShift[startLine]
+    const max = state.eMarks[startLine]
+    const line = state.src.slice(pos, max).trim()
+
+    if (line !== '<attributes-list />' && line !== '<attributes-list/>') return false
+    if (silent) return true
+
+    const token = state.push('attributes_list', '', 0)
+    const relativePath = state.env?.relativePath || ''
+    token.meta = { locale: getLocaleByPath('/' + relativePath) }
+    state.line = startLine + 1
+    return true
+  })
+
+  md.renderer.rules['attributes_list'] = (tokens, idx) => {
+    const locale = tokens[idx].meta?.locale
+    return renderAttributesList(md, locale)
+  }
 
   // ── <signature> block rule (multi-line) ──
 
@@ -754,5 +776,60 @@ function renderEnumBlock(md: MarkdownIt, data: EnumRenderData, env?: any): strin
   }
 
   html += '</div>\n'
+  return html
+}
+
+// ─── <attributes-list /> renderer ───────────────────────
+
+function renderAttributesList(md: MarkdownIt, locale?: LocaleConfig): string {
+  const localeCode = locale?.code ?? 'en'
+  const entries = getAllAttrEntries(localeCode)
+
+  if (entries.length === 0) return ''
+
+  // Group by pagePath
+  const groups = new Map<string, RegistryEntry[]>()
+  for (const entry of entries) {
+    const list = groups.get(entry.pagePath) || []
+    list.push(entry)
+    groups.set(entry.pagePath, list)
+  }
+
+  const tableLabels: Record<string, { attr: string; desc: string }> = {
+    en: { attr: 'Attribute', desc: 'Description' },
+    ru: { attr: 'Атрибут', desc: 'Описание' },
+  }
+  const l = tableLabels[localeCode] ?? tableLabels.en
+
+  // Sort groups by plugin name
+  const sortedGroups = [...groups.entries()].sort((a, b) => {
+    const nameA = getPluginByPagePath(localeCode, a[0])?.name ?? a[0]
+    const nameB = getPluginByPagePath(localeCode, b[0])?.name ?? b[0]
+    return nameA.localeCompare(nameB)
+  })
+
+  let html = ''
+
+  for (const [pagePath, attrs] of sortedGroups) {
+    const plugin = getPluginByPagePath(localeCode, pagePath)
+    const groupName = plugin?.name ?? pagePath.split('/').pop() ?? 'Unknown'
+    const slug = 'attrs-' + groupName.toLowerCase().replace(/\s+/g, '-')
+
+    if (plugin) {
+      const pluginHtml = renderPluginRefHtml(plugin.name, locale)
+      html += `<h2 id="${escapeHtml(slug)}">${pluginHtml}</h2>\n`
+    } else {
+      html += `<h2 id="${escapeHtml(slug)}">${escapeHtml(groupName)}</h2>\n`
+    }
+
+    html += `<table>\n<thead><tr><th>${escapeHtml(l.attr)}</th><th>${escapeHtml(l.desc)}</th></tr></thead>\n<tbody>\n`
+    for (const attr of attrs) {
+      const attrHtml = renderAttrRefHtml(md, attr.fqn, locale)
+      const shortHtml = attr.short ? md.renderInline(attr.short) : ''
+      html += `<tr><td>${attrHtml}</td><td>${shortHtml}</td></tr>\n`
+    }
+    html += '</tbody>\n</table>\n'
+  }
+
   return html
 }

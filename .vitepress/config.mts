@@ -104,6 +104,7 @@ gtag('config', 'G-VYGDN3X0PR');`],
             {
               text: 'Guide',
               items: [
+                { text: 'All Attributes', link: '/docs/attributes.md' },
                 { text: 'CLI Reference', link: '/docs/cli-reference.md' },
                 { text: 'AI Agents', link: '/docs/ai-agents.md' },
               ],
@@ -168,6 +169,7 @@ gtag('config', 'G-VYGDN3X0PR');`],
             {
               text: 'Руководство',
               items: [
+                { text: 'Все атрибуты', link: '/ru/docs/attributes.md' },
                 { text: 'CLI справка', link: '/ru/docs/cli-reference.md' },
                 { text: 'AI-агенты', link: '/ru/docs/ai-agents.md' },
               ],

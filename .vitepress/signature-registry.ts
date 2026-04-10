@@ -255,6 +255,14 @@ export function preScanSignatures(srcDir: string): void {
 }
 
 /**
+ * Return all attribute entries for a locale.
+ */
+export function getAllAttrEntries(localeCode: string): RegistryEntry[] {
+  const map = attrRegistry.get(localeCode)
+  return map ? [...map.values()] : []
+}
+
+/**
  * Look up a function signature entry by FQN and locale.
  */
 export function getEntry(localeCode: string, rawFqn: string): RegistryEntry | undefined {

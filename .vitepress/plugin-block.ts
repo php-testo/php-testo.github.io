@@ -73,6 +73,15 @@ export function getPluginEntry(localeCode: string, name: string): PluginRegistry
   return registry.get(localeCode)?.get(name.toLowerCase())
 }
 
+export function getPluginByPagePath(localeCode: string, pagePath: string): PluginRegistryEntry | undefined {
+  const map = registry.get(localeCode)
+  if (!map) return undefined
+  for (const entry of map.values()) {
+    if (entry.pagePath === pagePath) return entry
+  }
+  return undefined
+}
+
 // ─── Pre-scan ────────────────────────────────────────────
 
 /**
