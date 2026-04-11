@@ -787,49 +787,47 @@ function renderAttributesList(md: MarkdownIt, locale?: LocaleConfig): string {
 
   if (entries.length === 0) return ''
 
-  // Group by pagePath
-  const groups = new Map<string, RegistryEntry[]>()
-  for (const entry of entries) {
-    const list = groups.get(entry.pagePath) || []
-    list.push(entry)
-    groups.set(entry.pagePath, list)
-  }
-
-  const tableLabels: Record<string, { attr: string; desc: string }> = {
-    en: { attr: 'Attribute', desc: 'Description' },
-    ru: { attr: 'Атрибут', desc: 'Описание' },
+  const tableLabels: Record<string, { attr: string; plugin: string; desc: string }> = {
+    en: { attr: 'Attribute', plugin: 'Plugin', desc: 'Description' },
+    ru: { attr: 'Атрибут', plugin: 'Плагин', desc: 'Описание' },
   }
   const l = tableLabels[localeCode] ?? tableLabels.en
 
-  // Sort groups by plugin name
-  const sortedGroups = [...groups.entries()].sort((a, b) => {
-    const nameA = getPluginByPagePath(localeCode, a[0])?.name ?? a[0]
-    const nameB = getPluginByPagePath(localeCode, b[0])?.name ?? b[0]
-    return nameA.localeCompare(nameB)
-  })
+  // Build flat rows
+  const rows: { name: string; plugin: string; attrHtml: string; pluginHtml: string; shortHtml: string }[] = []
 
-  let html = ''
+  for (const entry of entries) {
+    const plugin = getPluginByPagePath(localeCode, entry.pagePath)
+    const pluginName = plugin?.name ?? entry.pagePath.split('/').pop() ?? ''
+    const shortName = stripNamespaceShort(entry.fqn)
 
-  for (const [pagePath, attrs] of sortedGroups) {
-    const plugin = getPluginByPagePath(localeCode, pagePath)
-    const groupName = plugin?.name ?? pagePath.split('/').pop() ?? 'Unknown'
-    const slug = 'attrs-' + groupName.toLowerCase().replace(/\s+/g, '-')
-
-    if (plugin) {
-      const pluginHtml = renderPluginRefHtml(plugin.name, locale)
-      html += `<h2 id="${escapeHtml(slug)}">${pluginHtml}</h2>\n`
-    } else {
-      html += `<h2 id="${escapeHtml(slug)}">${escapeHtml(groupName)}</h2>\n`
-    }
-
-    html += `<table>\n<thead><tr><th>${escapeHtml(l.attr)}</th><th>${escapeHtml(l.desc)}</th></tr></thead>\n<tbody>\n`
-    for (const attr of attrs) {
-      const attrHtml = renderAttrRefHtml(md, attr.fqn, locale)
-      const shortHtml = attr.short ? md.renderInline(attr.short) : ''
-      html += `<tr><td>${attrHtml}</td><td>${shortHtml}</td></tr>\n`
-    }
-    html += '</tbody>\n</table>\n'
+    rows.push({
+      name: shortName,
+      plugin: pluginName,
+      attrHtml: renderAttrRefHtml(md, entry.fqn, locale),
+      pluginHtml: plugin ? renderPluginRefHtml(plugin.name, locale) : escapeHtml(pluginName),
+      shortHtml: entry.short ? md.renderInline(entry.short) : '',
+    })
   }
 
+  // Default sort by name
+  rows.sort((a, b) => a.name.localeCompare(b.name))
+
+  let html = '<table class="attr-sortable">\n'
+  html += '<thead><tr>'
+  html += `<th data-sort="name" data-dir="asc">${escapeHtml(l.attr)}</th>`
+  html += `<th data-sort="plugin">${escapeHtml(l.plugin)}</th>`
+  html += `<th>${escapeHtml(l.desc)}</th>`
+  html += '</tr></thead>\n<tbody>\n'
+
+  for (const row of rows) {
+    html += `<tr data-name="${escapeHtml(row.name.toLowerCase())}" data-plugin="${escapeHtml(row.plugin.toLowerCase())}">`
+    html += `<td>${row.attrHtml}</td>`
+    html += `<td>${row.pluginHtml}</td>`
+    html += `<td>${row.shortHtml}</td>`
+    html += '</tr>\n'
+  }
+
+  html += '</tbody>\n</table>\n'
   return html
 }

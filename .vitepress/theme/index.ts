@@ -13,6 +13,34 @@ import BlogPostHeader from './BlogPostHeader.vue'
 import { isBlogPath, getBlogBackLink, localNavBackKey } from '../locales'
 import './style.css'
 
+function setupSortableTable() {
+  document.addEventListener('click', (e) => {
+    const th = (e.target as Element).closest?.('th[data-sort]') as HTMLElement | null
+    if (!th) return
+
+    const table = th.closest('table.attr-sortable')
+    if (!table) return
+
+    const tbody = table.querySelector('tbody')
+    if (!tbody) return
+
+    const key = th.dataset.sort!
+    const asc = th.dataset.dir !== 'asc'
+
+    table.querySelectorAll('th[data-sort]').forEach(h => delete (h as HTMLElement).dataset.dir)
+    th.dataset.dir = asc ? 'asc' : 'desc'
+
+    const rows = [...tbody.querySelectorAll('tr')]
+    rows.sort((a, b) => {
+      const va = (a as HTMLElement).dataset[key] || ''
+      const vb = (b as HTMLElement).dataset[key] || ''
+      return asc ? va.localeCompare(vb) : vb.localeCompare(va)
+    })
+
+    rows.forEach(r => tbody.appendChild(r))
+  })
+}
+
 function setupFuncRefTooltips() {
   let activeTooltip: HTMLElement | null = null
   let activeRef: Element | null = null
@@ -108,6 +136,7 @@ export default {
 
     if (typeof window !== 'undefined') {
       setupFuncRefTooltips()
+      setupSortableTable()
     }
   },
 } satisfies Theme

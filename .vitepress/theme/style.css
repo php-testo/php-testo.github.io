@@ -901,3 +901,27 @@ a.featured-post-card:hover {
     aspect-ratio: 16 / 9;
   }
 }
+
+/* ── Sortable attributes table ────────────────────────── */
+
+.attr-sortable th[data-sort] {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.attr-sortable th[data-sort]::after {
+  content: ' ↕';
+  opacity: 0.35;
+  font-size: 0.85em;
+}
+
+.attr-sortable th[data-sort][data-dir="asc"]::after {
+  content: ' ↑';
+  opacity: 0.7;
+}
+
+.attr-sortable th[data-sort][data-dir="desc"]::after {
+  content: ' ↓';
+  opacity: 0.7;
+}
