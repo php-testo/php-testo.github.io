@@ -5,7 +5,7 @@
  * in individual documentation files' frontmatter.
  *
  * Individual pages control their inclusion via frontmatter:
- *   llms: true (default) | "optional" | false
+ *   llms: true (default) | "optional" | "inline" | false
  *   llms_description: "Short description for LLM context"
  */
 

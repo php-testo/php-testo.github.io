@@ -12,7 +12,7 @@ interface PageInfo {
   url: string
   srcPath: string
   content: string
-  section: 'docs' | 'optional'
+  section: 'docs' | 'optional' | 'inline'
 }
 
 function extractH1(content: string): string | null {
@@ -39,13 +39,15 @@ function readPages(srcDir: string): PageInfo[] {
         const relPath = path.relative(srcDir, filePath).replace(/\\/g, '/')
         const url = '/' + relPath.replace(/\.md$/, '')
         const llmsValue = fm.llms ?? true
+        const section: PageInfo['section'] =
+          llmsValue === 'optional' ? 'optional' : llmsValue === 'inline' ? 'inline' : 'docs'
         pages.push({
           title: fm.title || extractH1(content) || entry.name.replace(/\.md$/, ''),
           llms_description: fm.llms_description,
           url,
           srcPath: relPath,
           content: content.trim(),
-          section: llmsValue === 'optional' ? 'optional' : 'docs',
+          section,
         })
       }
     }
@@ -91,6 +93,7 @@ function sortPages(pages: PageInfo[], sidebarPaths: string[]): PageInfo[] {
 function buildLlmsTxt(pages: PageInfo[]): string {
   const { title, summary, details, baseUrl, docsSection, optionalSection } = llmsConfig
 
+  const inline = pages.filter(p => p.section === 'inline')
   const docs = pages.filter(p => p.section === 'docs')
   const optional = pages.filter(p => p.section === 'optional')
 
@@ -102,6 +105,10 @@ function buildLlmsTxt(pages: PageInfo[]): string {
     ...details.map(d => `- ${d}`),
     '',
   ]
+
+  for (const p of inline) {
+    lines.push('---', '', p.content, '', '---', '')
+  }
 
   if (docs.length > 0) {
     lines.push(`## ${docsSection}`, '')
