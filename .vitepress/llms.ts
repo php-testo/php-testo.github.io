@@ -93,24 +93,17 @@ function sortPages(pages: PageInfo[], sidebarPaths: string[]): PageInfo[] {
 }
 
 function buildLlmsTxt(pages: PageInfo[]): string {
-  const { title, summary, details, baseUrl, docsSection, optionalSection } = llmsConfig
+  const { baseUrl, docsSection, optionalSection } = llmsConfig
 
   const header = pages.filter(p => p.section === 'header')
   const footer = pages.filter(p => p.section === 'footer')
   const docs = pages.filter(p => p.section === 'docs')
   const optional = pages.filter(p => p.section === 'optional')
 
-  const lines: string[] = [
-    `# ${title}`,
-    '',
-    `> ${summary}`,
-    '',
-    ...details.map(d => `- ${d}`),
-    '',
-  ]
+  const lines: string[] = []
 
   for (const p of header) {
-    lines.push('---', '', p.content, '', '---', '')
+    lines.push(p.content, '')
   }
 
   if (docs.length > 0) {
