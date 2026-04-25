@@ -61,6 +61,11 @@ use Testo\Testing\Traits\TestRunner;
 
 final class AssertJsonTest
 {
+    /**
+     * Runs each failing assertion scenario through the test runner and checks
+     * that the failure message contains the expected fragment, confirming that
+     * error output is precise enough to identify the problem without reading the code.
+     */
     #[Test]
     #[DataProvider('failureCases')]
     public function reportsCorrectly(string $method, string $expectedFragment): void
@@ -89,3 +94,67 @@ final class AssertJsonTest
 ```
 
 Each `yield` key becomes the dataset label in reports — when a test fails you see exactly which scenario broke (`missing keys`, `wrong count`, etc.) without reading the code.
+
+## Inline Datasets with `#[DataSet]`
+
+When there are only a few cases and the data is not reused elsewhere, a separate provider method is overkill. Use `#[DataSet]` — each attribute is one test run, defined directly on the method.
+
+### Without inline datasets (avoid this)
+
+Three near-identical methods testing the same rule with different inputs:
+
+```php
+final class EmailValidationTest
+{
+    #[Test]
+    public function emptyEmailIsInvalid(): void
+    {
+        Assert::false(Email::isValid(''));
+    }
+
+    #[Test]
+    public function malformedEmailIsInvalid(): void
+    {
+        Assert::false(Email::isValid('not-an-email'));
+    }
+
+    #[Test]
+    public function wellFormedEmailIsValid(): void
+    {
+        Assert::true(Email::isValid('user@example.com'));
+    }
+}
+```
+
+### With `#[DataSet]` (prefer this)
+
+One method, three datasets declared inline:
+
+```php
+use Testo\Assert;
+use Testo\Data\DataSet;
+use Testo\Test;
+
+final class EmailValidationTest
+{
+    #[Test]
+    #[DataSet(['', false], 'empty')]
+    #[DataSet(['not-an-email', false], 'invalid format')]
+    #[DataSet(['user@example.com', true], 'valid')]
+    public function validates(string $email, bool $expected): void
+    {
+        Assert::same($expected, Email::isValid($email));
+    }
+}
+```
+
+The second argument to `#[DataSet]` is the label shown in failure reports — the same role as `yield 'key'` in a data provider.
+
+### When to pick `#[DataSet]` vs `#[DataProvider]`
+
+| | `#[DataSet]` | `#[DataProvider]` |
+|---|---|---|
+| Number of cases | 2–4 | 5 or more |
+| Data reused across tests | No | Yes |
+| Needs generation logic | No | Yes |
+| Readable at a glance | Yes | Requires jumping to provider |
