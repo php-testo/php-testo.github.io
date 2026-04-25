@@ -3,6 +3,8 @@ llms: true
 llms_description: "Complete working examples of Testo tests covering common patterns"
 ---
 
+# Testo Code Samples
+
 ## Data Providers
 
 Use data providers when multiple test cases differ only in input/output values. This eliminates test method duplication — one test body, many datasets.
