@@ -12,7 +12,7 @@ interface PageInfo {
   url: string
   srcPath: string
   content: string
-  section: 'docs' | 'optional' | 'inline'
+  section: 'docs' | 'optional' | 'header' | 'footer'
 }
 
 function extractH1(content: string): string | null {
@@ -40,7 +40,9 @@ function readPages(srcDir: string): PageInfo[] {
         const url = '/' + relPath.replace(/\.md$/, '')
         const llmsValue = fm.llms ?? true
         const section: PageInfo['section'] =
-          llmsValue === 'optional' ? 'optional' : llmsValue === 'inline' ? 'inline' : 'docs'
+          llmsValue === 'optional' ? 'optional' :
+          llmsValue === 'header' ? 'header' :
+          llmsValue === 'footer' ? 'footer' : 'docs'
         pages.push({
           title: fm.title || extractH1(content) || entry.name.replace(/\.md$/, ''),
           llms_description: fm.llms_description,
@@ -93,7 +95,8 @@ function sortPages(pages: PageInfo[], sidebarPaths: string[]): PageInfo[] {
 function buildLlmsTxt(pages: PageInfo[]): string {
   const { title, summary, details, baseUrl, docsSection, optionalSection } = llmsConfig
 
-  const inline = pages.filter(p => p.section === 'inline')
+  const header = pages.filter(p => p.section === 'header')
+  const footer = pages.filter(p => p.section === 'footer')
   const docs = pages.filter(p => p.section === 'docs')
   const optional = pages.filter(p => p.section === 'optional')
 
@@ -106,7 +109,7 @@ function buildLlmsTxt(pages: PageInfo[]): string {
     '',
   ]
 
-  for (const p of inline) {
+  for (const p of header) {
     lines.push('---', '', p.content, '', '---', '')
   }
 
@@ -124,6 +127,10 @@ function buildLlmsTxt(pages: PageInfo[]): string {
       lines.push(`- [${p.title}](${baseUrl}/${p.srcPath}): ${p.llms_description}`)
     }
     lines.push('')
+  }
+
+  for (const p of footer) {
+    lines.push('---', '', p.content, '', '---', '')
   }
 
   return lines.join('\n')
