@@ -24,6 +24,23 @@ When tests differ only in input/output values, use parameterized tests:
 - **`#[DataSet]`** — few datasets (2–4), not reused elsewhere; inline, no extra method needed
 - **`#[DataProvider]`** — large or reused datasets, or when data generation requires logic; returns `iterable`, string keys become labels; can be an invokable class or any callable
 
+When positive and negative cases share the same test logic, combine them into a single parameterized test to keep all scenarios visible in one place:
+
+```php
+#[DataSet(['user@example.com', true], 'valid email')]
+#[DataSet(['userexample.com', false], 'missing @')]
+#[DataSet(['', false], 'empty string')]
+public function validate(string $email, bool $expected): void { ... }
+```
+
+For larger datasets split by outcome, use `#[DataCross]` twice to pair each provider with its expected result:
+
+```php
+#[DataCross(new DataProvider('validInputs'), new DataSet([true]))]
+#[DataCross(new DataProvider('invalidInputs'), new DataSet([false]))]
+public function validate(string $email, bool $expected): void { ... }
+```
+
 ### Test coverage
 
 Generate both positive and negative scenarios. Positive tests verify expected behaviour; negative tests verify what happens on invalid input, missing data, or error conditions.
