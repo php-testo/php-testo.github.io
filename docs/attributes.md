@@ -1,5 +1,5 @@
 ---
-llms_description: "Complete reference of all PHP attributes in Testo: #[Test], #[Retry], #[Bench], lifecycle hooks (#[BeforeTest], #[AfterTest], #[BeforeClass], #[AfterClass]), data providers (#[DataSet], #[DataProvider], #[DataZip], #[DataCross], #[DataUnion]), #[TestInline], coverage (#[Covers], #[CoversNothing])."
+llms: false
 ---
 
 # All Attributes
