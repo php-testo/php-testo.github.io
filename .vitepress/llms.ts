@@ -13,6 +13,7 @@ interface PageInfo {
   srcPath: string
   content: string
   section: 'docs' | 'optional' | 'header' | 'footer'
+  priority: number
 }
 
 function extractH1(content: string): string | null {
@@ -50,6 +51,7 @@ function readPages(srcDir: string): PageInfo[] {
           srcPath: relPath,
           content: content.trim(),
           section,
+          priority: typeof fm.llms_priority === 'number' ? fm.llms_priority : Infinity,
         })
       }
     }
@@ -86,6 +88,9 @@ function sortPages(pages: PageInfo[], sidebarPaths: string[]): PageInfo[] {
   const order = new Map(sidebarPaths.map((p, i) => [p, i]))
 
   return [...pages].sort((a, b) => {
+    // Priority first (lower = higher priority, Infinity for unset)
+    if (a.priority !== b.priority) return a.priority - b.priority
+    // Then sidebar order
     const ia = order.get(a.url) ?? 9999
     const ib = order.get(b.url) ?? 9999
     return ia - ib || a.url.localeCompare(b.url)
@@ -130,22 +135,10 @@ function buildLlmsTxt(pages: PageInfo[]): string {
 }
 
 function buildLlmsFullTxt(pages: PageInfo[]): string {
-  const { title, summary, details } = llmsConfig
-
-  const lines: string[] = [
-    `# ${title}`,
-    '',
-    `> ${summary}`,
-    '',
-    ...details.map(d => `- ${d}`),
-  ]
+  const lines: string[] = []
 
   for (const page of pages) {
-    const startsWithH1 = /^#\s+/.test(page.content)
-    lines.push('', '---', '')
-    if (!startsWithH1) {
-      lines.push(`# ${page.title}`, '')
-    }
+    if (lines.length > 0) lines.push('', '---', '')
     lines.push(page.content)
   }
 
