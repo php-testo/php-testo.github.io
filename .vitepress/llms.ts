@@ -12,7 +12,8 @@ interface PageInfo {
   url: string
   srcPath: string
   content: string
-  section: 'docs' | 'optional'
+  section: 'docs' | 'optional' | 'header' | 'footer'
+  priority: number
 }
 
 function extractH1(content: string): string | null {
@@ -39,13 +40,18 @@ function readPages(srcDir: string): PageInfo[] {
         const relPath = path.relative(srcDir, filePath).replace(/\\/g, '/')
         const url = '/' + relPath.replace(/\.md$/, '')
         const llmsValue = fm.llms ?? true
+        const section: PageInfo['section'] =
+          llmsValue === 'optional' ? 'optional' :
+          llmsValue === 'header' ? 'header' :
+          llmsValue === 'footer' ? 'footer' : 'docs'
         pages.push({
           title: fm.title || extractH1(content) || entry.name.replace(/\.md$/, ''),
           llms_description: fm.llms_description,
           url,
           srcPath: relPath,
           content: content.trim(),
-          section: llmsValue === 'optional' ? 'optional' : 'docs',
+          section,
+          priority: typeof fm.llms_priority === 'number' ? fm.llms_priority : Infinity,
         })
       }
     }
@@ -82,6 +88,9 @@ function sortPages(pages: PageInfo[], sidebarPaths: string[]): PageInfo[] {
   const order = new Map(sidebarPaths.map((p, i) => [p, i]))
 
   return [...pages].sort((a, b) => {
+    // Priority first (lower = higher priority, Infinity for unset)
+    if (a.priority !== b.priority) return a.priority - b.priority
+    // Then sidebar order
     const ia = order.get(a.url) ?? 9999
     const ib = order.get(b.url) ?? 9999
     return ia - ib || a.url.localeCompare(b.url)
@@ -89,19 +98,18 @@ function sortPages(pages: PageInfo[], sidebarPaths: string[]): PageInfo[] {
 }
 
 function buildLlmsTxt(pages: PageInfo[]): string {
-  const { title, summary, details, baseUrl, docsSection, optionalSection } = llmsConfig
+  const { baseUrl, docsSection, optionalSection } = llmsConfig
 
+  const header = pages.filter(p => p.section === 'header')
+  const footer = pages.filter(p => p.section === 'footer')
   const docs = pages.filter(p => p.section === 'docs')
   const optional = pages.filter(p => p.section === 'optional')
 
-  const lines: string[] = [
-    `# ${title}`,
-    '',
-    `> ${summary}`,
-    '',
-    ...details.map(d => `- ${d}`),
-    '',
-  ]
+  const lines: string[] = []
+
+  for (const p of header) {
+    lines.push(p.content, '')
+  }
 
   if (docs.length > 0) {
     lines.push(`## ${docsSection}`, '')
@@ -119,26 +127,18 @@ function buildLlmsTxt(pages: PageInfo[]): string {
     lines.push('')
   }
 
+  for (const p of footer) {
+    lines.push('---', '', p.content, '', '---', '')
+  }
+
   return lines.join('\n')
 }
 
 function buildLlmsFullTxt(pages: PageInfo[]): string {
-  const { title, summary, details } = llmsConfig
-
-  const lines: string[] = [
-    `# ${title}`,
-    '',
-    `> ${summary}`,
-    '',
-    ...details.map(d => `- ${d}`),
-  ]
+  const lines: string[] = []
 
   for (const page of pages) {
-    const startsWithH1 = /^#\s+/.test(page.content)
-    lines.push('', '---', '')
-    if (!startsWithH1) {
-      lines.push(`# ${page.title}`, '')
-    }
+    if (lines.length > 0) lines.push('', '---', '')
     lines.push(page.content)
   }
 
