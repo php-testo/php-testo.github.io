@@ -349,10 +349,35 @@ $data = Assert::json($string)->isObject()->decode();
 
 В отличие от утверждений, ожидания регистрируются во время выполнения теста, а проверяются **после его завершения**. Это удобно для ситуаций, когда результат нужно оценить по побочному эффекту — например, по выброшенному исключению или по состоянию памяти.
 
-<signature h="3" name="\Testo\Expect::exception(string|\Throwable $classOrObject): ExpectedException">
+<signature h="3" name="\Testo\Expect::exception(string|\Throwable $classOrObject, bool $same = false): ExpectedException">
 <short>Ожидает, что тест выбросит указанное исключение.</short>
-<description>Если тест завершится без исключения или с другим исключением, он будет считаться проваленным. Вместо имени класса можно передать конкретный объект исключения.</description>
-<param name="$classOrObject">Класс, интерфейс или объект ожидаемого исключения.</param>
+<description>
+Если тест завершится без исключения или с другим исключением, он считается проваленным. Вместо имени класса можно передать готовый объект-образец — тогда одной строкой задаётся сразу несколько ожиданий, без отдельных вызовов `withMessage()` и `withCode()`.
+
+Поведение `$same` зависит от того, что передано первым аргументом.
+
+В режиме по умолчанию (`$same = false`) проверка довольно мягкая:
+
+- для имени класса используется `instanceof`, поэтому подойдут и сам класс, и любые его наследники;
+- для объекта-образца к `instanceof` добавляется сравнение сообщения и кода; пустое сообщение и `code === 0` считаются незаданными и не проверяются.
+
+```php
+// проверяется только instanceof RuntimeException
+Expect::exception(new RuntimeException());
+
+// instanceof RuntimeException + сравнение сообщения и кода
+Expect::exception(new RuntimeException('failed', 42));
+```
+
+В строгом режиме (`$same = true`) каждая из проверок ужесточается до максимума:
+
+- для имени класса требуется точное совпадение, наследники уже не пройдут;
+- для объекта в тесте должен быть выброшен ровно тот же самый экземпляр (сравнение через `===`).
+
+Дополнительные ограничения можно навешивать через цепочку методов <class>\Testo\Assert\Api\ExpectedException</class> (`withMessage`, `withCode`, `fromMethod` и так далее).
+</description>
+<param name="$classOrObject">Класс, интерфейс или объект-образец ожидаемого исключения.</param>
+<param name="$same">Если `true`, применяется самая строгая проверка, доступная для переданного типа.</param>
 <example>
 ```php
 use Testo\Expect;
@@ -360,10 +385,23 @@ use Testo\Expect;
 #[Test]
 public function throwsOnInvalidInput(): void
 {
+    // Достаточно instanceof — подойдёт InvalidArgumentException и любой его наследник
     Expect::exception(\InvalidArgumentException::class);
 
     $service->process(null);
 }
+```
+</example>
+<example>
+```php
+// Точное совпадение класса: наследники RuntimeException провалят проверку
+Expect::exception(\RuntimeException::class, same: true);
+```
+</example>
+<example>
+```php
+// Объект-образец: разом задаём ожидаемый класс, сообщение и код
+Expect::exception(new PaymentException('insufficient funds', 402));
 ```
 </example>
 </signature>
@@ -373,7 +411,7 @@ public function throwsOnInvalidInput(): void
 <signature compact h="4" name="\Testo\Assert\Api\ExpectedException::fromMethod(string $class, string $method): self">
 <short>Проверяет, что указанный метод присутствует в стеке вызовов исключения.</short>
 <description>
-Метод можно вызывать несколько раз, добавляя несколько мест для проверки.
+Метод можно вызывать несколько раз — для прохождения проверки в стеке должны присутствовать все указанные методы.
 
 ::: info
 Стек вызовов в исключении заполняется в момент его создания, а не выброса. Таким образом, мы проверяем именно место создания, а не проброс через `throw`.
@@ -391,18 +429,22 @@ Expect::exception(ValidationException::class)
 
 <signature compact h="4" name="\Testo\Assert\Api\ExpectedException::withMessage(string $message): self">
 <short>Проверяет точное сообщение исключения.</short>
+<description>Повторный вызов заменяет предыдущее ожидание.</description>
 </signature>
 
 <signature compact h="4" name="\Testo\Assert\Api\ExpectedException::withMessagePattern(string $pattern): self">
 <short>Проверяет, что сообщение соответствует регулярному выражению.</short>
+<description>Повторный вызов заменяет предыдущее ожидание.</description>
 </signature>
 
 <signature compact h="4" name="\Testo\Assert\Api\ExpectedException::withMessageContaining(string $substring): self">
 <short>Проверяет, что сообщение содержит указанную подстроку.</short>
+<description>Можно вызывать несколько раз — сообщение должно содержать все указанные подстроки.</description>
 </signature>
 
 <signature compact h="4" name="\Testo\Assert\Api\ExpectedException::withCode(int|array $code): self">
 <short>Проверяет код исключения. Можно передать одно значение или массив допустимых кодов.</short>
+<description>Повторный вызов заменяет предыдущее ожидание.</description>
 </signature>
 
 <signature compact h="4" name="\Testo\Assert\Api\ExpectedException::withoutPrevious(): self">
@@ -411,6 +453,7 @@ Expect::exception(ValidationException::class)
 
 <signature compact h="4" name="\Testo\Assert\Api\ExpectedException::withPrevious(string|\Throwable $classOrObject, ?callable $assertion = null): self">
 <short>Проверяет наличие предыдущего исключения указанного типа.</short>
+<description>Повторный вызов заменяет предыдущее ожидание.</description>
 <param name="$assertion">Опциональный `callback`, получающий `ExpectedException` по предыдущей ошибке — это позволяет строить вложенные проверки с тем же API: проверить сообщение, код или даже его собственный `withPrevious()`.</param>
 <example>
 ```php

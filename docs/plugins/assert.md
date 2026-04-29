@@ -350,10 +350,35 @@ $data = Assert::json($string)->isObject()->decode();
 
 Unlike assertions, expectations are registered during test execution and verified **after the test finishes**. This is useful when the result needs to be evaluated by a side effect — for example, a thrown exception or a memory state.
 
-<signature h="3" name="\Testo\Expect::exception(string|\Throwable $classOrObject): ExpectedException">
+<signature h="3" name="\Testo\Expect::exception(string|\Throwable $classOrObject, bool $same = false): ExpectedException">
 <short>Expects the test to throw the given exception.</short>
-<description>If the test finishes without an exception or with a different one, it will be considered failed. You can pass a specific exception object instead of a class name.</description>
-<param name="$classOrObject">Class, interface, or object of the expected exception.</param>
+<description>
+If the test finishes without an exception or with a different one, it is considered failed. Instead of a class name you can pass a specimen object — that lets you express several expectations in a single line, without separate `withMessage()` and `withCode()` calls.
+
+The behavior of `$same` depends on what you pass as the first argument.
+
+In the default mode (`$same = false`) the comparison is fairly lenient:
+
+- a class-string is matched via `instanceof`, so the class itself and any of its subclasses will pass;
+- a specimen object adds message and code comparison to the `instanceof` check; an empty message and `code === 0` are treated as unspecified and skipped.
+
+```php
+// only instanceof RuntimeException is checked because message and code are default (empty and 0)
+Expect::exception(new RuntimeException());
+
+// instanceof RuntimeException + message and code comparison
+Expect::exception(new RuntimeException('failed', 42));
+```
+
+In the strict mode (`$same = true`) each variant tightens up to its maximum:
+
+- a class-string requires an exact class match, subclasses no longer pass;
+- an object means the test must throw the very same instance (compared with `===`).
+
+Additional constraints can be chained via <class>\Testo\Assert\Api\ExpectedException</class> (`withMessage`, `withCode`, `fromMethod`, etc.).
+</description>
+<param name="$classOrObject">Class, interface, or specimen object of the expected exception.</param>
+<param name="$same">When `true`, performs the strictest comparison available for the given input type.</param>
 <example>
 ```php
 use Testo\Expect;
@@ -361,10 +386,23 @@ use Testo\Expect;
 #[Test]
 public function throwsOnInvalidInput(): void
 {
+    // instanceof is enough — InvalidArgumentException or any subclass will pass
     Expect::exception(\InvalidArgumentException::class);
 
     $service->process(null);
 }
+```
+</example>
+<example>
+```php
+// Exact class match: subclasses of RuntimeException will fail the check
+Expect::exception(\RuntimeException::class, same: true);
+```
+</example>
+<example>
+```php
+// Specimen object: class, message, and code are all expressed at once
+Expect::exception(new PaymentException('insufficient funds', 402));
 ```
 </example>
 </signature>
@@ -374,7 +412,7 @@ You can narrow down the expected exception using chain methods:
 <signature compact h="4" name="\Testo\Assert\Api\ExpectedException::fromMethod(string $class, string $method): self">
 <short>Checks that the specified method is present in the exception's call stack.</short>
 <description>
-Can be called multiple times to require several methods in the call chain.
+Can be called multiple times — every specified method must be present in the call stack for the check to pass.
 
 ::: info
 The call stack in an exception is captured at the moment of its creation, not when it is thrown. So this checks where the exception was created, not where it was rethrown via `throw`.
@@ -392,18 +430,22 @@ Expect::exception(ValidationException::class)
 
 <signature compact h="4" name="\Testo\Assert\Api\ExpectedException::withMessage(string $message): self">
 <short>Checks the exact exception message.</short>
+<description>A subsequent call replaces the previous expectation.</description>
 </signature>
 
 <signature compact h="4" name="\Testo\Assert\Api\ExpectedException::withMessagePattern(string $pattern): self">
 <short>Checks that the message matches a regular expression.</short>
+<description>A subsequent call replaces the previous expectation.</description>
 </signature>
 
 <signature compact h="4" name="\Testo\Assert\Api\ExpectedException::withMessageContaining(string $substring): self">
 <short>Checks that the message contains the given substring.</short>
+<description>Can be called multiple times — the message must contain every specified substring.</description>
 </signature>
 
 <signature compact h="4" name="\Testo\Assert\Api\ExpectedException::withCode(int|array $code): self">
 <short>Checks the exception code. You can pass a single value or an array of acceptable codes.</short>
+<description>A subsequent call replaces the previous expectation.</description>
 </signature>
 
 <signature compact h="4" name="\Testo\Assert\Api\ExpectedException::withoutPrevious(): self">
@@ -412,6 +454,7 @@ Expect::exception(ValidationException::class)
 
 <signature compact h="4" name="\Testo\Assert\Api\ExpectedException::withPrevious(string|\Throwable $classOrObject, ?callable $assertion = null): self">
 <short>Checks for a previous exception of the given type.</short>
+<description>A subsequent call replaces the previous expectation.</description>
 <param name="$assertion">Optional callback that receives an `ExpectedException` for the previous exception — this allows building nested checks with the same API: verify the message, code, or even its own `withPrevious()`.</param>
 <example>
 ```php
