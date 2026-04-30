@@ -1,7 +1,7 @@
 ---
 outline: [2, 4]
 llms: true
-llms_description: "Code coverage collection during tests. CodecovPlugin configuration with CoverageLevel (Line/Branch/Path), CoverageMode (IfAvailable/Always/Never), CLI flags --coverage/--no-coverage. Clover and Cobertura XML reports. #[Covers] and #[CoversNothing] attributes for per-test coverage control. Source filtering via FinderConfig."
+llms_description: "Code coverage collection during tests. CodecovPlugin configuration with CoverageLevel (Line/Branch/Path), CoverageMode (IfAvailable/Always/Never), CLI flags --coverage/--no-coverage. Clover, Cobertura, and PHPUnit Coverage XML reports (the latter consumed by Infection for mutation testing). #[Covers] and #[CoversNothing] attributes for per-test coverage control. Source filtering via FinderConfig."
 ---
 
 # Code Coverage
@@ -151,6 +151,28 @@ Compatible with: GitHub Actions, GitLab CI, Jenkins.
 <example>
 ```php
 new CoberturaReport(__DIR__ . '/cobertura.xml')
+```
+</example>
+</signature>
+
+<signature h="4" name="new \Testo\Codecov\Report\PhpUnitXmlReport(string $outputDir)">
+<short>Generates a PHPUnit Coverage XML report — a directory with an index and one file per source.</short>
+<description>
+The format matches the output of `phpunit --coverage-xml`. Its main use case is mutation testing: [Infection](https://infection.github.io/) reads this exact format to determine which tests cover each line, so it can run only the relevant subset for every mutation.
+
+Output directory layout:
+
+- `<outputDir>/index.xml` — overview with `<file href="...">` links to each source file.
+- `<outputDir>/<relative path>/<basename>.xml` — per-source-file coverage with `<covered by="...">` elements, where `by` is the test method that executed the line.
+
+Only line coverage is recorded; the format does not support branch or path data. The directory is created automatically if it does not exist.
+
+Compatible with: Infection.
+</description>
+<param name="$outputDir">Absolute path to the directory where the report files will be written. Created automatically if missing.</param>
+<example>
+```php
+new PhpUnitXmlReport(__DIR__ . '/coverage-xml')
 ```
 </example>
 </signature>

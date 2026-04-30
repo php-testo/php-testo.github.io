@@ -153,6 +153,28 @@ new CoberturaReport(__DIR__ . '/cobertura.xml')
 </example>
 </signature>
 
+<signature h="4" name="new \Testo\Codecov\Report\PhpUnitXmlReport(string $outputDir)">
+<short>Генерирует отчёт в формате PHPUnit Coverage XML — директорию с индексом и отдельным файлом для каждого исходника.</short>
+<description>
+Формат соответствует тому, что выдаёт `phpunit --coverage-xml`. Главная польза — мутационное тестирование: [Infection](https://infection.github.io/) читает именно такой отчёт, чтобы понять, какие тесты покрывают каждую строку, и запускать только нужное подмножество для каждой мутации.
+
+Структура выходной директории:
+
+- `<outputDir>/index.xml` — общий индекс со ссылками `<file href="...">` на каждый исходный файл.
+- `<outputDir>/<относительный путь>/<имя файла>.xml` — покрытие отдельного файла с элементами `<covered by="...">`, где `by` — имя тестового метода, выполнившего строку.
+
+Записывается только построчное покрытие; данные о ветвях и путях формат не поддерживает. Директория создаётся автоматически, если её нет.
+
+Совместим с: Infection.
+</description>
+<param name="$outputDir">Абсолютный путь к директории, в которую будут записаны файлы отчёта. Создаётся автоматически, если не существует.</param>
+<example>
+```php
+new PhpUnitXmlReport(__DIR__ . '/coverage-xml')
+```
+</example>
+</signature>
+
 ## Управление покрытием
 
 Параметр `src` в конфигурации <class>\Testo\Application\Config\ApplicationConfig</class> определяет глобальный набор файлов, попадающих в покрытие. Атрибуты <attr>\Testo\Codecov\Covers</attr> и <attr>\Testo\Codecov\CoversNothing</attr> позволяют точечно управлять покрытием для конкретного теста.
