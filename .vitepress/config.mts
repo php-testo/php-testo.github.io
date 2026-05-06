@@ -102,6 +102,12 @@ gtag('config', 'G-VYGDN3X0PR');`],
               ],
             },
             {
+              text: 'Integrations',
+              items: [
+                { text: 'Infection', link: '/docs/bridge/infection.md' },
+              ],
+            },
+            {
               text: 'Guide',
               items: [
                 { text: 'All Attributes', link: '/docs/attributes.md' },
@@ -164,6 +170,12 @@ gtag('config', 'G-VYGDN3X0PR');`],
                 { text: 'Codecov', link: '/ru/docs/plugins/codecov.md' },
                 { text: 'Convention', link: '/ru/docs/plugins/convention.md' },
                 { text: 'Filter', link: '/ru/docs/plugins/filter.md' },
+              ],
+            },
+            {
+              text: 'Интеграции',
+              items: [
+                { text: 'Infection', link: '/ru/docs/bridge/infection.md' },
               ],
             },
             {
