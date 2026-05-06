@@ -566,6 +566,10 @@ html {
   padding-top: 0;
 }
 
+.vp-doc h2 .header-anchor {
+  top: 0;
+}
+
 .vp-doc h3 {
   margin-top: 48px;
 }
@@ -900,6 +904,12 @@ a.featured-post-card:hover {
     width: 100%;
     aspect-ratio: 16 / 9;
   }
+}
+
+/* ── Mermaid diagrams ─────────────────────────────────── */
+
+.mermaid svg {
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif !important;
 }
 
 /* ── Sortable attributes table ────────────────────────── */

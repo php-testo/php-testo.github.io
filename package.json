@@ -20,8 +20,10 @@
   "devDependencies": {
     "@types/node": "^25.3.3",
     "gray-matter": "^4.0.3",
+    "mermaid": "^11.14.0",
     "sharp": "^0.34.5",
-    "vitepress": "^1.6.4"
+    "vitepress": "^1.6.4",
+    "vitepress-plugin-mermaid": "^2.0.17"
   },
   "dependencies": {
     "feed": "^5.1.0"

@@ -1,5 +1,6 @@
 import { fileURLToPath } from 'url'
 import { defineConfig, HeadConfig } from 'vitepress'
+import { withMermaid } from 'vitepress-plugin-mermaid'
 import { generateRss, rssPlugin } from './rss'
 import { generateLlms, llmsPlugin } from './llms'
 import { isBlogPath } from './locales'
@@ -12,9 +13,14 @@ import { preScanSignatures } from './signature-registry'
 const baseUrl = 'https://php-testo.github.io'
 const srcDir = fileURLToPath(new URL('..', import.meta.url))
 
-export default defineConfig({
+export default withMermaid(defineConfig({
   title: 'Testo',
   description: 'Modern PHP Testing Framework',
+
+  mermaid: {
+    fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif',
+    htmlLabels: false,
+  },
 
   lastUpdated: false,
   cleanUrls: true,
@@ -261,4 +267,4 @@ gtag('config', 'G-VYGDN3X0PR');`],
 
     return head
   },
-})
+}))
