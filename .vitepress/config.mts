@@ -114,6 +114,12 @@ gtag('config', 'G-VYGDN3X0PR');`],
               ],
             },
             {
+              text: 'Theory',
+              items: [
+                { text: 'Mutation Testing', link: '/docs/theory/mutation-testing.md' },
+              ],
+            },
+            {
               text: 'Guide',
               items: [
                 { text: 'All Attributes', link: '/docs/attributes.md' },
@@ -182,6 +188,12 @@ gtag('config', 'G-VYGDN3X0PR');`],
               text: 'Интеграции',
               items: [
                 { text: 'Infection', link: '/ru/docs/bridge/infection.md' },
+              ],
+            },
+            {
+              text: 'Теория',
+              items: [
+                { text: 'Мутационное тестирование', link: '/ru/docs/theory/mutation-testing.md' },
               ],
             },
             {

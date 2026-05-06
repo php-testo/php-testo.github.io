@@ -5,9 +5,7 @@ llms_description: "How to run Infection mutation testing with Testo. Install the
 
 # Infection
 
-[Infection](https://infection.github.io/) is a mutation testing tool for PHP. It introduces tiny edits ("mutants") into your source code — flipping `>` to `>=`, removing a method call, replacing `true` with `false` — and re-runs your tests against each one. Every mutant that survives is a hint that your tests aren't actually exercising the behaviour they look like they cover. Line-based coverage cannot tell you that; mutation testing can.
-
-Testo plugs into Infection through a separate package — `php-testo/bridge-infection` — which registers itself as an Infection extension and lets Infection drive Testo as its underlying test runner.
+[Infection](https://infection.github.io/) is a [mutation testing](/docs/theory/mutation-testing.md) tool for PHP. Testo connects to it through a dedicated adapter, `php-testo/bridge-infection`.
 
 ::: info Package
 `php-testo/bridge-infection` — Infection extension. Auto-registers via Composer. No plugin needs to be added to `testo.php`.
