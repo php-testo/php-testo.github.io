@@ -2,6 +2,7 @@
 outline: [2, 3]
 faqLevel: false
 author: Алексей Гагарин
+image: /docs/theory/mutation-testing-preview.png
 ---
 
 # Мутационное тестирование
@@ -103,7 +104,7 @@ flowchart TD
 
 Во вводных статьях обычно ограничиваются killed/survived. Если вы видите в отчёте Infection статус `Timeout` или `Uncovered`, то теперь знаете, что это значит.
 
-![Infection](/images/infection-sample.png)
+![Infection](/docs/theory/infection-sample.png)
 
 ### Метрики
 
@@ -187,7 +188,7 @@ public function testGrades(): void
 
 Все три мутанта **выживут**.
 
-![Infection](/images/infection-sample-2.png)
+![Infection](/docs/theory/infection-sample-2.png)
 
 Почему? Тест на отметке 95 не отличает `>= 90` от `> 90`: 95 проходит и так, и эдак. То же для 85 и 75. Граничные значения — 90, 80, 70 — мы не проверяем. На границах диапазонов — слепое пятно.
 

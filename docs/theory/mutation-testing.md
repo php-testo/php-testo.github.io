@@ -3,6 +3,7 @@ outline: [2, 3]
 faqLevel: false
 llms: false
 author: Aleksei Gagarin
+image: /docs/theory/mutation-testing-preview.png
 ---
 
 # Mutation Testing
@@ -103,7 +104,7 @@ The minimal set of terms you'll see in any mutation report:
 
 Most introductory write-ups stop at killed/survived. If you've ever seen `Timeout` or `Uncovered` in an Infection report and wondered what they meant — now you know.
 
-![Infection](/images/infection-sample.png)
+![Infection](/docs/theory/infection-sample.png)
 
 ### Metrics
 
@@ -187,7 +188,7 @@ Now run mutation testing. Among other things, the tool will generate these mutat
 
 All three mutants will **survive**.
 
-![Infection](/images/infection-sample-2.png)
+![Infection](/docs/theory/infection-sample-2.png)
 
 Why? A test at 95 doesn't distinguish `>= 90` from `> 90`: 95 passes both ways. Same for 85 and 75. The boundary values — 90, 80, 70 — are the ones we never check. There's a blind spot exactly at the edges of the ranges.
 
