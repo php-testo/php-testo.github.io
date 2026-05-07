@@ -32,7 +32,7 @@ Goodhart's Law comes from economics, but it works one-to-one in testing: the mom
 
 A few numbers, so this doesn't sound abstract:
 
-- **Avito**, from their write-up on [rolling out mutation testing across 1,500 microservices](https://habr.com/ru/companies/avito/articles/650073/): the average MSI was **64.8%**, while line coverage on the same codebase stayed reliably high.
+- **Avito**, from their write-up on [rolling out mutation testing across 1,500 microservices](https://habr.com/ru/companies/avito/articles/650073/): the average <abbr title="Mutation Score Indicator">**MSI**</abbr> (a test quality metric; higher is better) was **64.8%**, while line coverage on the same codebase stayed reliably high.
 - **OTUS**, a [field example on a PHP service](https://habr.com/ru/companies/otus/articles/580772/): **96% line coverage → 34% MSI**. Real bugs surfaced within thirty minutes of working through the surviving mutants.
 - **Facebook**, a [study](https://arxiv.org/abs/2010.13464) on 15,000+ automatically generated mutants: **more than half** survived the company's rigorous internal test suite, which spans unit, integration, and end-to-end checks.
 
@@ -51,7 +51,7 @@ If we widen the sample with public data from the [Stryker Dashboard](https://das
 MSI ranges from 34% (one PHP service) all the way to 100% (dozens of Yii3 packages), even though most of these projects keep line coverage at 90%+. Coverage simply doesn't see this difference: it would put them all in a tight cluster around 95% and slap the same green badge on every one.
 
 ::: tip The Yii3 ecosystem as a reference point
-Out of 109 stable Yii3 packages, **91 publish data on the Stryker Dashboard**: average MSI **91.8%**, median **95.4%**, with **24 packages holding a perfect 100%** (router, csrf, aliases, definitions, widget, form, and others). The lowest scores belong to [view-twig](https://dashboard.stryker-mutator.io/reports/github.com/yiisoft/view-twig/master) (66.7%) and [log-target-file](https://dashboard.stryker-mutator.io/reports/github.com/yiisoft/log-target-file/master) (67.7%). It's a working example of systematic mutation testing baked into a development process across an entire ecosystem — not a personal initiative of one or two maintainers.
+Out of [104 stable Yii3 packages](https://gist.github.com/roxblnfk/6bcee7b92b6fa328f192987341251a15), **91 publish data on the Stryker Dashboard**: average MSI **91.6%**, median **95.4%**, with **23 packages holding a perfect 100%** (router, csrf, aliases, definitions, widget, form, and others). The lowest scores belong to [view-twig](https://dashboard.stryker-mutator.io/reports/github.com/yiisoft/view-twig/master) (66.67%) and [log-target-file](https://dashboard.stryker-mutator.io/reports/github.com/yiisoft/log-target-file/master) (67.67%). It's a working example of systematic mutation testing baked into a development process across an entire ecosystem — not a personal initiative of one or two maintainers.
 :::
 
 The takeaway is simple: **coverage is a necessary but not a sufficient condition**. It's a useful sanity filter (if a function has 0% coverage, it's definitely untested), but not a quality gauge. And here's where a metric that measures what coverage stays silent about steps onto the stage — namely, how good your tests actually are.

@@ -31,7 +31,7 @@ Coverage показывает, какие строки кода **исполни
 
 Несколько цифр, чтобы это не звучало абстрактно:
 
-- **Avito**, по [опыту внедрения мутационного тестирования на 1500 микросервисов](https://habr.com/ru/companies/avito/articles/650073/): средний MSI оказался **64.8%** при стабильно высоком line coverage по той же кодовой базе.
+- **Avito**, по [опыту внедрения мутационного тестирования на 1500 микросервисов](https://habr.com/ru/companies/avito/articles/650073/): средний <abbr title="Mutation Score Indicator">**MSI**</abbr> (индикатор качества тестов; чем выше, тем лучше) оказался **64.8%** при стабильно высоком line coverage по той же кодовой базе.
 - **OTUS**, [полевой пример на PHP-сервисе](https://habr.com/ru/companies/otus/articles/580772/): **96% line coverage → 34% MSI**. Реальные баги нашлись за полчаса анализа выживших мутантов.
 - **Facebook**, [исследование](https://arxiv.org/abs/2010.13464) на 15 000+ автоматически сгенерированных мутантов: **больше половины** переживают строгий внутренний test suite, который покрывает unit-, integration- и end-to-end проверки.
 
@@ -50,7 +50,7 @@ Coverage показывает, какие строки кода **исполни
 MSI скачет от 34% (один PHP-сервис) до 100% (десятки Yii3-пакетов), при том что у большинства line coverage 90%+. Coverage эту разницу не видит вообще: у всех был бы плотный кластер где-то у 95% и одинаковый «зелёный» бейдж.
 
 ::: tip Экосистема Yii3 как референс
-Из 109 стабильных Yii3-пакетов **91 публикует данные на Stryker Dashboard**: средний MSI **91.8%**, медиана **95.4%**, и **24 пакета держат perfect 100%** (router, csrf, aliases, definitions, widget, form и другие). Минимум — у [view-twig](https://dashboard.stryker-mutator.io/reports/github.com/yiisoft/view-twig/master) (66.7%) и [log-target-file](https://dashboard.stryker-mutator.io/reports/github.com/yiisoft/log-target-file/master) (67.7%). Это пример того, как систематическое мутационное тестирование может быть встроено в процесс разработки на уровне всей экосистемы — а не быть личной инициативой пары мейнтейнеров. 
+Из [104 стабильных Yii3-пакетов](https://gist.github.com/roxblnfk/6bcee7b92b6fa328f192987341251a15) **91 публикует данные на Stryker Dashboard**: средний MSI **91.6%**, медиана **95.4%**, и **23 пакета держат perfect 100%** (router, csrf, aliases, definitions, widget, form и другие). Минимум — у [view-twig](https://dashboard.stryker-mutator.io/reports/github.com/yiisoft/view-twig/master) (66.67%) и [log-target-file](https://dashboard.stryker-mutator.io/reports/github.com/yiisoft/log-target-file/master) (67.67%). Это пример того, как систематическое мутационное тестирование может быть встроено в процесс разработки на уровне всей экосистемы — а не быть личной инициативой пары мейнтейнеров.
 :::
 
 
