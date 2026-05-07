@@ -145,6 +145,8 @@ gtag('config', 'G-VYGDN3X0PR');`],
       label: 'Русский',
       lang: 'ru',
       link: '/ru/',
+      title: 'Testo',
+      description: 'Современный PHP-фреймворк для тестирования',
       head: [
         ['link', { rel: 'alternate', type: 'application/rss+xml', title: 'Блог Testo', href: '/ru/feed.xml' }],
       ],
@@ -255,7 +257,7 @@ gtag('config', 'G-VYGDN3X0PR');`],
 
     const title = pageData.frontmatter.title || siteData.title
     const description = pageData.frontmatter.description || siteData.description
-    const image = pageData.frontmatter.image
+    const image = pageData.frontmatter.image || '/images/og-image.jpg'
     const pageUrl = baseUrl + '/' + pageData.relativePath.replace(/index\.md$/, '').replace(/\.md$/, '')
 
     head.push(['meta', { property: 'og:type', content: 'website' }])
