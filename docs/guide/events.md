@@ -18,7 +18,7 @@ Event characteristics:
 
 ## Registering Event Listeners
 
-Register listeners via `EventListenerCollector` interface in your plugins. See [plugins](./plugins.md) for plugin development.
+Register listeners via `EventListenerCollector` interface in your plugins. See [plugins](../plugins.md) for plugin development.
 
 ```php
 class MyPlugin
@@ -164,7 +164,7 @@ This is useful when you don't care about the specific event type, only the data 
 
 ## Custom Event Dispatcher
 
-Testo uses PSR-14 compliant event dispatcher. You can replace it via the [plugin system](./plugins.md) by providing your own `EventDispatcherInterface` and `EventListenerCollector` implementations (PSR-14 doesn't define listener configuration, so Testo uses `EventListenerCollector` as the API for this).
+Testo uses PSR-14 compliant event dispatcher. You can replace it via the [plugin system](../plugins.md) by providing your own `EventDispatcherInterface` and `EventListenerCollector` implementations (PSR-14 doesn't define listener configuration, so Testo uses `EventListenerCollector` as the API for this).
 
 **Warning:** While Testo's core doesn't depend on events, many components do. Using a `NullDispatcher` or non-functional dispatcher will break:
 - Built-in renderers (progress reporting, output formatting)

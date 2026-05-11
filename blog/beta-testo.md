@@ -41,7 +41,7 @@ Yes. Testo is fully independent and doesn't conflict with other tools — it doe
 :::
 
 ::: question Does Testo work with AI agents?
-Yes. Testo provides `llms.txt` and `llms-full.txt` — special files for AI agents describing the framework's API. Feed them to your agent, and it will start writing Testo tests right away. Learn more in the [documentation](/docs/guide/ai-agents.md).
+Yes. Testo provides `llms.txt` and `llms-full.txt` — special files for AI agents describing the framework's API. Feed them to your agent, and it will start writing Testo tests right away. Learn more in the [documentation](/docs/intro/ai-agents.md).
 :::
 
 ::: question Is there IDE support?

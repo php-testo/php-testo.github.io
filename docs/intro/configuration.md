@@ -79,7 +79,7 @@ new FinderConfig(
 
 ## Plugins
 
-Testo is built on [plugins](plugins.md) — they define how tests are discovered, executed, and processed. Plugins are registered at two levels:
+Testo is built on [plugins](../plugins.md) — they define how tests are discovered, executed, and processed. Plugins are registered at two levels:
 
 - **Application level** (`ApplicationConfig::$plugins`) — act globally across all Test Suites
 - **Test Suite level** (`SuiteConfig::$plugins`) — act only within a specific Test Suite
@@ -90,7 +90,7 @@ If the `plugins` array is not specified, Testo uses the default plugin set.
 You can check the default plugin list in the <class>\Testo\Application\Config\Plugin\ApplicationPlugins</class> class.
 
 Currently:
-- [Filter](plugins/filter.md)
+- [Filter](../plugins/filter.md)
 - **Terminal** and **Teamcity** depending on the `--teamcity` flag
 :::
 
@@ -98,11 +98,11 @@ Currently:
 You can check the default plugin list in the <class>\Testo\Application\Config\Plugin\SuitePlugins</class> class.
 
 Currently:
-- [Assert](plugins/assert.md)
-- [Bench](plugins/bench.md)
-- [Inline](plugins/inline.md)
-- [Lifecycle](plugins/lifecycle.md)
-- [Test](plugins/test.md)
+- [Assert](../plugins/assert.md)
+- [Bench](../plugins/bench.md)
+- [Inline](../plugins/inline.md)
+- [Lifecycle](../plugins/lifecycle.md)
+- [Test](../plugins/test.md)
 :::
 
 ### Managing Plugins

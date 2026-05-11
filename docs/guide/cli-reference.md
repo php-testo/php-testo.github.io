@@ -73,7 +73,7 @@ Testo provides three types of filters that can be combined to selectively run te
 - Different type filters use AND logic: `--filter=test1 --suite=Unit` → test1 AND Unit
 - Formula: `AND(OR(filters), OR(paths), OR(suites), type)`
 
-For detailed information about filtering behavior, see [Filtering](plugins/filter.md).
+For detailed information about filtering behavior, see [Filtering](../plugins/filter.md).
 
 #### `--suite`
 
@@ -148,7 +148,7 @@ testo run --filter=testAuthentication --suite=Unit
 testo run --filter=UserTest --path="tests/Unit"
 ```
 
-**Filter Behavior:** See [Filtering](plugins/filter.md) for details.
+**Filter Behavior:** See [Filtering](../plugins/filter.md) for details.
 
 #### `--type`
 
@@ -156,8 +156,8 @@ Filter tests by type. If specified, only tests of the matching type are run.
 
 **Possible values:**
 - `test` — regular tests (methods in classes)
-- `inline` — [inline tests](plugins/inline.md) (tests via <attr>\Testo\Inline\TestInline</attr>)
-- `bench` — [benchmarks](plugins/bench.md)
+- `inline` — [inline tests](../plugins/inline.md) (tests via <attr>\Testo\Inline\TestInline</attr>)
+- `bench` — [benchmarks](../plugins/bench.md)
 
 **Examples:**
 ```bash

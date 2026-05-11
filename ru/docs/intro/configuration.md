@@ -79,7 +79,7 @@ new FinderConfig(
 
 ## Плагины
 
-Testo построен на [плагинах](plugins.md) — именно они определяют, как находятся, запускаются и обрабатываются тесты. Плагины подключаются на двух уровнях:
+Testo построен на [плагинах](../plugins.md) — именно они определяют, как находятся, запускаются и обрабатываются тесты. Плагины подключаются на двух уровнях:
 
 - **Уровень приложения** (`ApplicationConfig::$plugins`) — действуют глобально на все Test Suite
 - **Уровень Test Suite** (`SuiteConfig::$plugins`) — действуют только в конкретном Test Suite
@@ -90,7 +90,7 @@ Testo построен на [плагинах](plugins.md) — именно он
 Вы можете посмотреть список плагинов по умолчанию в классе <class>\Testo\Application\Config\Plugin\ApplicationPlugins</class>.
 
 Сейчас это:
-- [Filter](plugins/filter.md)
+- [Filter](../plugins/filter.md)
 - **Terminal** и **Teamcity** в зависимости от флага `--teamcity`
 :::
 
@@ -98,11 +98,11 @@ Testo построен на [плагинах](plugins.md) — именно он
 Вы можете посмотреть список плагинов по умолчанию в классе <class>\Testo\Application\Config\Plugin\SuitePlugins</class>.
 
 Сейчас это:
-- [Assert](plugins/assert.md)
-- [Bench](plugins/bench.md)
-- [Inline](plugins/inline.md)
-- [Lifecycle](plugins/lifecycle.md)
-- [Test](plugins/test.md)
+- [Assert](../plugins/assert.md)
+- [Bench](../plugins/bench.md)
+- [Inline](../plugins/inline.md)
+- [Lifecycle](../plugins/lifecycle.md)
+- [Test](../plugins/test.md)
 :::
 
 ### Управление плагинами
