@@ -32,22 +32,22 @@ The same three steps work for new tests and for porting an existing suite:
 Writing tests from scratch:
 
 ```
+Documentation: https://php-testo.github.io/llms-full.txt
+
 Using the Testo PHP testing framework, write tests for the following class:
 
 {paste your class here}
+```
 
+Migrating from another framework:
+
+```
 Documentation: https://php-testo.github.io/llms-full.txt
-```
 
-Migrating from PHPUnit, Pest, or Codeception:
-
-```
-Rewrite the following PHPUnit test to Testo. Keep the same assertions and data providers,
+Rewrite the tests in the following folder to Testo. Keep the same assertions and data providers,
 do not invent extra scenarios.
 
-{paste your old test here}
-
-Documentation: https://php-testo.github.io/llms-full.txt
+Tests folder: tests/Unit
 ```
 
 ### Claude Code

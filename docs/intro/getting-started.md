@@ -6,7 +6,7 @@ llms_description: "Getting started with Testo. Installation via Composer, testo.
 # Getting Started
 
 ::: tip Working with an AI assistant?
-Testo is designed to be friendly to AI coding agents — both for writing new tests and for migrating from PHPUnit, Pest, or Codeception. Skim [AI Agents](./ai-agents.md) first, and your agent can do most of the work below for you.
+Testo is designed to be friendly to AI coding agents — both for writing new tests and for migrating from other frameworks. Skim [AI Agents](./ai-agents.md) first, and your agent can do most of the work below for you.
 :::
 
 ## Installation
