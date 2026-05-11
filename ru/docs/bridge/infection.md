@@ -4,7 +4,7 @@ outline: [2, 3]
 
 # Infection
 
-[Infection](https://infection.github.io/) — инструмент [мутационного тестирования](/ru/docs/theory/mutation-testing.md) для PHP. Testo подключается к нему через отдельный адаптер `php-testo/bridge-infection`.
+[Infection](https://infection.github.io/) — инструмент [мутационного тестирования](/ru/docs/theory/mutation-testing.md) для PHP. Testo подключается к нему через отдельный адаптер `testo/bridge-infection`.
 
 
 ## Установка
@@ -12,7 +12,7 @@ outline: [2, 3]
 Поставьте Infection и пакет интеграции как dev-зависимости:
 
 ```bash
-composer require --dev infection/infection php-testo/bridge-infection
+composer require --dev infection/infection testo/bridge-infection
 ```
 
 ::: warning

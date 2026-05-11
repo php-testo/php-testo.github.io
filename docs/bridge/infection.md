@@ -1,14 +1,14 @@
 ---
 outline: [2, 3]
-llms_description: "How to run Infection mutation testing with Testo. Install the php-testo/bridge-infection adapter (or use the Infection Phar, which already bundles it). Configure infection.json with testFramework: testo and tmpDir. Register CodecovPlugin in testo.php with a PhpUnitXmlReport pointing at <tmpDir>/infection/coverage-xml. Reuse existing coverage with Infection's --coverage flag."
+llms_description: "How to run Infection mutation testing with Testo. Install the testo/bridge-infection adapter (or use the Infection Phar, which already bundles it). Configure infection.json with testFramework: testo and tmpDir. Register CodecovPlugin in testo.php with a PhpUnitXmlReport pointing at <tmpDir>/infection/coverage-xml. Reuse existing coverage with Infection's --coverage flag."
 ---
 
 # Infection
 
-[Infection](https://infection.github.io/) is a [mutation testing](/docs/theory/mutation-testing.md) tool for PHP. Testo connects to it through a dedicated adapter, `php-testo/bridge-infection`.
+[Infection](https://infection.github.io/) is a [mutation testing](/docs/theory/mutation-testing.md) tool for PHP. Testo connects to it through a dedicated adapter, `testo/bridge-infection`.
 
 ::: info Package
-`php-testo/bridge-infection` — Infection extension. Auto-registers via Composer. No plugin needs to be added to `testo.php`.
+`testo/bridge-infection` — Infection extension. Auto-registers via Composer. No plugin needs to be added to `testo.php`.
 :::
 
 ## Installation
@@ -16,7 +16,7 @@ llms_description: "How to run Infection mutation testing with Testo. Install the
 Install Infection and the integration package as dev dependencies:
 
 ```bash
-composer require --dev infection/infection php-testo/bridge-infection
+composer require --dev infection/infection testo/bridge-infection
 ```
 
 ::: warning
