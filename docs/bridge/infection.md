@@ -54,11 +54,7 @@ In Infection's configuration (usually `infection.json`), declare that you're usi
         "directories": ["src"]
     },
     "testFramework": "testo",
-    "tmpDir": "runtime",
-    "logs": {
-        "text": "runtime/infection.log",
-        "html": "runtime/infection.html"
-    }
+    "tmpDir": "runtime"
 }
 ```
 

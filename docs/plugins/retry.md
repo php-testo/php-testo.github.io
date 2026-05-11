@@ -71,6 +71,10 @@ return new ApplicationConfig(
 
 This way all tests in the Integration Test Suite will be retried up to 3 times on failure, without placing the attribute on each test individually.
 
+## Retry vs Repeat
+
+Retry forgives a single transient failure and stops as soon as the test passes. When you instead want to prove that a test is stable — running it N times in a row regardless of the first outcome — use <attr>\Testo\Repeat</attr>. See the [Repeat plugin](./repeat.md#repeat-vs-retry) for a side-by-side comparison and the rules for combining both attributes.
+
 ::: question What happens if a retry policy is defined at multiple levels?
 When multiple retry policies are defined, only the closest one to the test applies. For example, if the Test Suite has `maxAttempts: 3`, the class has `2`, and the method has `5`, the test will retry **up to 5 times**. Policies do not stack.
 :::
