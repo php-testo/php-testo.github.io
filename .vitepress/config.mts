@@ -86,10 +86,10 @@ gtag('config', 'G-VYGDN3X0PR');`],
               text: 'Introduction',
               items: [
                 { text: 'Why Testo?', link: '/docs/intro/why-testo.md' },
-                { text: 'AI Agents', link: '/docs/intro/ai-agents.md' },
                 { text: 'Getting Started', link: '/docs/intro/getting-started.md' },
                 { text: 'Configuration', link: '/docs/intro/configuration.md' },
                 { text: 'Writing Tests', link: '/docs/intro/writing-tests.md' },
+                { text: 'AI Agents', link: '/docs/intro/ai-agents.md' },
               ],
             },
             {
@@ -115,18 +115,18 @@ gtag('config', 'G-VYGDN3X0PR');`],
               ],
             },
             {
-              text: 'Theory',
-              items: [
-                { text: 'Mutation Testing', link: '/docs/theory/mutation-testing.md' },
-              ],
-            },
-            {
               text: 'Guide',
               items: [
                 { text: 'All Attributes', link: '/docs/guide/attributes.md' },
                 { text: 'CLI Reference', link: '/docs/guide/cli-reference.md' },
                 { text: 'Events', link: '/docs/guide/events.md' },
                 { text: 'Interceptors', link: '/docs/guide/interceptors.md' },
+              ],
+            },
+            {
+              text: 'Theory',
+              items: [
+                { text: 'Mutation Testing', link: '/docs/theory/mutation-testing.md' },
               ],
             },
             {
@@ -161,10 +161,10 @@ gtag('config', 'G-VYGDN3X0PR');`],
               text: 'Введение',
               items: [
                 { text: 'Почему Testo?', link: '/ru/docs/intro/why-testo.md' },
-                { text: 'AI-агенты', link: '/ru/docs/intro/ai-agents.md' },
                 { text: 'Начало работы', link: '/ru/docs/intro/getting-started.md' },
                 { text: 'Конфигурация', link: '/ru/docs/intro/configuration.md' },
                 { text: 'Пишем тесты', link: '/ru/docs/intro/writing-tests.md' },
+                { text: 'AI-агенты', link: '/ru/docs/intro/ai-agents.md' },
               ],
             },
             {
@@ -190,18 +190,18 @@ gtag('config', 'G-VYGDN3X0PR');`],
               ],
             },
             {
-              text: 'Теория',
-              items: [
-                { text: 'Мутационное тестирование', link: '/ru/docs/theory/mutation-testing.md' },
-              ],
-            },
-            {
               text: 'Руководство',
               items: [
                 { text: 'Все атрибуты', link: '/ru/docs/guide/attributes.md' },
                 { text: 'CLI справка', link: '/ru/docs/guide/cli-reference.md' },
                 { text: 'События', link: '/ru/docs/guide/events.md' },
                 { text: 'Интерцепторы', link: '/ru/docs/guide/interceptors.md' },
+              ],
+            },
+            {
+              text: 'Теория',
+              items: [
+                { text: 'Мутационное тестирование', link: '/ru/docs/theory/mutation-testing.md' },
               ],
             },
             {
