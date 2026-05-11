@@ -22,13 +22,13 @@ interface PluginConfigurator
 }
 ```
 
-When a plugin is loaded, Testo calls `configure()` and passes its internal DI container. The configurator uses the container to access the framework API. Configurators are registered at two levels: application and Test Suite — see [Configuration — Plugins](./configuration.md#plugins) for details.
+When a plugin is loaded, Testo calls `configure()` and passes its internal DI container. The configurator uses the container to access the framework API. Configurators are registered at two levels: application and Test Suite — see [Configuration — Plugins](./intro/configuration.md#plugins) for details.
 
 The container provides three main extension points:
 
 ### Interceptors
 
-Interceptors are middleware that hook into test discovery and execution pipelines. See the [interceptors](./interceptors.md) page for details.
+Interceptors are middleware that hook into test discovery and execution pipelines. See the [interceptors](./guide/interceptors.md) page for details.
 
 Interceptors are registered via <class>\Testo\Pipeline\InterceptorCollector</class>:
 
@@ -38,7 +38,7 @@ $container->get(InterceptorCollector::class)->addInterceptor(new MyInterceptor()
 
 ### Event listeners
 
-Testo emits [events](./events.md) at every stage of execution: session start and finish, Test Suite, Test Case, and individual tests. A configurator can subscribe to any of these events via <class>\Testo\Common\EventListenerCollector</class>:
+Testo emits [events](./guide/events.md) at every stage of execution: session start and finish, Test Suite, Test Case, and individual tests. A configurator can subscribe to any of these events via <class>\Testo\Common\EventListenerCollector</class>:
 
 ```php
 $container->get(EventListenerCollector::class)->addListener(
@@ -51,7 +51,7 @@ $container->get(EventListenerCollector::class)->addListener(
 
 This mechanism follows the [PSR-14](https://www.php-fig.org/psr/psr-14/) standard with one restriction: events are **always** immutable. The same applies to any custom events you create.
 
-See the [Events](./events.md) page for the full list.
+See the [Events](./guide/events.md) page for the full list.
 
 ### Container bindings
 
@@ -248,4 +248,4 @@ jobs:
 
 ## Plugins without a configurator
 
-Not all plugins need a configurator. Some, like <plugin>Retry</plugin> and <plugin>Data</plugin>, work entirely through PHP attributes with automatic interceptor activation. See [interceptors](./interceptors.md) for details.
+Not all plugins need a configurator. Some, like <plugin>Retry</plugin> and <plugin>Data</plugin>, work entirely through PHP attributes with automatic interceptor activation. See [interceptors](./guide/interceptors.md) for details.

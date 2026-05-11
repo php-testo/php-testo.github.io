@@ -73,7 +73,7 @@ gtag('config', 'G-VYGDN3X0PR');`],
       ],
       themeConfig: {
         nav: [
-          { text: 'Docs', link: '/docs/getting-started.md' },
+          { text: 'Docs', link: '/docs/intro/getting-started.md' },
           { text: 'Blog', link: '/blog/' },
         ],
         editLink: {
@@ -85,10 +85,11 @@ gtag('config', 'G-VYGDN3X0PR');`],
             {
               text: 'Introduction',
               items: [
-                { text: 'Why Testo?', link: '/docs/why-testo.md' },
-                { text: 'Getting Started', link: '/docs/getting-started.md' },
-                { text: 'Configuration', link: '/docs/configuration.md' },
-                { text: 'Writing Tests', link: '/docs/writing-tests.md' },
+                { text: 'Why Testo?', link: '/docs/intro/why-testo.md' },
+                { text: 'AI Agents', link: '/docs/intro/ai-agents.md' },
+                { text: 'Getting Started', link: '/docs/intro/getting-started.md' },
+                { text: 'Configuration', link: '/docs/intro/configuration.md' },
+                { text: 'Writing Tests', link: '/docs/intro/writing-tests.md' },
               ],
             },
             {
@@ -122,15 +123,10 @@ gtag('config', 'G-VYGDN3X0PR');`],
             {
               text: 'Guide',
               items: [
-                { text: 'All Attributes', link: '/docs/attributes.md' },
-                { text: 'CLI Reference', link: '/docs/cli-reference.md' },
-                { text: 'AI Agents', link: '/docs/ai-agents.md' },
-              ],
-            },
-            {
-              text: 'Customization',
-              items: [
-                { text: 'Events', link: '/docs/events.md' },
+                { text: 'All Attributes', link: '/docs/guide/attributes.md' },
+                { text: 'CLI Reference', link: '/docs/guide/cli-reference.md' },
+                { text: 'Events', link: '/docs/guide/events.md' },
+                { text: 'Interceptors', link: '/docs/guide/interceptors.md' },
               ],
             },
             {
@@ -152,7 +148,7 @@ gtag('config', 'G-VYGDN3X0PR');`],
       ],
       themeConfig: {
         nav: [
-          { text: 'Документация', link: '/ru/docs/getting-started.md' },
+          { text: 'Документация', link: '/ru/docs/intro/getting-started.md' },
           { text: 'Блог', link: '/ru/blog/' },
         ],
         editLink: {
@@ -164,10 +160,11 @@ gtag('config', 'G-VYGDN3X0PR');`],
             {
               text: 'Введение',
               items: [
-                { text: 'Почему Testo?', link: '/ru/docs/why-testo.md' },
-                { text: 'Начало работы', link: '/ru/docs/getting-started.md' },
-                { text: 'Конфигурация', link: '/ru/docs/configuration.md' },
-                { text: 'Пишем тесты', link: '/ru/docs/writing-tests.md' },
+                { text: 'Почему Testo?', link: '/ru/docs/intro/why-testo.md' },
+                { text: 'AI-агенты', link: '/ru/docs/intro/ai-agents.md' },
+                { text: 'Начало работы', link: '/ru/docs/intro/getting-started.md' },
+                { text: 'Конфигурация', link: '/ru/docs/intro/configuration.md' },
+                { text: 'Пишем тесты', link: '/ru/docs/intro/writing-tests.md' },
               ],
             },
             {
@@ -201,15 +198,10 @@ gtag('config', 'G-VYGDN3X0PR');`],
             {
               text: 'Руководство',
               items: [
-                { text: 'Все атрибуты', link: '/ru/docs/attributes.md' },
-                { text: 'CLI справка', link: '/ru/docs/cli-reference.md' },
-                { text: 'AI-агенты', link: '/ru/docs/ai-agents.md' },
-              ],
-            },
-            {
-              text: 'Кастомизация',
-              items: [
-                { text: 'События', link: '/ru/docs/events.md' },
+                { text: 'Все атрибуты', link: '/ru/docs/guide/attributes.md' },
+                { text: 'CLI справка', link: '/ru/docs/guide/cli-reference.md' },
+                { text: 'События', link: '/ru/docs/guide/events.md' },
+                { text: 'Интерцепторы', link: '/ru/docs/guide/interceptors.md' },
               ],
             },
             {

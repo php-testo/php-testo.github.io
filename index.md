@@ -21,7 +21,7 @@ hero:
   actions:
     - theme: brand
       text: Get Started
-      link: /docs/getting-started
+      link: /docs/intro/getting-started
     - theme: alt
       text: GitHub
       link: https://github.com/php-testo/testo

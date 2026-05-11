@@ -20,7 +20,7 @@ hero:
   actions:
     - theme: brand
       text: Начать
-      link: /ru/docs/getting-started
+      link: /ru/docs/intro/getting-started
     - theme: alt
       text: GitHub
       link: https://github.com/php-testo/testo

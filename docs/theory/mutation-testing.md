@@ -504,7 +504,7 @@ The technique is language-agnostic. If you've landed here from outside the PHP w
 - **Java/JVM — [PIT (Pitest)](https://pitest.org/).** Mature, very fast (works at the bytecode level), tightly integrated with Maven, Gradle, and JUnit. A rich [catalog of mutators](https://pitest.org/quickstart/mutators/).
 - **JavaScript/TypeScript — [StrykerJS](https://stryker-mutator.io/).** Supports virtually the entire modern JS stack: TypeScript, React, Angular, Vue, Svelte, Node. The same project also offers [Stryker.NET](https://stryker-mutator.io/docs/stryker-net/introduction/) and [Stryker4s](https://stryker-mutator.io/docs/stryker4s/getting-started/) for Scala.
 - **Python — [mutmut](https://github.com/boxed/mutmut).** A simple CLI with friendly output.
-- **Elixir/Erlang — [muex](https://habr.com/ru/articles/1004240/).** Fresh, 2026.
+- **Elixir/Erlang — [muex](https://hexdocs.pm/muex/readme.html).** Fresh, 2026.
 
 If you're writing PHP and reading this, the next step is obvious: [hook up Infection through Testo's integration](/docs/bridge/infection.md), point it at a critical part of your code, and look at your first report.
 

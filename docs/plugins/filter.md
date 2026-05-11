@@ -4,7 +4,7 @@ llms_description: "How to filter which tests run. Filter class with name/path/su
 
 # Test Filtering
 
-This document describes the internal logic of the filtering plugin: the algorithm, pipeline stages, and criteria combination. If you just need to filter tests when running — see the [CLI reference](../cli-reference.md).
+This document describes the internal logic of the filtering plugin: the algorithm, pipeline stages, and criteria combination. If you just need to filter tests when running — see the [CLI reference](../guide/cli-reference.md).
 
 <plugin-info name="Filter" class="\Testo\Filter\FilterPlugin" included="\Testo\Application\Config\Plugin\ApplicationPlugins" />
 
