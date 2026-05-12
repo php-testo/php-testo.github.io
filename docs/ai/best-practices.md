@@ -6,49 +6,124 @@ llms_priority: 1
 
 ## Best Practices
 
-### PHPDoc descriptions
+1. **Mark the class as a test.** Put `\Testo\Test` on the class, not on every method — every public `void`/`never` method is picked up automatically. Use method-level `\Testo\Test` only when the class isn't a pure test case or a test method is private.
+2. **Add PHPDoc only when the name isn't enough.** The block becomes the test description in reports. Skip it when the method name already says everything — an empty description beats a redundant one.
+3. **Declare the coverage scope with `\Testo\Codecov\Covers`.** Place it on the class; move down to a method only when that test targets something different. The attribute is repeatable. For free functions pass the FQN as a string: `#[Covers('Acme\\format_price')]`. Use `\Testo\Codecov\CoversNothing` for smoke checks that shouldn't affect coverage.
+4. **Follow Arrange-Act-Assert.** Separate the three phases with a single blank line — no `// arrange` / `// act` / `// assert` comments. If a phase gets unreadable, use semantic comments, or extract a helper or split the test.
+5. **Parameterize when only data differs.** Pick the right attribute for the shape of the data:
+   - `\Testo\Data\DataSet` — inline cases declared right on the test method; reach for it whenever a separate provider would be overkill.
+   - `\Testo\Data\DataProvider` — large or reused sets, or when data generation needs logic; returns `iterable`, string keys become labels.
+   - `\Testo\Data\DataCross` — combine separate providers, typically to pair inputs with their expected outcomes.
 
-A PHPDoc block on a test method becomes the test description in Testo output. Add one when the method name alone doesn't fully convey what the test checks or why. If the name is self-explanatory, skip the PHPDoc — an empty description is better than a redundant one.
+   Each dataset label appears in failure reports — make it describe the scenario, not the data.
+6. **Cover both positive and negative paths.** Verify expected behaviour, invalid input, and boundary values: off-by-one (`0`, `1`, `n-1`, `n`, `n+1`), empty/null, type limits (`PHP_INT_MAX`, `PHP_INT_MIN`), transitions between valid and invalid ranges. These matter most for mutation testing.
 
-```php
-/**
- * Null is returned instead of throwing when the user does not exist,
- * so callers can handle missing users without try/catch.
- */
-public function returnsNullForMissingUser(): void {}
-```
+### Examples
 
-### Avoid test duplication using parameterized tests
-
-When tests differ only in input/output values, use parameterized tests:
-
-- **`#[DataSet]`** — few datasets (2–4), not reused elsewhere; inline, no extra method needed
-- **`#[DataProvider]`** — large or reused datasets, or when data generation requires logic; returns `iterable`, string keys become labels; can be an invokable class or any callable
-
-When positive and negative cases share the same test logic, combine them into a single parameterized test to keep all scenarios visible in one place:
+A typical test class — `\Testo\Test` and `\Testo\Codecov\Covers` on the class, AAA in every test body separated by blank lines, PHPDoc only where the method name leaves something unsaid:
 
 ```php
-#[DataSet(['user@example.com', true], 'valid email')]
-#[DataSet(['userexample.com', false], 'missing @')]
-#[DataSet(['', false], 'empty string')]
-public function validate(string $email, bool $expected): void { ... }
+use Testo\Assert;
+use Testo\Codecov\Covers;
+use Testo\Test;
+
+#[Test]
+#[Covers(UserService::class)]
+final class UserServiceTest
+{
+    public function createsUser(): void
+    {
+        $service = new UserService(new InMemoryRepository());
+
+        $user = $service->create('Alice', 'alice@example.com');
+
+        Assert::same('Alice', $user->name);
+    }
+
+    /**
+     * Null is returned instead of throwing when the user is missing,
+     * so callers can handle the case without try/catch.
+     */
+    public function returnsNullForUnknownId(): void
+    {
+        $service = new UserService(new InMemoryRepository());
+
+        $user = $service->find(999);
+
+        Assert::null($user);
+    }
+}
 ```
 
-For larger datasets split by outcome, use `#[DataCross]` twice to pair each provider with its expected result:
+Boundary values fit `\Testo\Data\DataSet` well — each case is one attribute on the method, the values live next to the assertion they drive, and adding another boundary is a one-line change:
 
 ```php
-#[DataCross(new DataProvider('validInputs'), new DataSet([true]))]
-#[DataCross(new DataProvider('invalidInputs'), new DataSet([false]))]
-public function validate(string $email, bool $expected): void { ... }
+#[DataSet([12,  false], 'below minimum')]
+#[DataSet([13,  true],  'minimum')]
+#[DataSet([120, true],  'maximum')]
+#[DataSet([121, false], 'above maximum')]
+public function rejectsAgesOutsideRange(int $age, bool $accepted): void
+{
+    $service = new UserService(new InMemoryRepository());
+
+    Assert::same($accepted, $service->canRegister($age));
+}
 ```
 
-### Test coverage
+Reach for `\Testo\Data\DataProvider` when the cases need code to produce — generated programmatically or loaded from a fixture file:
 
-Generate both positive and negative scenarios. Positive tests verify expected behaviour; negative tests verify what happens on invalid input, missing data, or error conditions.
+```php
+#[DataProvider('emailFixtures')]
+public function validatesEmail(string $email, bool $expected): void
+{
+    Assert::same($expected, UserService::isValidEmail($email));
+}
 
-Pay attention to boundary values — these matter most for mutation testing:
+public static function emailFixtures(): iterable
+{
+    $cases = json_decode(file_get_contents(__DIR__ . '/fixtures/emails.json'), true);
+    foreach ($cases as $label => [$input, $expected]) {
+        yield $label => [$input, $expected];
+    }
+}
+```
 
-- off-by-one values (`0`, `1`, `n-1`, `n`, `n+1`)
-- empty collections, null, empty string
-- type boundaries (e.g. `PHP_INT_MAX`, `PHP_INT_MIN`)
-- transitions between valid and invalid ranges
+When the same dataset feeds several tests, lift it into an invokable provider class and reference it by instance — one source of truth, no copy-paste:
+
+```php
+final class CommonPasswords
+{
+    public function __invoke(): iterable
+    {
+        yield 'too short'     => ['abc'];
+        yield 'all digits'    => ['12345678'];
+        yield 'leaked top-10' => ['password'];
+    }
+}
+
+#[DataProvider(new CommonPasswords())]
+public function rejectsCommonPassword(string $password): void { ... }
+
+#[DataProvider(new CommonPasswords())]
+public function suggestsStrongerPassword(string $password): void { ... }
+```
+
+When positive and negative cases come from separate providers, pair each with its expected outcome via `\Testo\Data\DataCross`:
+
+```php
+#[DataCross(new DataProvider('validEmails'), new DataSet([true]))]
+#[DataCross(new DataProvider('invalidEmails'), new DataSet([false]))]
+#[Covers(UserService::class, 'isValidEmail')]
+public function validatesEmail(string $email, bool $expected): void
+{
+    Assert::same($expected, UserService::isValidEmail($email));
+}
+```
+
+A test that should be excluded from coverage entirely:
+
+```php
+#[Test]
+#[CoversNothing]
+public function smokeBootstrap(): void { ... }
+```
