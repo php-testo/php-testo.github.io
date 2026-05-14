@@ -223,12 +223,14 @@ Inside <attr>\Testo\Data\DataZip</attr>, <attr>\Testo\Data\DataCross</attr>, and
 
 ### Mixing Types
 
-Handy when some parameters are fixed while others come from a provider:
+Each argument of <attr>\Testo\Data\DataCross</attr> is a separate **axis**, and its arguments are concatenated into the final call. So if you want several inline cases on a single axis (here: the database driver), wrap them in <attr>\Testo\Data\DataUnion</attr> — otherwise each <attr>\Testo\Data\DataSet</attr> becomes its own axis and the arity stops matching the method signature.
 
 ```php
 #[DataCross(
-    new DataSet(['mysql'], 'mysql'),
-    new DataSet(['pgsql'], 'pgsql'),
+    new DataUnion(
+        new DataSet(['mysql'], 'mysql'),
+        new DataSet(['pgsql'], 'pgsql'),
+    ),
     new DataProvider('migrationScenarios'),
 )]
 public function testMigration(string $driver, array $scenario): void { ... }

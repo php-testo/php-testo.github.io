@@ -223,12 +223,14 @@ public function testExport(string $format, int $compression): void
 
 ### Смешивание типов
 
-Удобно, когда часть параметров фиксирована, а часть приходит из провайдера:
+Каждый аргумент <attr>\Testo\Data\DataCross</attr> — это отдельная **ось**, и их аргументы конкатенируются в итоговый вызов. Поэтому, если на одной оси нужно несколько inline-кейсов (здесь — драйвер БД), оберни их в <attr>\Testo\Data\DataUnion</attr>. Иначе каждый <attr>\Testo\Data\DataSet</attr> станет своей осью, и арность перестанет совпадать с сигнатурой метода.
 
 ```php
 #[DataCross(
-    new DataSet(['mysql'], 'mysql'),
-    new DataSet(['pgsql'], 'pgsql'),
+    new DataUnion(
+        new DataSet(['mysql'], 'mysql'),
+        new DataSet(['pgsql'], 'pgsql'),
+    ),
     new DataProvider('migrationScenarios'),
 )]
 public function testMigration(string $driver, array $scenario): void { ... }
