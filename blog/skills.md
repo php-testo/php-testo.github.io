@@ -74,58 +74,52 @@ The package is 95% vibe-coded, but that's nothing to worry about: it's all cover
 
 ## Quick start
 
-1. Install `llm/skills` (and bring Testo up to date while you're at it):
-
-    ```bash
-    composer require --dev llm/skills
-    ```
-
-2. Tweak `composer.json` if you want a different target folder (default is `.agents/skills`) or want to extend the trusted-vendor list:
+1. Add the settings to `composer.json`:
 
     ```json
     {
         "extra": {
             "skills": {
-                "target": ".claude/skills",
-                "trusted": ["my-vendor/*"]
+                "target": ".agents/skills",
+                "aliases": [".claude/skills", ".cursor/skills"],
+                "trusted": ["my-vendor/*"],
+                "discovery": true,
+                "auto-sync": true
             }
         }
     }
     ```
 
-3. See what skills are available:
+    - `target` — the real skills directory (default `.agents/skills`).
+    - `aliases` — extra mirror paths (Windows junctions or POSIX symlinks) pointing at `target`. Handy when a project hosts several agents at once: Claude Code, Cursor & friends read the same skills through their own conventional paths, no duplicated files.
+    - `trusted` — trusted-vendor patterns (`vendor/*` or `vendor/package`). Testo and a few others are already in the built-in whitelist, so this is usually where you list your own additions.
+    - `discovery` — pick up skills from packages that don't declare `extra.skills` but ship a `skills/` folder at the root. `false` by default.
+    - `auto-sync` — run `skills:update` automatically after `composer install` / `update`.
+
+2. Install the plugin — it'll pick up the skills and lay them out right away:
 
     ```bash
-    composer skills:show --discover
+    composer require --dev llm/skills
     ```
 
-4. Pull skills into the project.
+    Composer will ask for permission to run the plugin (`allow-plugins`) — say yes.
 
-    Everything from trusted vendors:
+3. See what else is available to sync.
+
+    `composer skills:show` is a read-only inspector that tells you what's syncing, what's skipped, and why. Useful flags:
 
     ```bash
-    composer skills:update --discover
+    composer skills:show                      # current layout
+    composer skills:show --discovery          # + packages with a skills/ folder but no extra.skills
+    composer skills:show --trust='acme/*'     # + what would unlock if you extended trust
     ```
 
-    Or specific vendors:
-
-    ```bash
-    composer skills:update testo/*
-    ```
-
-5. Wire up auto-update in `composer.json`:
-
-    ```json
-    {
-        "scripts": {
-            "post-install-cmd": ["@composer skills:update"],
-            "post-update-cmd": ["@composer skills:update"]
-        }
-    }
-    ```
-
-That's it — the Testo skills are now sitting in `.claude/skills/`, and Claude Code will pick them up on its next run. Using a different agent? Just point `target` at whatever path it reads from.
+    Spot a `[skip] not trusted` next to something interesting? Add the vendor to `trusted` and the skills will land on the next sync. For a one-off sync, name the package right in the command: `skills:update acme/foo`.
 
 ::: tip
-`composer skills:show` previews what's about to land where, without touching the disk. Handy to run before your first `update`.
+You can install the plugin globally — then `composer skills:show` / `skills:update` work in any project, while the per-project settings (`target`, `aliases`, `trusted`) are still read from the local `composer.json`:
+
+```bash
+composer global require llm/skills
+```
 :::

@@ -74,57 +74,52 @@ faqLevel: false
 
 ## Быстрый старт
 
-
-1. Поставить пакет `llm/skills` и обновить Testo.
-
-    ```bash
-    composer require --dev llm/skills
-    ```
-
-2. Настроить `composer.json`, если надо складывать скиллы в другую папку (по умолчанию `.agents/skills`) или расширить список доверенных вендоров:
+1. Прописать настройки в `composer.json`:
 
     ```json
     {
         "extra": {
             "skills": {
-                "target": ".claude/skills",
-                "trusted": ["my-vendor/*"]
+                "target": ".agents/skills",
+                "aliases": [".claude/skills", ".cursor/skills"],
+                "trusted": ["my-vendor/*"],
+                "discovery": true,
+                "auto-sync": true
             }
         }
     }
     ```
 
-3. Чтобы посмотреть, какие скиллы доступны:
+    - `target` — реальная папка со скиллами (дефолт `.agents/skills`).
+    - `aliases` — дополнительные пути-зеркала (junction на Windows, symlink на POSIX), указывающие на `target`. Удобно, когда в проекте живут несколько агентов: Claude Code, Cursor и компания читают один и тот же набор через свои привычные пути, без дублирования файлов.
+    - `trusted` — доверенные вендоры в формате `vendor/*` или `vendor/package`. Testo и часть других пакетов уже сидят во встроенном whitelist'е, так что сюда обычно добавляют что-то своё.
+    - `discovery` — подбирать скиллы из пакетов, у которых нет `extra.skills`, но есть папка `skills/` в корне. По умолчанию `false`.
+    - `auto-sync` — гонять `skills:update` автоматически после `composer install` / `update`.
+
+2. Поставить плагин — он сразу же подхватит и разложит скиллы по указанным путям:
 
     ```bash
-    composer skills:show --discover
-    ```
-4. Скачать скиллы в проект:
-
-    Всё из списка доверенных вендоров:
-    ```bash
-    composer skills:update --discover
+    composer require --dev llm/skills
     ```
 
-    Конкретные вендоры:
+    Composer спросит разрешение запустить плагин (`allow-plugins`) — соглашайтесь.
+
+3. Посмотреть, что ещё можно синкнуть.
+
+    `composer skills:show` — read-only инспектор: показывает, что уже синкается, что пропущено и почему. Полезные флаги:
 
     ```bash
-    composer skills:update testo/*
-   ```
-
-5. Донастроить `composer.json` на автообновление.
-
-    ```json
-    {
-        "scripts": {
-            "post-install-cmd": ["@composer skills:update"],
-            "post-update-cmd": ["@composer skills:update"]
-        }
-    }
+    composer skills:show                      # текущая раскладка
+    composer skills:show --discovery          # + пакеты с папкой skills/ без extra.skills
+    composer skills:show --trust='acme/*'     # + что окажется доступным, если расширить трасты
     ```
 
-Всё — скиллы Testo лежат в `.claude/skills/`, и Claude Code подхватит их при следующем запуске. Используете другого агента — поменяйте `target` на нужный путь.
+    Заметили `[skip] not trusted` напротив интересного пакета — добавьте его в `trusted`, и при следующем синке скиллы приедут. Для однократного синка можно указать пакет прямо в команде `skills:update acme/foo`
 
 ::: tip
-`composer skills:show` покажет, что куда поедет, без записи на диск. Удобно проверить перед первым `update`.
+Плагин можно поставить глобально — тогда `composer skills:show` / `skills:update` будут доступны в любом проекте, а настройки (`target`, `aliases`, `trusted`) всё равно читаются из локального `composer.json`:
+
+```bash
+composer global require llm/skills
+```
 :::
