@@ -19,6 +19,35 @@ Testo publishes its documentation in the [llms.txt](https://llmstxt.org/) format
 | [`/llms.txt`](https://php-testo.github.io/llms.txt)           | Page list with short descriptions and best practices.  | Quick overview of available documentation.                 |
 | [`/llms-full.txt`](https://php-testo.github.io/llms-full.txt) | Full text of all documentation pages.                  | When the agent needs complete context for code generation. |
 
+## Skills for agents
+
+Alongside `llms.txt`, Testo ships a set of [**AI skills**](/blog/skills.md) — short instructions that an agent (Claude Code, Codex, and others) loads on demand when it spots a matching task. They cover writing tests, migrating from other frameworks, parameterization, benchmarks, coverage, and other scenarios. The full list lives in the [`skills/`](https://github.com/php-testo/testo/tree/1.x/skills) folder.
+
+Roughly: `llms.txt` tells the agent **what** the API offers, while a skill tells it **when** to use what and **where the pitfalls are**. When triggered, a skill sends the agent off to read `llms.txt` for the details — so documentation isn't duplicated and skills don't go stale alongside the API.
+
+### Installation via the Composer plugin
+
+To avoid copying skills by hand from `vendor/testo/testo/skills/` into wherever your agent looks for them (`.claude/skills/`, `.cursor/skills/`, etc.), there's a dedicated package — **[`llm/skills`](https://packagist.org/packages/llm/skills)** — that lays out skills from trusted Composer dependencies for you:
+
+```bash
+composer require --dev llm/skills
+```
+
+Once installed, `composer skills:update` copies skills into `.agents/skills/` (the path is configurable via `extra.skills.target` in `composer.json`). Testo is a trusted skill provider, so no extra configuration is needed. To make them visible to a specific agent, add its path to `extra.skills.aliases` — for example, `.claude/skills` for Claude Code:
+
+```json
+{
+    "extra": {
+        "skills": {
+            "aliases": [".claude/skills", ".cursor/skills"],
+            "auto-sync": true
+        }
+    }
+}
+```
+
+At those paths the plugin creates links (Windows junctions or POSIX symlinks) pointing at the main folder — the same set of skills is visible to every agent with no duplicated files.
+
 ## Typical workflow
 
 The same three steps work for new tests and for porting an existing suite:
