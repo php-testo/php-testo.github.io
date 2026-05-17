@@ -75,7 +75,20 @@ const declareTabs = [
 
 </script>
 
+<div class="home-feature">
+
+## Важное
+
 <div class="featured-post">
+<a href="/ru/blog/infection-debut" class="featured-post-card">
+  <div class="featured-post-image">
+    <img src="/blog/infection-debut/preview.png" alt="Infection + Testo" />
+  </div>
+  <div class="featured-post-body">
+    <span class="featured-post-title">Infection + Testo</span>
+    <p class="featured-post-description">Infection 0.33.0 вышел со встроенной поддержкой Testo. Мутационное тестирование теперь работает из коробки.</p>
+  </div>
+</a>
 <a href="/ru/blog/beta-testo" class="featured-post-card">
   <div class="featured-post-image">
     <img src="/blog/beta-testo/img-0.jpg" alt="Beta-тестирование открыто!" />
@@ -85,6 +98,8 @@ const declareTabs = [
     <p class="featured-post-description">Начните тестировать с Testo уже сегодня и помогите сделать его лучше к релизу!</p>
   </div>
 </a>
+</div>
+
 </div>
 
 <div class="home-feature">
