@@ -13,7 +13,7 @@ import type StateInline from 'markdown-it/lib/rules_inline/state_inline.mjs'
 import type StateBlock from 'markdown-it/lib/rules_block/state_block.mjs'
 import { getLocaleByPath, type LocaleConfig } from './locales'
 import { getEntry, getAttrEntry, getClassEntry, getEnumCaseEntry, getAllAttrEntries, type RegistryEntry } from './signature-registry'
-import { getPluginEntry, getPluginByPagePath } from './plugin-block'
+import { getPluginEntry, getPluginByPagePath, getAllPluginEntries } from './plugin-block'
 
 interface Param {
   name: string
@@ -397,6 +397,28 @@ export function funcBlockPlugin(md: MarkdownIt) {
   md.renderer.rules['attributes_list'] = (tokens, idx) => {
     const locale = tokens[idx].meta?.locale
     return renderAttributesList(md, locale)
+  }
+
+  // ── <plugins-list /> block rule ──
+
+  md.block.ruler.before('html_block', 'plugins_list', (state, startLine, _endLine, silent) => {
+    const pos = state.bMarks[startLine] + state.tShift[startLine]
+    const max = state.eMarks[startLine]
+    const line = state.src.slice(pos, max).trim()
+
+    if (line !== '<plugins-list />' && line !== '<plugins-list/>') return false
+    if (silent) return true
+
+    const token = state.push('plugins_list', '', 0)
+    const relativePath = state.env?.relativePath || ''
+    token.meta = { locale: getLocaleByPath('/' + relativePath) }
+    state.line = startLine + 1
+    return true
+  })
+
+  md.renderer.rules['plugins_list'] = (tokens, idx) => {
+    const locale = tokens[idx].meta?.locale
+    return renderPluginsList(md, locale)
   }
 
   // ── <signature> block rule (multi-line) ──
@@ -825,6 +847,111 @@ function renderAttributesList(md: MarkdownIt, locale?: LocaleConfig): string {
     html += `<td>${row.attrHtml}</td>`
     html += `<td>${row.pluginHtml}</td>`
     html += `<td>${row.shortHtml}</td>`
+    html += '</tr>\n'
+  }
+
+  html += '</tbody>\n</table>\n'
+  return html
+}
+
+// ─── <plugins-list /> renderer ──────────────────────────
+
+function renderPluginsList(md: MarkdownIt, locale?: LocaleConfig): string {
+  const localeCode = locale?.code ?? 'en'
+  const entries = getAllPluginEntries(localeCode)
+
+  if (entries.length === 0) return ''
+
+  interface PluginsTableLabels {
+    plugin: string
+    klass: string
+    setup: string
+    klassNone: string
+    statusManual: string
+    statusManualTitle: string
+    statusNone: string
+    statusNoneTitle: string
+  }
+  const tableLabels: Record<string, PluginsTableLabels> = {
+    en: {
+      plugin: 'Plugin',
+      klass: 'Class',
+      setup: 'Setup',
+      klassNone: 'no class',
+      statusManual: 'Manual',
+      statusManualTitle: 'Must be registered manually',
+      statusNone: 'Not required',
+      statusNoneTitle: 'Works via attributes — no registration needed',
+    },
+    ru: {
+      plugin: 'Плагин',
+      klass: 'Класс',
+      setup: 'Подключение',
+      klassNone: 'нет класса',
+      statusManual: 'Вручную',
+      statusManualTitle: 'Нужно подключать вручную',
+      statusNone: 'Не требуется',
+      statusNoneTitle: 'Работает через атрибуты — регистрация не нужна',
+    },
+  }
+  const l = tableLabels[localeCode] ?? tableLabels.en
+
+  // State ordering for the Setup column sort: default → manual → not required.
+  type SetupState = 'default' | 'manual' | 'none'
+  const setupOrder: Record<SetupState, string> = { default: '1', manual: '2', none: '3' }
+
+  const rows: {
+    name: string
+    klassSort: string
+    setupSort: string
+    pluginHtml: string
+    klassHtml: string
+    setupHtml: string
+  }[] = []
+
+  for (const entry of entries) {
+    const hasKlass = entry.fqn && entry.fqn.startsWith('\\')
+    const state: SetupState = entry.included ? 'default' : hasKlass ? 'manual' : 'none'
+
+    let setupHtml: string
+    let setupSortSuffix: string
+    if (state === 'default') {
+      setupHtml = `<span class="plugin-status plugin-status-default">${renderKlassRefHtml(md, entry.included!, locale)}</span>`
+      setupSortSuffix = stripNamespaceShort(entry.included!).toLowerCase()
+    } else if (state === 'manual') {
+      setupHtml = `<span class="plugin-status plugin-status-manual" title="${escapeHtml(l.statusManualTitle)}">${escapeHtml(l.statusManual)}</span>`
+      setupSortSuffix = l.statusManual.toLowerCase()
+    } else {
+      setupHtml = `<span class="plugin-status plugin-status-none" title="${escapeHtml(l.statusNoneTitle)}">${escapeHtml(l.statusNone)}</span>`
+      setupSortSuffix = l.statusNone.toLowerCase()
+    }
+
+    rows.push({
+      name: entry.name,
+      klassSort: hasKlass ? stripNamespaceShort(entry.fqn).toLowerCase() : '￿',
+      setupSort: setupOrder[state] + '_' + setupSortSuffix,
+      pluginHtml: renderPluginRefHtml(entry.name, locale),
+      klassHtml: hasKlass
+        ? renderKlassRefHtml(md, entry.fqn, locale)
+        : `<span class="plugin-klass-none">${escapeHtml(l.klassNone)}</span>`,
+      setupHtml,
+    })
+  }
+
+  rows.sort((a, b) => a.name.localeCompare(b.name))
+
+  let html = '<table class="attr-sortable plugins-list">\n'
+  html += '<thead><tr>'
+  html += `<th data-sort="name" data-dir="asc">${escapeHtml(l.plugin)}</th>`
+  html += `<th data-sort="klass">${escapeHtml(l.klass)}</th>`
+  html += `<th data-sort="setup">${escapeHtml(l.setup)}</th>`
+  html += '</tr></thead>\n<tbody>\n'
+
+  for (const row of rows) {
+    html += `<tr data-name="${escapeHtml(row.name.toLowerCase())}" data-klass="${escapeHtml(row.klassSort)}" data-setup="${escapeHtml(row.setupSort)}">`
+    html += `<td>${row.pluginHtml}</td>`
+    html += `<td>${row.klassHtml}</td>`
+    html += `<td>${row.setupHtml}</td>`
     html += '</tr>\n'
   }
 

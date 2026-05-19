@@ -929,3 +929,36 @@ a.featured-post-card:hover {
   content: ' ↓';
   opacity: 0.7;
 }
+
+/* ── Plugins list table ───────────────────────────────── */
+
+.plugins-list .plugin-klass-none {
+  color: var(--vp-c-text-3);
+  font-style: italic;
+  font-size: 0.9em;
+}
+
+.plugins-list .plugin-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  flex-wrap: wrap;
+  font-size: 0.9em;
+}
+
+.plugins-list .plugin-status-default {
+  color: var(--vp-c-success-1, var(--vp-c-green-1, #18794e));
+  font-weight: 500;
+}
+
+.plugins-list .plugin-status-manual {
+  color: var(--vp-c-warning-1, var(--vp-c-yellow-1, #b6803a));
+  font-weight: 500;
+  cursor: help;
+}
+
+.plugins-list .plugin-status-none {
+  color: var(--vp-c-text-3);
+  font-style: italic;
+  cursor: help;
+}

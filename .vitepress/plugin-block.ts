@@ -82,6 +82,11 @@ export function getPluginByPagePath(localeCode: string, pagePath: string): Plugi
   return undefined
 }
 
+export function getAllPluginEntries(localeCode: string): PluginRegistryEntry[] {
+  const map = registry.get(localeCode)
+  return map ? [...map.values()] : []
+}
+
 // ─── Pre-scan ────────────────────────────────────────────
 
 /**

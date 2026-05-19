@@ -11,6 +11,16 @@ A plugin in Testo is an independent module responsible for a specific framework 
 
 A plugin can consist of a configurator, interceptors, attributes, event listeners — in any combination. For example, the <plugin>Assert</plugin> plugin uses a configurator to register interceptors, while <plugin>Retry</plugin> has no configurator and works entirely through an attribute or interceptor.
 
+## List of plugins
+
+All plugins documented on this site are listed below. The values in the "Setup" column read as follows:
+
+- The name of a standard set (<class>\Testo\Application\Config\Plugin\SuitePlugins</class> or <class>\Testo\Application\Config\Plugin\ApplicationPlugins</class>) — the plugin is included in that set by default and works out of the box.
+- **Manual** — the plugin has a class but is not part of the standard set. It must be added to the application or Test Suite configuration.
+- **Not required** — the plugin has no configurator. It works through attributes and activates automatically as soon as an attribute appears in your tests.
+
+<plugins-list />
+
 ## Plugin configurator
 
 A configurator is a class implementing the <class>\Testo\Common\PluginConfigurator</class> interface:
