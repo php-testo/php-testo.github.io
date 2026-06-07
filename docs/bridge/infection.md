@@ -39,14 +39,9 @@ Coverage requires the PCOV or XDebug extension. See the <plugin>Codecov</plugin>
 
 Then run mutation testing as usual — through the [JetBrains IDE plugin](https://plugins.jetbrains.com/plugin/28650-infection) or from the console:
 
-::: code-group
-```bash [XDebug]
-XDEBUG_MODE=coverage vendor/bin/infection
-```
-```bash [PCOV]
+```bash
 vendor/bin/infection
 ```
-:::
 
 ## How it works
 

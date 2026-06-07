@@ -38,14 +38,9 @@ composer require --dev infection/infection testo/bridge-infection
 
 Дальше запускайте мутационное тестирование как обычно — через [плагин для IDE](https://plugins.jetbrains.com/plugin/28650-infection) или из консоли:
 
-::: code-group
-```bash [XDebug]
-XDEBUG_MODE=coverage vendor/bin/infection
-```
-```bash [PCOV]
+```bash
 vendor/bin/infection
 ```
-:::
 
 ## Как это работает
 
