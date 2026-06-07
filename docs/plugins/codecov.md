@@ -25,6 +25,10 @@ PCOV is faster and easier to set up, but only supports line coverage. XDebug is 
 
 ## Setup
 
+::: tip
+Registering the plugin in `testo.php` is optional — you can enable coverage with CLI flags alone, without touching the config. See the [CLI activation](#cli-activation) section for how.
+:::
+
 Register <class>\Testo\Codecov\CodecovPlugin</class> in the `plugins` section of your configuration:
 
 ::: code-group
@@ -176,6 +180,45 @@ new PhpUnitXmlReport(__DIR__ . '/coverage-xml')
 ```
 </example>
 </signature>
+
+## CLI activation
+
+The <plugin>Codecov</plugin> plugin is part of the default application plugin set in a "shadow" (inert) mode. Because of that, coverage can be enabled and its reports pointed at chosen paths **straight from the command line, without touching `testo.php`**. This is handy for CI, IDE plugins, and tools like [Infection](/docs/bridge/infection.md) that need a report at a known path.
+
+### Flags
+
+| Flag | Effect |
+|------|--------|
+| `--coverage` | Forces coverage collection (mode <enum>\Testo\Codecov\Config\CoverageMode::Always</enum>); fails if no driver is available. |
+| `--no-coverage` | Disables coverage entirely (mode <enum>\Testo\Codecov\Config\CoverageMode::Never</enum>). Highest priority. |
+| `--coverage-clover=<file>` | Writes a Clover report (<class>\Testo\Codecov\Report\CloverReport</class>) to the given file. |
+| `--coverage-cobertura=<file>` | Writes a Cobertura report (<class>\Testo\Codecov\Report\CoberturaReport</class>) to the given file. |
+| `--coverage-xml=<dir>` | Writes a PHPUnit Coverage XML report (<class>\Testo\Codecov\Report\PhpUnitXmlReport</class>) to the given directory — the format Infection consumes. |
+
+```bash
+# Enable coverage and produce a Clover report — without a single line in testo.php
+vendor/bin/testo run --coverage-clover=runtime/clover.xml
+
+# Several reports at once
+vendor/bin/testo run \
+    --coverage-clover=runtime/clover.xml \
+    --coverage-cobertura=runtime/cobertura.xml \
+    --coverage-xml=runtime/coverage-xml
+```
+
+### Soft activation
+
+Specifying a report path (`--coverage-clover`, `--coverage-cobertura`, `--coverage-xml`) by itself enables coverage in <enum>\Testo\Codecov\Config\CoverageMode::IfAvailable</enum> mode: if a driver (PCOV/XDebug) is present, the report is written; if not, the run silently proceeds without it. `--no-coverage` always wins and disables coverage, ignoring any report paths.
+
+### Working alongside a plugin from `testo.php`
+
+If `testo.php` already registers its own <class>\Testo\Codecov\CodecovPlugin</class>, the flag-driven reports do not conflict with it — they are **merged** into a single coverage collection:
+
+- coverage is collected **once** — no double overhead, no repeated driver-filter initialization;
+- the resulting analysis level is the deepest one requested, and test types are unioned;
+- **all** reports are generated — both those declared in `testo.php` and those passed via flags.
+
+So an IDE plugin or Infection can run Testo with their own paths in parallel with whatever the user configured, without breaking anything.
 
 ## Coverage Control
 

@@ -23,6 +23,10 @@ PCOV быстрее и проще в настройке, но поддержив
 
 ## Настройка
 
+::: tip
+Прописывать плагин в `testo.php` не обязательно — покрытие можно включить прямо из командной строки, не трогая конфиг. Как это сделать, описано в разделе [«Активация через CLI»](#активация-через-cli).
+:::
+
 Зарегистрируйте <class>\Testo\Codecov\CodecovPlugin</class> в секции `plugins` конфигурации:
 
 ::: code-group
@@ -174,6 +178,45 @@ new PhpUnitXmlReport(__DIR__ . '/coverage-xml')
 ```
 </example>
 </signature>
+
+## Активация через CLI
+
+Плагин <plugin>Codecov</plugin> входит в набор плагинов приложения по умолчанию в «теневом» (неактивном) режиме. Благодаря этому покрытие можно включить и направить отчёты в нужные пути **прямо из командной строки, не меняя `testo.php`**. Это удобно для CI, IDE-плагинов и инструментов вроде [Infection](/ru/docs/bridge/infection.md), которым важно получить отчёт по заранее известному пути.
+
+### Флаги
+
+| Флаг | Действие |
+|------|----------|
+| `--coverage` | Принудительно включает сбор покрытия (режим <enum>\Testo\Codecov\Config\CoverageMode::Always</enum>); падает, если драйвер недоступен. |
+| `--no-coverage` | Полностью отключает покрытие (режим <enum>\Testo\Codecov\Config\CoverageMode::Never</enum>). Наивысший приоритет. |
+| `--coverage-clover=<файл>` | Записывает Clover-отчёт (<class>\Testo\Codecov\Report\CloverReport</class>) в указанный файл. |
+| `--coverage-cobertura=<файл>` | Записывает Cobertura-отчёт (<class>\Testo\Codecov\Report\CoberturaReport</class>) в указанный файл. |
+| `--coverage-xml=<папка>` | Записывает PHPUnit Coverage XML (<class>\Testo\Codecov\Report\PhpUnitXmlReport</class>) в указанную папку — формат для Infection. |
+
+```bash
+# Включить покрытие и собрать Clover-отчёт — без единой строчки в testo.php
+vendor/bin/testo run --coverage-clover=runtime/clover.xml
+
+# Несколько отчётов сразу
+vendor/bin/testo run \
+    --coverage-clover=runtime/clover.xml \
+    --coverage-cobertura=runtime/cobertura.xml \
+    --coverage-xml=runtime/coverage-xml
+```
+
+### Мягкая активация
+
+Сам факт указания пути к отчёту (`--coverage-clover`, `--coverage-cobertura`, `--coverage-xml`) включает сбор покрытия в режиме <enum>\Testo\Codecov\Config\CoverageMode::IfAvailable</enum>: если драйвер (PCOV/XDebug) доступен — отчёт будет записан, если нет — запуск молча пройдёт без него. Флаг `--no-coverage` всегда побеждает и отключает покрытие, игнорируя пути отчётов.
+
+### Совместная работа с плагином из `testo.php`
+
+Если в `testo.php` уже зарегистрирован свой <class>\Testo\Codecov\CodecovPlugin</class>, флаговые отчёты не конфликтуют с ним, а **сливаются** в один сбор покрытия:
+
+- покрытие собирается **один раз** — без двойных накладных расходов и без повторной инициализации фильтра драйвера;
+- итоговый уровень анализа — самый глубокий из запрошенных, типы тестов объединяются;
+- генерируются **все** отчёты — и заданные в `testo.php`, и переданные флагами.
+
+Так IDE-плагин или Infection могут запускать Testo со своими путями параллельно с тем, что настроил пользователь, ничего не ломая.
 
 ## Управление покрытием
 

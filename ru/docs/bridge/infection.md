@@ -6,8 +6,11 @@ outline: [2, 3]
 
 [Infection](https://infection.github.io/) — инструмент [мутационного тестирования](/ru/docs/theory/mutation-testing.md) для PHP. Testo подключается к нему через отдельный адаптер `testo/bridge-infection`.
 
+::: info Пакет
+`testo/bridge-infection` — расширение для Infection. Регистрируется само через Composer, добавлять плагин в `testo.php` не нужно.
+:::
 
-## Установка
+## Настройка
 
 Поставьте Infection и пакет интеграции как dev-зависимости:
 
@@ -19,14 +22,45 @@ composer require --dev infection/infection testo/bridge-infection
 Если вы используете [Phar-архив Infection](https://infection.github.io/guide/installation.html#Phar), то адаптер устанавливать не нужно — он уже включён в состав Phar.
 :::
 
-## Конфигурация
+В настройках Infection (обычно `infection.json`) достаточно указать, что тесты запускаются через Testo:
 
-Для работы Infection требуются два отчёта от Testo:
+```json
+{
+    "$schema": "vendor/infection/infection/resources/schema.json",
+    "source": {
+        "directories": ["src"]
+    },
+    "testFramework": "testo"
+}
+```
 
-- **Coverage XML** — папка с XML-файлами в формате PHPUnit Coverage. По нему Infection понимает, какими тестами покрываются строки кода, чтобы запускать только нужный набор тестов для каждого мутанта. **Обязательно**.
-- **JUnit XML** — единый файл с результатами тестов. Помогает Infection быстро сопоставлять тест с файлом, в котором он лежит, чтобы эффективнее пользоваться фильтрами Testo. **Опционально**, но сильно рекомендуется.
+Для сбора покрытия понадобится расширение PCOV или XDebug. О настройке расширений и компромиссах между ними подробно написано на странице <plugin>Codecov</plugin>.
 
-Оба отчёта Infection ищет в фиксированной структуре:
+Дальше запускайте мутационное тестирование как обычно — через [плагин для IDE](https://plugins.jetbrains.com/plugin/28650-infection) или из консоли:
+
+::: code-group
+```bash [XDebug]
+XDEBUG_MODE=coverage vendor/bin/infection
+```
+```bash [PCOV]
+vendor/bin/infection
+```
+:::
+
+## Как это работает
+
+Этот раздел — для тех, кому интересны детали. Для обычной работы достаточно настройки выше.
+
+### Какие отчёты нужны Infection
+
+Infection берёт у Testo два отчёта:
+
+- **Coverage XML** — папка с XML-файлами в формате PHPUnit Coverage. По нему Infection понимает, какими тестами покрыта каждая строка кода, чтобы для каждого мутанта запускать только нужный набор тестов. **Обязательно**.
+- **JUnit XML** — единый файл с результатами тестов. Помогает Infection быстро сопоставлять тест с файлом, в котором он лежит, чтобы эффективнее пользоваться фильтрами Testo. **Опционально**, но рекомендуется.
+
+Оба отчёта адаптер запрашивает у Testo автоматически: на начальном прогоне он передаёт `--coverage`, `--coverage-xml=<tmpDir>/infection/coverage-xml` и `--log-junit=<tmpDir>/infection/junit.xml`. Эти флаги активируют теневой плагин <plugin>Codecov</plugin> из набора по умолчанию, поэтому отчёты генерируются, даже если в `testo.php` нет ни одного плагина покрытия.
+
+Infection ищет отчёты в фиксированной структуре относительно своей временной директории `tmpDir`:
 
 ```
 └── <tmpDir>/
@@ -35,61 +69,9 @@ composer require --dev infection/infection testo/bridge-infection
         └── junit.xml
 ```
 
-::: danger Важный момент:
-`tmpDir` мы должны указать в настройках Infection а путь до `coverage-xml` — в `testo.php`.
-::: 
+`tmpDir` — опция конфига Infection (`infection.json`); по умолчанию это системная временная папка. Подпапку `infection/` внутри неё Infection дописывает сам, а адаптер передаёт Testo уже готовые пути.
 
-### infection.json
-
-В настройках Infection (обычно `infection.json`) укажите, что вы используете Testo, и настройте временную директорию:
-
-```json
-{
-    "$schema": "vendor/infection/infection/resources/schema.json",
-    "source": {
-        "directories": ["src"]
-    },
-    "testFramework": "testo",
-    "tmpDir": "runtime",
-    "logs": {
-        "text": "runtime/infection.log",
-        "html": "runtime/infection.html"
-    }
-}
-```
-
-### testo.php
-
-Зарегистрируйте плагин <plugin>Codecov</plugin> с отчётом <class>\Testo\Codecov\Report\PhpUnitXmlReport</class>, указывающим на папку `<tmpDir>/infection/coverage-xml`:
-
-```php
-use Testo\Application\Config\ApplicationConfig;
-use Testo\Codecov\CodecovPlugin;
-use Testo\Codecov\Report\PhpUnitXmlReport;
-
-return new ApplicationConfig(
-    src: ['src'],
-    plugins: [
-        new CodecovPlugin(
-            reports: [
-                new PhpUnitXmlReport(__DIR__ . '/runtime/infection/coverage-xml'),
-            ],
-        ),
-    ],
-);
-```
-
-::: info
-Для сбора покрытия требуется расширение PCOV или XDebug. О настройке расширений и компромиссах между ними подробно написано на странице <plugin>Codecov</plugin>.
-:::
-
-## Запуск
-
-```bash
-XDEBUG_MODE=coverage vendor/bin/infection
-```
-
-Можно использовать PCOV — требования к драйверу покрытия диктует <plugin>Codecov</plugin>, а не Infection.
+### Двойной прогон
 
 Infection прогоняет Testo дважды:
 
@@ -106,4 +88,33 @@ vendor/bin/infection --coverage=runtime/infection
 
 В этом режиме Infection пропускает свой начальный прогон, а указанная директория должна содержать уже готовые отчёты.
 
-Чтобы получить эти отчёты, запустите Testo с флагами `--coverage --log-junit=<tmpDir>/infection/junit.xml` — так же, как это делает адаптер для начального прогона. Важно, чтобы структура папок и имена файлов совпадали с тем, что ожидает Infection.
+Чтобы получить эти отчёты, запустите Testo с теми же флагами, что использует адаптер на начальном прогоне:
+
+```bash
+vendor/bin/testo run --coverage \
+    --coverage-xml=runtime/infection/coverage-xml \
+    --log-junit=runtime/infection/junit.xml
+```
+
+Важно, чтобы структура папок и имена файлов совпадали с тем, что ожидает Infection.
+
+### Дополнительные отчёты
+
+Если помимо мутационного тестирования вам нужны и другие отчёты (например, Clover для Codecov.io), добавьте свой <class>\Testo\Codecov\CodecovPlugin</class> с нужными генераторами. Он не конфликтует с флагами адаптера — оба набора отчётов сливаются в один сбор покрытия (см. раздел [«Активация через CLI»](/ru/docs/plugins/codecov.md) плагина Codecov):
+
+```php
+use Testo\Application\Config\ApplicationConfig;
+use Testo\Codecov\CodecovPlugin;
+use Testo\Codecov\Report\CloverReport;
+
+return new ApplicationConfig(
+    src: ['src'],
+    plugins: [
+        new CodecovPlugin(
+            reports: [
+                new CloverReport(__DIR__ . '/runtime/clover.xml', 'MyProject'),
+            ],
+        ),
+    ],
+);
+```
