@@ -15,7 +15,7 @@ The plugin collects code coverage data during test execution and generates repor
 One of the following PHP extensions is required:
 
 - **[PCOV](https://github.com/krakjoe/pcov)** — lightweight, fast, line coverage only.
-- **[XDebug](https://xdebug.org/)** ≥ 3.0 with `coverage` mode enabled (`xdebug.mode=coverage`).
+- **[XDebug](https://xdebug.org/)** ≥ 3.1 in `coverage` mode. You can enable the mode any standard way — `xdebug.mode=coverage` in the ini file, the `-d xdebug.mode=coverage` flag, or the `XDEBUG_MODE=coverage` environment variable: Testo detects the active mode via `xdebug_info('mode')`, so the env override (used by `composer infect` and IDEs) is honored correctly.
 
 When both extensions are available, Testo prefers PCOV due to its lower overhead. If neither extension is installed, behavior depends on the plugin's activation mode (<enum>\Testo\Codecov\Config\CoverageMode</enum>).
 
@@ -189,7 +189,7 @@ The <plugin>Codecov</plugin> plugin is part of the default application plugin se
 
 | Flag | Effect |
 |------|--------|
-| `--coverage` | Forces coverage collection (mode <enum>\Testo\Codecov\Config\CoverageMode::Always</enum>); fails if no driver is available. |
+| `--coverage` | Forces coverage collection (mode <enum>\Testo\Codecov\Config\CoverageMode::Always</enum>); fails with <class>\Testo\Codecov\Exception\CoverageDriverNotAvailable</class> (non-zero exit code) if no driver is available — even when no reports are requested. This makes a bare `vendor/bin/testo run --coverage` a handy CI check that a driver is available at all. |
 | `--no-coverage` | Disables coverage entirely (mode <enum>\Testo\Codecov\Config\CoverageMode::Never</enum>). Highest priority. |
 | `--coverage-clover=<file>` | Writes a Clover report (<class>\Testo\Codecov\Report\CloverReport</class>) to the given file. |
 | `--coverage-cobertura=<file>` | Writes a Cobertura report (<class>\Testo\Codecov\Report\CoberturaReport</class>) to the given file. |

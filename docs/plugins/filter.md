@@ -1,5 +1,5 @@
 ---
-llms_description: "How to filter which tests run. Filter class with name/path/suite/type filters, OR/AND combination logic, 5-stage filtering pipeline from files to DataProvider indices."
+llms_description: "How to filter which tests run. Filter class with name/path/suite/type/group filters, #[Group] attribute with inheritance, --group include/exclude (! prefix) selection, OR/AND combination logic, 5-stage filtering pipeline from files to DataProvider indices."
 ---
 
 # Test Filtering
@@ -12,12 +12,14 @@ This document describes the internal logic of the filtering plugin: the algorith
 
 Testo provides a flexible filtering system that operates in multiple stages to progressively narrow down the test set. Filtering can be controlled programmatically via the <class>\Testo\Filter</class> class or automatically from CLI arguments.
 
-<signature h="2" name="new \Testo\Filter(array $suites = [], array $names = [], array $paths = [], ?string $type = null)">
+<signature h="2" name="new \Testo\Filter(array $suites = [], array $names = [], array $paths = [], ?string $type = null, array $groups = [], array $excludeGroups = [])">
 <short>Immutable DTO containing test filtering criteria.</short>
 <param name="$suites">Test suite names to filter by.</param>
 <param name="$names">Class, method, or function names. Formats: `ClassName::methodName`, `Namespace\ClassName`, fragment `methodName`. Optional DataProvider indices via colon: `name:providerIndex:datasetIndex`.</param>
 <param name="$paths">File or directory paths. Supports glob patterns: `*`, `?`, `[abc]`.</param>
 <param name="$type">Test type: `test`, `inline`, `bench`, or other custom type. If not specified — all types are run.</param>
+<param name="$groups">Group names to include (OR logic). A test matches if it belongs to any of these groups. See <attr>\Testo\Filter\Group</attr>.</param>
+<param name="$excludeGroups">Group names to exclude. A test in any of these groups is skipped — exclusion wins over inclusion.</param>
 <example>
 ```php
 $filter = new Filter(
@@ -25,6 +27,8 @@ $filter = new Filter(
     names: ['UserTest::testLogin', 'testAuthentication'],
     paths: ['tests/Unit/*', 'tests/Integration/*'],
     type: 'test',
+    groups: ['database'],
+    excludeGroups: ['slow'],
 );
 ```
 </example>
@@ -32,7 +36,7 @@ $filter = new Filter(
 
 ### Usage
 
-**Via CLI options** — when creating via `Application::createFromInput()`, the plugin automatically creates <class>\Testo\Filter</class> from command options: `--filter`, `--path`, `--suite`, `--type`:
+**Via CLI options** — when creating via `Application::createFromInput()`, the plugin automatically creates <class>\Testo\Filter</class> from command options: `--filter`, `--path`, `--suite`, `--type`, `--group`:
 
 ```php
 $app = Application::createFromInput(
@@ -74,7 +78,7 @@ Different filter types are combined with AND logic:
 - `names: ['UserTest'], paths: ['tests/Unit/*']` → matches if name is UserTest **AND** path matches tests/Unit/*
 - `names: ['test1'], type: 'inline'` → matches if name is test1 **AND** type is inline
 
-**Formula**: `AND(OR(names), OR(paths), OR(suites), type)`
+**Formula**: `AND(OR(names), OR(paths), OR(suites), type, OR(groups), NOT OR(excludeGroups))`
 
 **Example:**
 ```php
@@ -85,6 +89,53 @@ $filter = new Filter(
     type: 'test',                     // regular tests only
 );
 // Result: (test1 OR test2) AND (path1 OR path2) AND (Unit OR Critical) AND type=test
+```
+
+## Filtering by Groups
+
+Groups are flat string labels you attach to tests with the <attr>\Testo\Filter\Group</attr> attribute. Unlike names and paths, they don't depend on how a test is named or where it lives — you mark tests by category (`db`, `slow`, `integration`) and then run or skip whole categories at once.
+
+<signature h="2" name="#[\Testo\Filter\Group(string ...$names)]">
+<short>Labels a class, method, or function with one or more group names for selective filtering.</short>
+<description>
+The attribute is variadic — pass several group names at once. Groups have no key/value semantics; they're plain string labels.
+
+The effective group set of a test is the **union** of all groups reachable from it: the test method (including any parent method it overrides), the test class, its parent classes, and traits. So a group declared on a class is inherited by every test in it.
+</description>
+<param name="$names">Group labels to assign.</param>
+<example>
+```php
+#[Test]
+#[Group('integration')]
+final class OrderTest
+{
+    public function createsOrder(): void {}            // groups: integration
+
+    #[Group('slow')]
+    public function importsLargeDataset(): void {}     // groups: integration, slow
+}
+```
+</example>
+</signature>
+
+Selection happens through the `--group` CLI flag (or the `$groups` / `$excludeGroups` properties of the <class>\Testo\Filter</class> DTO):
+
+- **Include** — `--group=db` runs only tests in group `db`. Multiple `--group` values use OR logic.
+- **Exclude** — the `!` prefix marks an exclusion: `--group=!slow` skips tests in group `slow`. Exclusion always wins over inclusion.
+- Group filters combine with name, path, suite, and type filters using AND logic.
+
+```bash
+# Only tests in the "database" group
+testo run --group=database
+
+# Tests in "database" OR "unit"
+testo run --group=database --group=unit
+
+# Everything except the "slow" group
+testo run --group=!slow
+
+# Combine with a name filter (AND)
+testo run --group=database --filter=UserTest
 ```
 
 ## Name Filter Behavior

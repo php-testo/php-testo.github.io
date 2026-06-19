@@ -206,6 +206,10 @@ Assert::iterable($users)
 <short>Checks that the collection contains the given value.</short>
 </signature>
 
+<signature compact h="4" name="\Testo\Assert\Api\Builtin\IterableType::notContains(mixed $needle, string $message = ''): static">
+<short>Checks that the collection does not contain the given value.</short>
+</signature>
+
 <signature compact h="4" name="\Testo\Assert\Api\Builtin\IterableType::sameSizeAs(iterable $expected, string $message = ''): static">
 <short>Checks that the number of elements matches another collection.</short>
 </signature>

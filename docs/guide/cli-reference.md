@@ -1,5 +1,5 @@
 ---
-llms_description: "How to run Testo from the command line. Available flags: --config, --teamcity, --suite, --path, --filter, --type. Filter combination logic (OR within type, AND across types), exit codes."
+llms_description: "How to run Testo from the command line. Available flags: --config, --teamcity, --json, --log-json, --log-junit, --suite, --path, --filter, --type, --group. Filter combination logic (OR within type, AND across types), group include/exclude selection, JSON output for agents and CI, exit codes."
 ---
 
 # Command Line Interface
@@ -64,14 +64,44 @@ testo --teamcity
 testo --suite=Unit --teamcity
 ```
 
+#### `--json`
+
+Render the whole run as a single minimalistic JSON object on stdout — and nothing else. The JSON report is meant for machine consumers: AI agents and CI scripts that need to parse results instead of scraping the ANSI output.
+
+The report contains only what's needed to act on a failing run: the overall `status`, `duration`, per-status `totals`, and a flat `failures[]` list. Each failure carries the test FQN, exception type, message, file and line, a trimmed stack trace, the chain of previous exceptions (`causedBy`), and any captured output.
+
+`--json` is mutually exclusive with `--teamcity` — both render to stdout. To get JSON alongside a human-readable run, use `--log-json` instead.
+
+```bash
+testo --json
+testo --suite=Unit --json
+```
+
+#### `--log-json`
+
+Write the JSON report to a file while keeping the regular terminal output active. Mirrors `--log-junit`.
+
+```bash
+testo --log-json=runtime/report.json
+testo --suite=Unit --log-json=runtime/report.json
+```
+
+#### `--log-junit`
+
+Write a JUnit XML report to the given path (overrides the JUnit plugin config). Keeps the terminal output active.
+
+```bash
+testo --log-junit=runtime/junit.xml
+```
+
 ### Filtering
 
-Testo provides three types of filters that can be combined to selectively run tests.
+Testo provides several filters that can be combined to selectively run tests.
 
 **Filter Combination Logic:**
 - Same type filters use OR logic: `--filter=test1 --filter=test2` → test1 OR test2
 - Different type filters use AND logic: `--filter=test1 --suite=Unit` → test1 AND Unit
-- Formula: `AND(OR(filters), OR(paths), OR(suites), type)`
+- Formula: `AND(OR(filters), OR(paths), OR(suites), type, OR(groups), NOT OR(excludeGroups))`
 
 For detailed information about filtering behavior, see [Filtering](../plugins/filter.md).
 
@@ -178,6 +208,32 @@ testo run --type=inline --filter=testLogin
 ::: info Middleware and test types
 Middleware bound to a specific test type is excluded from the pipeline if the type doesn't match the one specified in `--type`.
 :::
+
+#### `--group`
+
+Filter tests by group. Groups are flat labels attached to tests with the <attr>\Testo\Filter\Group</attr> attribute.
+
+**Repeatable:** Yes (OR logic)
+
+- A plain name **includes** a group: `--group=database`.
+- A `!` prefix **excludes** a group: `--group=!slow`. Exclusion wins over inclusion.
+
+**Examples:**
+```bash
+# Only tests in the "database" group
+testo run --group=database
+
+# Tests in "database" OR "integration"
+testo run --group=database --group=integration
+
+# Everything except the "slow" group
+testo run --group=!slow
+
+# Combine with a name filter (AND)
+testo run --group=database --filter=UserTest
+```
+
+See [Filtering by Groups](../plugins/filter.md#filtering-by-groups) for inheritance rules.
 
 ### Combining Filters
 

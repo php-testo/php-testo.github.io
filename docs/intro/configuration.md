@@ -90,8 +90,8 @@ If the `plugins` array is not specified, Testo uses the default plugin set.
 You can check the default plugin list in the <class>\Testo\Application\Config\Plugin\ApplicationPlugins</class> class.
 
 Currently:
-- [Filter](../plugins/filter.md)
-- **Terminal** and **Teamcity** depending on the `--teamcity` flag
+- <plugin>Filter</plugin>
+- **Terminal**, **Teamcity**, or **JSON** depending on the `--teamcity` / `--json` flags
 :::
 
 ::: question Which Test Suite plugins are enabled by default?

@@ -12,12 +12,14 @@ outline: [2, 3]
 
 Testo предоставляет гибкую систему фильтрации, которая работает в несколько этапов для последовательного сужения набора тестов. Фильтрацией можно управлять программно через класс <class>\Testo\Filter</class> или автоматически из аргументов CLI.
 
-<signature h="2" name="new \Testo\Filter(array $suites = [], array $names = [], array $paths = [], ?string $type = null)">
+<signature h="2" name="new \Testo\Filter(array $suites = [], array $names = [], array $paths = [], ?string $type = null, array $groups = [], array $excludeGroups = [])">
 <short>Неизменяемый DTO с критериями фильтрации тестов.</short>
 <param name="$suites">Названия Test Suite для фильтрации.</param>
 <param name="$names">Имена классов, методов или функций. Форматы: `ClassName::methodName`, `Namespace\ClassName`, фрагмент `methodName`. Опциональные индексы DataProvider через двоеточие: `name:providerIndex:datasetIndex`.</param>
 <param name="$paths">Пути к файлам или директориям. Поддерживает glob-паттерны: `*`, `?`, `[abc]`.</param>
 <param name="$type">Тип тестов: `test`, `inline`, `bench` или другой пользовательский. Если не указан — запускаются все типы.</param>
+<param name="$groups">Названия групп для включения (логика ИЛИ). Тест совпадает, если входит в любую из этих групп. См. <attr>\Testo\Filter\Group</attr>.</param>
+<param name="$excludeGroups">Названия групп для исключения. Тест из любой такой группы пропускается — исключение имеет приоритет над включением.</param>
 <example>
 ```php
 $filter = new Filter(
@@ -25,6 +27,8 @@ $filter = new Filter(
     names: ['UserTest::testLogin', 'testAuthentication'],
     paths: ['tests/Unit/*', 'tests/Integration/*'],
     type: 'test',
+    groups: ['database'],
+    excludeGroups: ['slow'],
 );
 ```
 </example>
@@ -32,7 +36,7 @@ $filter = new Filter(
 
 ### Использование
 
-**Через CLI-опции** — при создании через `Application::createFromInput()` плагин автоматически создаёт <class>\Testo\Filter</class> из опций команды: `--filter`, `--path`, `--suite`, `--type`:
+**Через CLI-опции** — при создании через `Application::createFromInput()` плагин автоматически создаёт <class>\Testo\Filter</class> из опций команды: `--filter`, `--path`, `--suite`, `--type`, `--group`:
 
 ```php
 $app = Application::createFromInput(
@@ -72,7 +76,7 @@ $result = $app->run();
 - `names: ['UserTest'], paths: ['tests/Unit/*']` → совпадает, если имя UserTest **И** путь соответствует tests/Unit/*
 - `names: ['test1'], type: 'inline'` → совпадает, если имя test1 **И** тип - inline
 
-**Формула**: `AND(OR(names), OR(paths), OR(suites), type)`
+**Формула**: `AND(OR(names), OR(paths), OR(suites), type, OR(groups), NOT OR(excludeGroups))`
 
 **Пример:**
 ```php
@@ -83,6 +87,53 @@ $filter = new Filter(
     type: 'test',                     // только обычные тесты
 );
 // Результат: (test1 ИЛИ test2) И (path1 ИЛИ path2) И (Unit ИЛИ Critical) И type=test
+```
+
+## Фильтрация по группам
+
+Группы — это простые строковые метки, которые вы навешиваете на тесты атрибутом <attr>\Testo\Filter\Group</attr>. В отличие от имён и путей, они не зависят от того, как тест назван и где лежит: вы помечаете тесты по категориям (`db`, `slow`, `integration`), а затем запускаете или пропускаете целые категории разом.
+
+<signature h="2" name="#[\Testo\Filter\Group(string ...$names)]">
+<short>Помечает класс, метод или функцию одной или несколькими группами для выборочной фильтрации.</short>
+<description>
+Можно указать сразу несколько названий групп. Это просто строковые метки без структуры «ключ-значение».
+
+Тест попадает во все группы, которые объявлены где-либо на пути к нему: на самом методе (и на родительском методе, который он переопределяет), на классе теста, на его родительских классах и трейтах. Все эти группы **складываются**, поэтому группа, объявленная на классе, действует для каждого теста внутри него.
+</description>
+<param name="$names">Названия групп для присвоения.</param>
+<example>
+```php
+#[Test]
+#[Group('integration')]
+final class OrderTest
+{
+    public function createsOrder(): void {}            // группы: integration
+
+    #[Group('slow')]
+    public function importsLargeDataset(): void {}     // группы: integration, slow
+}
+```
+</example>
+</signature>
+
+Выбор тестов выполняется через CLI-флаг `--group` (или свойства `$groups` / `$excludeGroups` DTO <class>\Testo\Filter</class>):
+
+- **Включение** — `--group=db` запускает только тесты из группы `db`. Несколько значений `--group` комбинируются логикой ИЛИ.
+- **Исключение** — префикс `!` означает исключение: `--group=!slow` пропускает тесты из группы `slow`. Исключение всегда имеет приоритет над включением.
+- Фильтры по группам комбинируются с фильтрами по имени, пути, Test Suite и типу логикой И.
+
+```bash
+# Только тесты из группы "database"
+testo run --group=database
+
+# Тесты из "database" ИЛИ "unit"
+testo run --group=database --group=unit
+
+# Всё, кроме группы "slow"
+testo run --group=!slow
+
+# Комбинация с фильтром по имени (И)
+testo run --group=database --filter=UserTest
 ```
 
 ## Поведение фильтра по именам

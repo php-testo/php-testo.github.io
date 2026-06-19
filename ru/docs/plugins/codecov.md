@@ -13,7 +13,7 @@ outline: [2, 4]
 Для сбора покрытия нужно одно из PHP-расширений:
 
 - **[PCOV](https://github.com/krakjoe/pcov)** — легковесное, быстрое, только построчное покрытие.
-- **[XDebug](https://xdebug.org/)** ≥ 3.0 в режиме `coverage` (`xdebug.mode=coverage`).
+- **[XDebug](https://xdebug.org/)** ≥ 3.1 в режиме `coverage`. Режим можно задать любым штатным способом — `xdebug.mode=coverage` в ini, флагом `-d xdebug.mode=coverage` или переменной окружения `XDEBUG_MODE=coverage`: Testo определяет активный режим через `xdebug_info('mode')`, поэтому env-override (которым пользуются `composer infect` и IDE) учитывается корректно.
 
 Если доступны оба расширения, Testo предпочитает PCOV — у него меньше накладных расходов. Если не установлено ни одно из расширений, поведение зависит от режима активации плагина (<enum>\Testo\Codecov\Config\CoverageMode</enum>).
 
@@ -187,7 +187,7 @@ new PhpUnitXmlReport(__DIR__ . '/coverage-xml')
 
 | Флаг | Действие |
 |------|----------|
-| `--coverage` | Принудительно включает сбор покрытия (режим <enum>\Testo\Codecov\Config\CoverageMode::Always</enum>); падает, если драйвер недоступен. |
+| `--coverage` | Принудительно включает сбор покрытия (режим <enum>\Testo\Codecov\Config\CoverageMode::Always</enum>); падает с <class>\Testo\Codecov\Exception\CoverageDriverNotAvailable</class> (ненулевой код выхода), если драйвер недоступен — даже без указанных отчётов. Поэтому «голый» `vendor/bin/testo run --coverage` удобен как CI-проверка, что драйвер вообще доступен. |
 | `--no-coverage` | Полностью отключает покрытие (режим <enum>\Testo\Codecov\Config\CoverageMode::Never</enum>). Наивысший приоритет. |
 | `--coverage-clover=<файл>` | Записывает Clover-отчёт (<class>\Testo\Codecov\Report\CloverReport</class>) в указанный файл. |
 | `--coverage-cobertura=<файл>` | Записывает Cobertura-отчёт (<class>\Testo\Codecov\Report\CoberturaReport</class>) в указанный файл. |
