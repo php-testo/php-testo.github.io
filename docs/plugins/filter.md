@@ -12,12 +12,13 @@ This document describes the internal logic of the filtering plugin: the algorith
 
 Testo provides a flexible filtering system that operates in multiple stages to progressively narrow down the test set. Filtering can be controlled programmatically via the <class>\Testo\Filter</class> class or automatically from CLI arguments.
 
-<signature h="2" name="new \Testo\Filter(array $suites = [], array $names = [], array $paths = [], ?string $type = null, array $groups = [], array $excludeGroups = [])">
+<signature h="2" name="new \Testo\Filter(array $suites = [], array $names = [], array $paths = [], array $type = [], array $notType = [], array $groups = [], array $excludeGroups = [])">
 <short>Immutable DTO containing test filtering criteria.</short>
 <param name="$suites">Test suite names to filter by.</param>
 <param name="$names">Class, method, or function names. Formats: `ClassName::methodName`, `Namespace\ClassName`, fragment `methodName`. Optional DataProvider indices via colon: `name:providerIndex:datasetIndex`.</param>
 <param name="$paths">File or directory paths. Supports glob patterns: `*`, `?`, `[abc]`.</param>
-<param name="$type">Test type: `test`, `inline`, `bench`, or other custom type. If not specified — all types are run.</param>
+<param name="$type">Test types to include (OR logic): `test`, `inline`, `bench`, or custom. An empty list runs all types. See <attr>\Testo\Core\Value\TestType</attr>.</param>
+<param name="$notType">Test types to exclude. A test of such a type is skipped — exclusion wins over inclusion.</param>
 <param name="$groups">Group names to include (OR logic). A test matches if it belongs to any of these groups. See <attr>\Testo\Filter\Group</attr>.</param>
 <param name="$excludeGroups">Group names to exclude. A test in any of these groups is skipped — exclusion wins over inclusion.</param>
 <example>
@@ -26,7 +27,8 @@ $filter = new Filter(
     suites: ['Unit', 'Integration'],
     names: ['UserTest::testLogin', 'testAuthentication'],
     paths: ['tests/Unit/*', 'tests/Integration/*'],
-    type: 'test',
+    type: ['test'],
+    notType: ['bench'],
     groups: ['database'],
     excludeGroups: ['slow'],
 );
@@ -76,9 +78,9 @@ Different filter types are combined with AND logic:
 
 - `names: ['test1'], suites: ['Unit']` → matches if name is test1 **AND** suite is Unit
 - `names: ['UserTest'], paths: ['tests/Unit/*']` → matches if name is UserTest **AND** path matches tests/Unit/*
-- `names: ['test1'], type: 'inline'` → matches if name is test1 **AND** type is inline
+- `names: ['test1'], type: ['inline']` → matches if name is test1 **AND** type is inline
 
-**Formula**: `AND(OR(names), OR(paths), OR(suites), type, OR(groups), NOT OR(excludeGroups))`
+**Formula**: `AND(OR(names), OR(paths), OR(suites), OR(type), NOT OR(notType), OR(groups), NOT OR(excludeGroups))`
 
 **Example:**
 ```php
@@ -86,10 +88,37 @@ $filter = new Filter(
     names: ['test1', 'test2'],        // test1 OR test2
     paths: ['path1', 'path2'],        // path1 OR path2
     suites: ['Unit', 'Critical'],     // Unit OR Critical
-    type: 'test',                     // regular tests only
+    type: ['test'],                   // regular tests only
 );
 // Result: (test1 OR test2) AND (path1 OR path2) AND (Unit OR Critical) AND type=test
 ```
+
+## Filtering by Type
+
+A type is the kind of test: `test` (regular `#[Test]`), `inline` (<attr>\Testo\Inline\TestInline</attr>), `bench` (<attr>\Testo\Bench\Bench</attr>), or custom. See <attr>\Testo\Core\Value\TestType</attr>.
+
+Unlike groups, the type filter does **not** work per individual test — it works at the pipeline level: it selects which locator interceptors (and other middleware) take part in the pipeline based on their declared type (<attr>\Testo\Pipeline\Attribute\InterceptorOptions</attr>, the `testType` parameter). Every locator that produces tests of a given type declares that type; universal middleware (no `testType`) always runs.
+
+Selection is done via the `--type` CLI flag (or the `$type` / `$notType` properties of the <class>\Testo\Filter</class> DTO):
+
+- **Inclusion** — `--type=bench` keeps only the `bench` type. Multiple `--type` values combine with OR.
+- **Exclusion** — a leading `!` means exclusion: `--type=!bench` runs everything except benches. Exclusion always wins over inclusion.
+- Type filters combine with name, path, Test Suite, and group filters using AND.
+
+```bash
+# Benchmarks only
+testo run --type=bench
+
+# Regular tests OR inline tests
+testo run --type=test --type=inline
+
+# Everything except benches
+testo run --type=!bench
+```
+
+::: tip A type passes when
+A type `t` passes when it is in the include list (or the include list is empty) **and** it is not in the exclude list. An interceptor stays in the pipeline when it is universal (no `testType`) or at least one of its declared types passes.
+:::
 
 ## Filtering by Groups
 

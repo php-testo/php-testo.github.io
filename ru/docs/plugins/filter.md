@@ -12,12 +12,13 @@ outline: [2, 3]
 
 Testo предоставляет гибкую систему фильтрации, которая работает в несколько этапов для последовательного сужения набора тестов. Фильтрацией можно управлять программно через класс <class>\Testo\Filter</class> или автоматически из аргументов CLI.
 
-<signature h="2" name="new \Testo\Filter(array $suites = [], array $names = [], array $paths = [], ?string $type = null, array $groups = [], array $excludeGroups = [])">
+<signature h="2" name="new \Testo\Filter(array $suites = [], array $names = [], array $paths = [], array $type = [], array $notType = [], array $groups = [], array $excludeGroups = [])">
 <short>Неизменяемый DTO с критериями фильтрации тестов.</short>
 <param name="$suites">Названия Test Suite для фильтрации.</param>
 <param name="$names">Имена классов, методов или функций. Форматы: `ClassName::methodName`, `Namespace\ClassName`, фрагмент `methodName`. Опциональные индексы DataProvider через двоеточие: `name:providerIndex:datasetIndex`.</param>
 <param name="$paths">Пути к файлам или директориям. Поддерживает glob-паттерны: `*`, `?`, `[abc]`.</param>
-<param name="$type">Тип тестов: `test`, `inline`, `bench` или другой пользовательский. Если не указан — запускаются все типы.</param>
+<param name="$type">Типы тестов для включения (логика ИЛИ): `test`, `inline`, `bench` или пользовательские. Пустой список — запускаются все типы. См. <attr>\Testo\Core\Value\TestType</attr>.</param>
+<param name="$notType">Типы тестов для исключения. Тест такого типа пропускается — исключение имеет приоритет над включением.</param>
 <param name="$groups">Названия групп для включения (логика ИЛИ). Тест совпадает, если входит в любую из этих групп. См. <attr>\Testo\Filter\Group</attr>.</param>
 <param name="$excludeGroups">Названия групп для исключения. Тест из любой такой группы пропускается — исключение имеет приоритет над включением.</param>
 <example>
@@ -26,7 +27,8 @@ $filter = new Filter(
     suites: ['Unit', 'Integration'],
     names: ['UserTest::testLogin', 'testAuthentication'],
     paths: ['tests/Unit/*', 'tests/Integration/*'],
-    type: 'test',
+    type: ['test'],
+    notType: ['bench'],
     groups: ['database'],
     excludeGroups: ['slow'],
 );
@@ -74,9 +76,9 @@ $result = $app->run();
 
 - `names: ['test1'], suites: ['Unit']` → совпадает, если имя test1 **И** Test Suite - Unit
 - `names: ['UserTest'], paths: ['tests/Unit/*']` → совпадает, если имя UserTest **И** путь соответствует tests/Unit/*
-- `names: ['test1'], type: 'inline'` → совпадает, если имя test1 **И** тип - inline
+- `names: ['test1'], type: ['inline']` → совпадает, если имя test1 **И** тип - inline
 
-**Формула**: `AND(OR(names), OR(paths), OR(suites), type, OR(groups), NOT OR(excludeGroups))`
+**Формула**: `AND(OR(names), OR(paths), OR(suites), OR(type), NOT OR(notType), OR(groups), NOT OR(excludeGroups))`
 
 **Пример:**
 ```php
@@ -84,10 +86,37 @@ $filter = new Filter(
     names: ['test1', 'test2'],        // test1 ИЛИ test2
     paths: ['path1', 'path2'],        // path1 ИЛИ path2
     suites: ['Unit', 'Critical'],     // Unit ИЛИ Critical
-    type: 'test',                     // только обычные тесты
+    type: ['test'],                   // только обычные тесты
 );
 // Результат: (test1 ИЛИ test2) И (path1 ИЛИ path2) И (Unit ИЛИ Critical) И type=test
 ```
+
+## Фильтрация по типу
+
+Тип — это вид теста: `test` (обычные `#[Test]`), `inline` (<attr>\Testo\Inline\TestInline</attr>), `bench` (<attr>\Testo\Bench\Bench</attr>) или пользовательский. См. <attr>\Testo\Core\Value\TestType</attr>.
+
+В отличие от групп, фильтр по типу работает **не на уровне отдельных тестов**, а на уровне конвейера: он отбирает, какие interceptor'ы-локаторы (и другие мидлвари) участвуют в пайплайне, исходя из объявленного у них типа (<attr>\Testo\Pipeline\Attribute\InterceptorOptions</attr>, параметр `testType`). Каждый локатор, порождающий тесты определённого типа, объявляет этот тип; универсальные мидлвари (без `testType`) работают всегда.
+
+Выбор выполняется через CLI-флаг `--type` (или свойства `$type` / `$notType` DTO <class>\Testo\Filter</class>):
+
+- **Включение** — `--type=bench` оставляет только тип `bench`. Несколько значений `--type` комбинируются логикой ИЛИ.
+- **Исключение** — префикс `!` означает исключение: `--type=!bench` запускает всё, кроме бенчей. Исключение всегда имеет приоритет над включением.
+- Фильтры по типу комбинируются с фильтрами по имени, пути, Test Suite и группам логикой И.
+
+```bash
+# Только бенчмарки
+testo run --type=bench
+
+# Обычные тесты ИЛИ встроенные
+testo run --type=test --type=inline
+
+# Всё, кроме бенчей
+testo run --type=!bench
+```
+
+::: tip Тип проходит, если
+Тип `t` проходит, когда он есть в списке включения (или список включения пуст) **и** его нет в списке исключения. Interceptor остаётся в пайплайне, если он универсальный (без `testType`) либо хотя бы один из объявленных у него типов проходит.
+:::
 
 ## Фильтрация по группам
 
