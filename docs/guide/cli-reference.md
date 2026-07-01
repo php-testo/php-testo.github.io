@@ -1,5 +1,5 @@
 ---
-llms_description: "How to run Testo from the command line. Available flags: --config, --teamcity, --json, --log-json, --log-junit, --suite, --path, --filter, --type, --group. Filter combination logic (OR within type, AND across types), group include/exclude selection, JSON output for agents and CI, exit codes."
+llms_description: "How to run Testo from the command line. Available flags: --config, --teamcity, --json, --log-json, --log-junit, --suite, --path, --filter, --type, --group. Filter combination logic (OR within type, AND across types), type and group include/exclude selection (leading ! excludes), JSON output for agents and CI, exit codes."
 ---
 
 # Command Line Interface
@@ -101,7 +101,7 @@ Testo provides several filters that can be combined to selectively run tests.
 **Filter Combination Logic:**
 - Same type filters use OR logic: `--filter=test1 --filter=test2` → test1 OR test2
 - Different type filters use AND logic: `--filter=test1 --suite=Unit` → test1 AND Unit
-- Formula: `AND(OR(filters), OR(paths), OR(suites), type, OR(groups), NOT OR(excludeGroups))`
+- Formula: `AND(OR(filters), OR(paths), OR(suites), OR(type), NOT OR(notType), OR(groups), NOT OR(excludeGroups))`
 
 For detailed information about filtering behavior, see [Filtering](../plugins/filter.md).
 
@@ -182,31 +182,39 @@ testo run --filter=UserTest --path="tests/Unit"
 
 #### `--type`
 
-Filter tests by type. If specified, only tests of the matching type are run.
+Filter tests by type.
+
+**Repeatable:** Yes (OR logic)
 
 **Possible values:**
 - `test` — regular tests (methods in classes)
 - `inline` — [inline tests](../plugins/inline.md) (tests via <attr>\Testo\Inline\TestInline</attr>)
 - `bench` — [benchmarks](../plugins/bench.md)
 
+- A plain name **includes** a type: `--type=bench`. Multiple values combine with OR.
+- A leading `!` **excludes** a type: `--type=!bench`. Exclusion wins over inclusion.
+
 **Examples:**
 ```bash
 # Regular tests only
 testo run --type=test
 
-# Inline tests only
-testo run --type=inline
+# Regular tests OR inline tests
+testo run --type=test --type=inline
 
 # Benchmarks only
 testo run --type=bench
 
-# Combine with other filters
+# Everything except benchmarks
+testo run --type=!bench
+
+# Combine with other filters (AND)
 testo run --type=test --suite=Unit
 testo run --type=inline --filter=testLogin
 ```
 
 ::: info Middleware and test types
-Middleware bound to a specific test type is excluded from the pipeline if the type doesn't match the one specified in `--type`.
+The type filter works at the pipeline level: middleware (and test locators) bound to a specific type are excluded from the pipeline when their type doesn't pass the filter. See [Filtering by Type](/docs/plugins/filter.md#filtering-by-type) for details.
 :::
 
 #### `--group`

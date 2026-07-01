@@ -74,6 +74,10 @@ Infection runs Testo twice:
 1. **Initial run** — executes the full test suite against the original source, collecting coverage and a JUnit log. This is the slow phase: every test runs and the coverage driver is active.
 2. **Mutant runs** — for each mutant, Infection picks only the tests that touch the mutated lines and runs them. Coverage is not collected here, so each mutant runs quickly.
 
+::: info Benches are excluded
+On both runs the adapter passes `--type=!bench`: benches are slow and timing-based and carry no meaningful pass/fail signal for mutation testing, so they are excluded from Infection runs.
+:::
+
 ### Reusing existing coverage
 
 If a coverage report has already been generated — for example, in an earlier CI step — you can hand it to Infection instead of triggering a fresh Testo run via the [`--coverage` flag](https://infection.github.io/guide/command-line-options.html#coverage):
