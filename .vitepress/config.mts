@@ -113,6 +113,7 @@ gtag('config', 'G-VYGDN3X0PR');`],
               text: 'Integrations',
               items: [
                 { text: 'Infection', link: '/docs/bridge/infection.md' },
+                { text: 'Mockery', link: '/docs/bridge/mockery.md' },
               ],
             },
             {
@@ -189,6 +190,7 @@ gtag('config', 'G-VYGDN3X0PR');`],
               text: 'Интеграции',
               items: [
                 { text: 'Infection', link: '/ru/docs/bridge/infection.md' },
+                { text: 'Mockery', link: '/ru/docs/bridge/mockery.md' },
               ],
             },
             {
