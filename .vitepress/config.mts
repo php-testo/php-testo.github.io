@@ -114,6 +114,7 @@ gtag('config', 'G-VYGDN3X0PR');`],
               items: [
                 { text: 'Infection', link: '/docs/bridge/infection.md' },
                 { text: 'Mockery', link: '/docs/bridge/mockery.md' },
+                { text: 'Rector', link: '/docs/bridge/rector.md' },
               ],
             },
             {
@@ -191,6 +192,7 @@ gtag('config', 'G-VYGDN3X0PR');`],
               items: [
                 { text: 'Infection', link: '/ru/docs/bridge/infection.md' },
                 { text: 'Mockery', link: '/ru/docs/bridge/mockery.md' },
+                { text: 'Rector', link: '/ru/docs/bridge/rector.md' },
               ],
             },
             {
