@@ -1,6 +1,6 @@
 ---
 outline: [2, 3]
-llms_description: "How to write assertions in Testo tests. Two facades: Assert for immediate checks (same, equals, true, null, blank, fail), typed assertion chains (string, int, float, array, iterable, object, json) with fluent API; Expect for post-test expectations (exception with message/code/previous matching, memory leak detection). Start here to understand assertion syntax and available checks."
+llms_description: "How to write assertions in Testo tests. Two facades: Assert for immediate checks (same, equals, true, null, blank, fail), typed assertion chains (string, int, float, array, iterable, object, json) with fluent API; Expect for post-test expectations (exception with message/code/previous matching, memory leak detection). #[ExpectNoAssertions] marks a test that intentionally asserts nothing so it stays Passed instead of Risky. Start here to understand assertion syntax and available checks."
 ---
 
 # Assert
@@ -522,6 +522,33 @@ public function cachePersistsObjects(): void
 
     Expect::leaks($entity);
     // After the test, Testo will verify that $entity is still held in memory (by the cache)
+}
+```
+</example>
+</signature>
+
+## No Assertions
+
+By default, a test that finishes without recording a single assertion is reported as <enum>\Testo\Core\Value\Status::Risky</enum> — Testo assumes you forgot to check something. But sometimes a test really is meant to assert nothing: it only needs to make sure a call doesn't throw. The <attr>\Testo\Assert\ExpectNoAssertions</attr> attribute declares exactly that.
+
+<signature h="3" name="#[\Testo\Assert\ExpectNoAssertions]">
+<short>Declares that a test intentionally performs no assertions.</short>
+<description>
+This is a two-way contract, checked when the run finishes:
+
+- a marked test that records **no** assertions stays <enum>\Testo\Core\Value\Status::Passed</enum> instead of being flagged as risky;
+- a marked test that nevertheless records an assertion becomes <enum>\Testo\Core\Value\Status::Risky</enum> — the declaration no longer holds, so the attribute is stale or misapplied.
+
+Expecting an exception (via <func>\Testo\Expect::exception()</func> or <attr>\Testo\Assert\ExpectException</attr>) counts as an assertion, so pairing it with this attribute is contradictory and comes out risky.
+</description>
+<example>
+```php
+#[Test]
+#[ExpectNoAssertions]
+public function bootDoesNotThrow(): void
+{
+    // Success is simply reaching the end without an exception
+    $this->app->boot();
 }
 ```
 </example>

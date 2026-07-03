@@ -525,3 +525,30 @@ public function cachePersistsObjects(): void
 ```
 </example>
 </signature>
+
+## Тесты без проверок
+
+По умолчанию тест, который завершился, не записав ни одной проверки, помечается статусом <enum>\Testo\Core\Value\Status::Risky</enum> — Testo считает, что вы забыли что-то проверить. Но иногда тест действительно ничего не проверяет: ему достаточно убедиться, что вызов не выбросил исключение. Именно это и объявляет атрибут <attr>\Testo\Assert\ExpectNoAssertions</attr>.
+
+<signature h="3" name="#[\Testo\Assert\ExpectNoAssertions]">
+<short>Объявляет, что тест намеренно не выполняет проверок.</short>
+<description>
+Это двусторонний контракт, который проверяется в конце прогона:
+
+- помеченный тест, не записавший **ни одной** проверки, остаётся в статусе <enum>\Testo\Core\Value\Status::Passed</enum> вместо того, чтобы стать рискованным;
+- помеченный тест, который всё же записал проверку, становится <enum>\Testo\Core\Value\Status::Risky</enum> — объявление больше не выполняется, а значит, атрибут устарел или применён по ошибке.
+
+Ожидание исключения (через <func>\Testo\Expect::exception()</func> или <attr>\Testo\Assert\ExpectException</attr>) само по себе является проверкой, поэтому сочетать его с этим атрибутом бессмысленно — тест получит статус <enum>\Testo\Core\Value\Status::Risky</enum>.
+</description>
+<example>
+```php
+#[Test]
+#[ExpectNoAssertions]
+public function bootDoesNotThrow(): void
+{
+    // Успех — это просто дойти до конца без исключения
+    $this->app->boot();
+}
+```
+</example>
+</signature>
