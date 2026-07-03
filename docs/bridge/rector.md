@@ -21,7 +21,7 @@ composer require --dev testo/bridge-rector rector/rector
 
 The rules exist to move an existing test suite from one framework to another without rewriting it by hand — for example, to migrate a project from PHPUnit or Pest to Testo, to go back to PHPUnit, or to produce a mirror PHPUnit copy of the suite for a different runner.
 
-Conversion works in three directions, and each one comes as a ready-made Rector set. The handy way to reference a set is through a <class>\Testo\Bridge\Rector\Set\TestoRectorSetList</class> constant — no path to remember and no need to assemble a list of individual rules by hand.
+Conversion works in three directions, and each one comes as a ready-made Rector set. The convenient way to reference a set is through a <class>\Testo\Bridge\Rector\Set\TestoRectorSetList</class> constant — no path to remember and no need to assemble a list of individual rules by hand.
 
 | Direction | Set constant |
 |-----------|--------------|
@@ -52,18 +52,18 @@ vendor/bin/rector process
 Rector walks the listed files and rewrites them in place, so it's easy to review the result with a plain `git diff` before committing.
 
 ::: info Not everything is convertible
-Some constructs can't be converted — they simply have no faithful counterpart in the target framework. The set leaves them as-is rather than dropping them, so you can find and handle those spots manually.
+Some constructs can't be converted — they simply have no faithful counterpart in the target framework. The set leaves them as-is rather than dropping them, so you can spot and fix them manually.
 :::
 
 ::: question What happens to a test that can't be converted?
-It depends on what exactly is unconvertible. A standalone construct with no counterpart (a mock, a PHPUnit constraint, a Pest `arch()` test) is left in the code as-is — the rest of the test is rewritten and you clean that spot up by hand. When a whole test needs a live Testo runtime (the Testo → PHPUnit direction), it's turned into a visible `markTestSkipped()` with a reason, and the other tests in the class keep running. Either way, nothing is deleted silently.
+It depends on what exactly can't be converted. A standalone construct with no counterpart (a mock, a PHPUnit constraint, a Pest `arch()` test) is left in the code as-is — the rest of the test is rewritten and you clean that spot up by hand. When a whole test needs a live Testo runtime (the Testo → PHPUnit direction), it's turned into a visible `markTestSkipped()` with a reason, and the other tests in the class keep running. Either way, nothing is deleted silently.
 :::
 
 ## Testing your own rules
 
 If you write your own Rector rules, Testo gives you a more convenient toolkit for testing them than the stock one. It has nothing to do with converting tests — it's a standalone tool for rule authors, usable in any project that has Testo.
 
-Testing rules through PHPUnit wants a separate `AbstractRectorTestCase` subclass per rule, each with the same data provider and test method. Instead of that boilerplate, a **single attribute right on the rule** is enough: Testo finds its fixtures and turns each into its own data set — the same idea as the <plugin>Inline</plugin> plugin.
+Testing rules through PHPUnit means a separate `AbstractRectorTestCase` subclass per rule, each with the same data provider and test method. Instead of that boilerplate, a **single attribute right on the rule** is enough: Testo finds its fixtures and turns each into its own data set — the same idea as the <plugin>Inline</plugin> plugin.
 
 On top of that, each fixture's input and expected output are streamed to a messenger channel, so you see the "before → after" of every case right in the report:
 
@@ -108,7 +108,7 @@ final class AssertCallToTestoRector extends AbstractRector { /* … */ }
 
 ### Fixture format
 
-A fixture is a `*.php.inc` file holding the input and the expected output, separated by a `-----` line. If there is no separator, the rule is asserted to leave the input **unchanged** — handy for the "must not touch this" cases:
+A fixture is a `*.php.inc` file holding the input and the expected output, separated by a `-----` line. If there is no separator, the rule is expected to leave the input **unchanged** — handy for the "must not touch this" cases:
 
 ```php
 <?php
