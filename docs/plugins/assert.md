@@ -1,6 +1,6 @@
 ---
 outline: [2, 3]
-llms_description: "How to write assertions in Testo tests. Two facades: Assert for immediate checks (same, equals, true, null, blank, fail), typed assertion chains (string, int, float, array, iterable, object, json) with fluent API; Expect for post-test expectations (exception with message/code/previous matching, memory leak detection). #[ExpectNoAssertions] marks a test that intentionally asserts nothing so it stays Passed instead of Risky. Start here to understand assertion syntax and available checks."
+llms_description: "How to write assertions in Testo tests. Two facades: Assert for immediate checks (same, equals, true, null, blank, fail), typed assertion chains (string, int, float, array, iterable, object, json) with fluent API; Expect for post-test expectations (exception with message/code/previous matching, memory leak detection). #[ExpectException] is the attribute form of Expect::exception() for the type-only case. #[ExpectNoAssertions] marks a test that intentionally asserts nothing so it stays Passed instead of Risky. Start here to understand assertion syntax and available checks."
 ---
 
 # Assert
@@ -407,6 +407,30 @@ Expect::exception(\RuntimeException::class, same: true);
 ```php
 // Specimen object: class, message, and code are all expressed at once
 Expect::exception(new PaymentException('insufficient funds', 402));
+```
+</example>
+</signature>
+
+The same expectation can be declared with an attribute instead of a call — handy when the whole test boils down to "this should throw":
+
+<signature h="3" name="#[\Testo\Assert\ExpectException(string $class)]">
+<short>Attribute form of <func>\Testo\Expect::exception()</func>.</short>
+<description>
+A compact, declarative alternative for the common case where you only need to check the exception type. The class is matched via `instanceof`, so subclasses pass too.
+
+The attribute takes only the class. For finer checks — message, code, or a previous exception — call <func>\Testo\Expect::exception()</func> in the test body instead.
+</description>
+<param name="$class">Class or interface of the expected exception.</param>
+<example>
+```php
+use Testo\Assert\ExpectException;
+
+#[Test]
+#[ExpectException(\InvalidArgumentException::class)]
+public function throwsOnInvalidInput(): void
+{
+    $service->process(null);
+}
 ```
 </example>
 </signature>

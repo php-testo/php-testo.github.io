@@ -410,6 +410,30 @@ Expect::exception(new PaymentException('insufficient funds', 402));
 </example>
 </signature>
 
+То же ожидание можно объявить атрибутом вместо вызова — удобно, когда весь тест сводится к «здесь должно быть исключение»:
+
+<signature h="3" name="#[\Testo\Assert\ExpectException(string $class)]">
+<short>Атрибутная форма <func>\Testo\Expect::exception()</func>.</short>
+<description>
+Компактная и декларативная альтернатива для частого случая, когда нужно проверить лишь тип исключения. Класс сверяется через `instanceof`, поэтому наследники тоже проходят проверку.
+
+Атрибут принимает только класс. Для более тонких проверок — сообщения, кода или предыдущего исключения — вызывайте <func>\Testo\Expect::exception()</func> в теле теста.
+</description>
+<param name="$class">Класс или интерфейс ожидаемого исключения.</param>
+<example>
+```php
+use Testo\Assert\ExpectException;
+
+#[Test]
+#[ExpectException(\InvalidArgumentException::class)]
+public function throwsOnInvalidInput(): void
+{
+    $service->process(null);
+}
+```
+</example>
+</signature>
+
 С помощью цепочки методов можно уточнить, какое именно исключение ожидается:
 
 <signature compact h="4" name="\Testo\Assert\Api\ExpectedException::fromMethod(string $class, string $method): self">
