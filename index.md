@@ -334,10 +334,10 @@ Add the <attr>\Testo\Bench</attr> attribute to a method, and Testo will show whi
 ```php
 // Baseline method with the #[Bench] attribute
 #[Bench(
-    callables: [ 'sumInCycle' => [self::class, 'sumInCycle']],
+    callables: ['in cycle' => [self::class, 'sumCycle']],
     arguments: [1, 5_000],
 )]
-public static function sumInArray(int $a, int $b): int
+public static function sumArray(int $a, int $b): int
 {
     return \array_sum(\range($a, $b));
 }
@@ -349,7 +349,7 @@ public static function sumInArray(int $a, int $b): int
 
 ```php
 // Alternative implementation
-public static function sumInCycle(int $a, int $b): int
+public static function sumCycle(int $a, int $b): int
 {
     $result = 0;
     for ($i = $a; $i <= $b; ++$i) {
@@ -364,7 +364,7 @@ public static function sumInCycle(int $a, int $b): int
 <template #result>
 
 ```
-Results for sumInArray:
+Results for sumArray:
 +--------------------------+------------------------------------------------+---------+
 | BENCHMARK SETUP          | TIME RESULTS                                   | SUMMARY |
 | Name     | Iters | Calls | Mean              | Median            | RStDev | Place   |
