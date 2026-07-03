@@ -81,13 +81,13 @@ const declareTabs = [
 ## Featured
 
 <div class="featured-post">
-<a href="/blog/infection-debut" class="featured-post-card">
+<a href="/blog/self-mutation" class="featured-post-card">
   <div class="featured-post-image">
-    <img src="/blog/infection-debut/preview.png" alt="Infection + Testo" />
+    <img src="/blog/self-mutation/preview.png" alt="Who Mutates the Mutator" />
   </div>
   <div class="featured-post-body">
-    <span class="featured-post-title">Infection + Testo</span>
-    <p class="featured-post-description">Infection 0.33.0 ships with built-in Testo support. Mutation testing now works out of the box.</p>
+    <span class="featured-post-title">Who Mutates the Mutator</span>
+    <p class="featured-post-description">What happens when mutation testing tries to mutate the very tool it tests with.</p>
   </div>
 </a>
 <a href="/blog/beta-testo" class="featured-post-card">

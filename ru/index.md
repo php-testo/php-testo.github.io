@@ -80,13 +80,13 @@ const declareTabs = [
 ## Важное
 
 <div class="featured-post">
-<a href="/ru/blog/infection-debut" class="featured-post-card">
+<a href="/ru/blog/self-mutation" class="featured-post-card">
   <div class="featured-post-image">
-    <img src="/blog/infection-debut/preview.png" alt="Infection + Testo" />
+    <img src="/blog/self-mutation/preview.png" alt="Кто мутирует мутатора" />
   </div>
   <div class="featured-post-body">
-    <span class="featured-post-title">Infection + Testo</span>
-    <p class="featured-post-description">Infection 0.33.0 вышел со встроенной поддержкой Testo. Мутационное тестирование теперь работает из коробки.</p>
+    <span class="featured-post-title">Кто мутирует мутатора</span>
+    <p class="featured-post-description">Что происходит, когда мутационное тестирование пытается мутировать сам инструмент, которым тестирует.</p>
   </div>
 </a>
 <a href="/ru/blog/beta-testo" class="featured-post-card">
