@@ -1,0 +1,22 @@
+# Line-ending normalization for text files.
+* text=auto
+
+# PHP-aware hunk headers in `git diff`.
+*.php diff=php
+
+# Binary files keep their bytes.
+*.http binary
+*.gpg binary
+
+# Default: nothing is included in the `composer archive` of testo/testo.
+# Re-include only the files that actually belong to the root metapackage below.
+* export-ignore
+
+# Top-level documentation and the manifest itself.
+/composer.json   -export-ignore
+/LICENSE.md      -export-ignore
+/README.md       -export-ignore
+/CHANGELOG.md    -export-ignore
+/AGENTS.md       -export-ignore
+/skills          -export-ignore
+/skills/**       -export-ignore

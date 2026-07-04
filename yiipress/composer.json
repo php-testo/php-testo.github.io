@@ -1,0 +1,32 @@
+{
+    "name": "testo/docs",
+    "type": "project",
+    "license": "BSD-3-Clause",
+    "homepage": "https://php-testo.github.io/",
+    "authors": [
+        {
+            "name": "Aleksei Gagarin",
+            "homepage": "https://github.com/roxblnfk"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/php-testo/php-testo.github.io/issues",
+        "source": "https://github.com/php-testo/php-testo.github.io"
+    },
+    "funding": [
+        {
+            "type": "boosty",
+            "url": "https://boosty.to/roxblnfk"
+        }
+    ],
+    "require-dev": {
+        "internal/dload": "^1.13",
+        "spiral/code-style": "dev-master",
+        "testo/testo": "1.x-dev"
+    },
+    "minimum-stability": "dev",
+    "scripts": {
+        "post-update-cmd": "dload get --no-interaction -v || \"echo can't dload binaries\"",
+        "test": "testo"
+    }
+}
