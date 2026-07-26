@@ -10,6 +10,7 @@ import JetBrainsPluginButton from './JetBrainsPluginButton.vue'
 import JetBrainsPlugin from './JetBrainsPlugin.vue'
 import BlogPosts from './BlogPosts.vue'
 import BlogPostHeader from './BlogPostHeader.vue'
+import Tweet from './Tweet.vue'
 import { isBlogPath, getBlogBackLink, localNavBackKey } from '../locales'
 import './style.css'
 
@@ -133,6 +134,7 @@ export default {
     app.component('JetBrainsPluginButton', JetBrainsPluginButton)
     app.component('JetBrainsPlugin', JetBrainsPlugin)
     app.component('BlogPosts', BlogPosts)
+    app.component('Tweet', Tweet)
 
     if (typeof window !== 'undefined') {
       setupFuncRefTooltips()

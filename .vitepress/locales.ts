@@ -16,6 +16,11 @@ export interface LocaleConfig {
   signatureParamsLabel: string    // 'Parameters:', 'Параметры:', etc.
   signatureExamplesLabel: string  // 'Examples:', 'Примеры:', etc.
   signatureCasesLabel: string     // 'Cases:', 'Значения:', etc.
+  tweetLoadLabel: string          // Retry button title after a failed load
+  tweetLoadingLabel: string       // Placeholder title while widgets.js is loading
+  tweetHint: string               // Default sub-label under the button title
+  tweetFailedLabel: string        // Shown when the embed can't be rendered
+  tweetOpenLabel: string          // Fallback link to x.com
 }
 
 export const locales: LocaleConfig[] = [
@@ -28,6 +33,11 @@ export const locales: LocaleConfig[] = [
     signatureParamsLabel: 'Parameters:',
     signatureExamplesLabel: 'Examples:',
     signatureCasesLabel: 'Cases:',
+    tweetLoadLabel: 'Show the tweet by',
+    tweetLoadingLabel: 'Loading the tweet by',
+    tweetHint: 'Fetching the embedded post from x.com',
+    tweetFailedLabel: "Couldn't load it — x.com may be blocked. Click to retry.",
+    tweetOpenLabel: 'Open on X',
   },
   {
     code: 'ru',
@@ -38,6 +48,11 @@ export const locales: LocaleConfig[] = [
     signatureParamsLabel: 'Параметры:',
     signatureExamplesLabel: 'Примеры:',
     signatureCasesLabel: 'Значения:',
+    tweetLoadLabel: 'Показать твит',
+    tweetLoadingLabel: 'Загружаем твит',
+    tweetHint: 'Подгружаем встроенный пост с x.com',
+    tweetFailedLabel: 'Не удалось загрузить — возможно, x.com заблокирован. Нажмите, чтобы повторить.',
+    tweetOpenLabel: 'Открыть в X',
   },
 ]
 
