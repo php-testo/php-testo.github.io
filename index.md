@@ -81,13 +81,13 @@ const declareTabs = [
 ## Featured
 
 <div class="featured-post">
-<a href="/blog/self-mutation" class="featured-post-card">
+<a href="/blog/what-is-faster" class="featured-post-card">
   <div class="featured-post-image">
-    <img src="/blog/self-mutation/preview.png" alt="Who Mutates the Mutator" />
+    <img src="/blog/what-is-faster/preview.png" alt="What's Faster" />
   </div>
   <div class="featured-post-body">
-    <span class="featured-post-title">Who Mutates the Mutator</span>
-    <p class="featured-post-description">What happens when mutation testing tries to mutate the very tool it tests with.</p>
+    <span class="featured-post-title">What's Faster</span>
+    <p class="featured-post-description">Tempest Testing, PHPUnit and Testo on the same codebase: the test plumbing sets the pace, not the runner.</p>
   </div>
 </a>
 <a href="/blog/beta-testo" class="featured-post-card">

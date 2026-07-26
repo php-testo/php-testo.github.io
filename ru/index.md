@@ -80,13 +80,13 @@ const declareTabs = [
 ## Важное
 
 <div class="featured-post">
-<a href="/ru/blog/self-mutation" class="featured-post-card">
+<a href="/ru/blog/what-is-faster" class="featured-post-card">
   <div class="featured-post-image">
-    <img src="/blog/self-mutation/preview.png" alt="Кто мутирует мутатора" />
+    <img src="/blog/what-is-faster/preview.png" alt="Что быстрее" />
   </div>
   <div class="featured-post-body">
-    <span class="featured-post-title">Кто мутирует мутатора</span>
-    <p class="featured-post-description">Что происходит, когда мутационное тестирование пытается мутировать сам инструмент, которым тестирует.</p>
+    <span class="featured-post-title">Что быстрее</span>
+    <p class="featured-post-description">Tempest Testing, PHPUnit и Testo на одной кодовой базе: темп задаёт обвязка тестов, а не раннер.</p>
   </div>
 </a>
 <a href="/ru/blog/beta-testo" class="featured-post-card">
