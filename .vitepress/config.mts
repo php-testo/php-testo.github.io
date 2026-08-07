@@ -57,6 +57,12 @@ export default withMermaid(defineConfig({
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-VYGDN3X0PR');`],
+    ['script', {
+      src: 'https://context7.com/widget.js',
+      'data-library': '/php-testo/php-testo.github.io',
+      'data-color': '#d4a574',
+      'data-position': 'bottom-right',
+    }],
   ],
 
   buildEnd: async (config) => {
@@ -179,6 +185,7 @@ gtag('config', 'G-VYGDN3X0PR');`],
                 { text: 'Inline (встроенные тесты)', link: '/ru/docs/plugins/inline.md' },
                 { text: 'Retry', link: '/ru/docs/plugins/retry.md' },
                 { text: 'Repeat', link: '/ru/docs/plugins/repeat.md' },
+                { text: 'Fiber (файберы)', link: '/ru/docs/plugins/fiber.md' },
                 { text: 'Bench', link: '/ru/docs/plugins/bench.md' },
                 { text: '\#[Test]', link: '/ru/docs/plugins/test.md' },
                 { text: 'Lifecycle', link: '/ru/docs/plugins/lifecycle.md' },
@@ -193,6 +200,7 @@ gtag('config', 'G-VYGDN3X0PR');`],
                 { text: 'Infection', link: '/ru/docs/bridge/infection.md' },
                 { text: 'Mockery', link: '/ru/docs/bridge/mockery.md' },
                 { text: 'Rector', link: '/ru/docs/bridge/rector.md' },
+                { text: 'Revolt', link: '/ru/docs/bridge/revolt.md' },
               ],
             },
             {
