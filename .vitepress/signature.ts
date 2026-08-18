@@ -44,6 +44,20 @@ function escapeHtml(str: string): string {
     .replace(/"/g, '&quot;')
 }
 
+/**
+ * Render inline markdown for tooltip content, then neutralize any nested
+ * cross-reference links. A tooltip lives inside a `.func-ref` that may itself
+ * be an `<a>`, and nested `<a>` tags are invalid HTML — the browser hoists the
+ * inner link out of the `display:none` tooltip, making it show up inline.
+ * Tooltips are `pointer-events: none`, so links inside them are dead anyway.
+ */
+function renderTooltipInline(md: MarkdownIt, raw: string): string {
+  if (!raw) return ''
+  return md.renderInline(raw)
+    .replace(/<a\b([^>]*)>/g, (_m, attrs) => '<span' + attrs.replace(/\s*href="[^"]*"/g, '') + '>')
+    .replace(/<\/a>/g, '</span>')
+}
+
 function stripNamespace(signature: string): { display: string } {
   const match = signature.match(/^\\?(?:[A-Za-z_]\w*\\)+(.*)$/)
   return { display: match ? match[1] : signature }
@@ -122,7 +136,7 @@ function renderRefHtml(
   if (entry) {
     const sigHtml = highlightSignature(md, entry.signature)
     const displayHtml = highlightSignature(md, displayFqn) || escapeHtml(displayFqn)
-    const shortHtml = entry.short ? md.renderInline(entry.short) : ''
+    const shortHtml = renderTooltipInline(md, entry.short)
 
     const tooltip = `<span class="func-ref-tooltip">`
       + `<code class="func-ref-tooltip-sig vp-code">${sigHtml}</code>`
@@ -156,7 +170,7 @@ function renderKlassRefHtml(md: MarkdownIt, fqn: string, locale?: LocaleConfig):
 
   if (entry) {
     const sigHtml = highlightSignature(md, entry.signature)
-    const shortHtml = entry.short ? md.renderInline(entry.short) : ''
+    const shortHtml = renderTooltipInline(md, entry.short)
 
     const tooltip = `<span class="func-ref-tooltip">`
       + `<code class="func-ref-tooltip-sig vp-code">${sigHtml}</code>`
@@ -196,9 +210,9 @@ function renderEnumRefHtml(md: MarkdownIt, rawFqn: string, locale?: LocaleConfig
       const displayText = enumShort + '::' + caseEntry.caseName
       const displayHtml = highlightSignature(md, displayText) || escapeHtml(displayText)
       const sigHtml = highlightSignature(md, caseEntry.enumSignature)
-      const descHtml = md.renderInline(caseEntry.description)
+      const descHtml = renderTooltipInline(md, caseEntry.description)
 
-      const enumShortHtml = caseEntry.enumShort ? md.renderInline(caseEntry.enumShort) : ''
+      const enumShortHtml = renderTooltipInline(md, caseEntry.enumShort)
 
       const tooltip = `<span class="func-ref-tooltip">`
         + `<code class="func-ref-tooltip-sig vp-code">${sigHtml}</code>`
@@ -225,7 +239,7 @@ function renderEnumRefHtml(md: MarkdownIt, rawFqn: string, locale?: LocaleConfig
       const displayText = enumShort + '::' + casePart
       const displayHtml = highlightSignature(md, displayText) || escapeHtml(displayText)
       const sigHtml = highlightSignature(md, classEntry.signature)
-      const shortHtml = classEntry.short ? md.renderInline(classEntry.short) : ''
+      const shortHtml = renderTooltipInline(md, classEntry.short)
 
       const tooltip = `<span class="func-ref-tooltip">`
         + `<code class="func-ref-tooltip-sig vp-code">${sigHtml}</code>`
