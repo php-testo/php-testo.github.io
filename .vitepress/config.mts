@@ -122,6 +122,7 @@ gtag('config', 'G-VYGDN3X0PR');`],
                 { text: 'Infection', link: '/docs/bridge/infection.md' },
                 { text: 'Mockery', link: '/docs/bridge/mockery.md' },
                 { text: 'Rector', link: '/docs/bridge/rector.md' },
+                { text: 'Revolt', link: '/docs/bridge/revolt.md' },
               ],
             },
             {
