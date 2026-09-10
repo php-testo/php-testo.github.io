@@ -1,12 +1,12 @@
 ---
-title: "Back to 8.1"
+title: "Back to PHP 8.1"
 date: 2026-09-10
 description: "Testo targets PHP 8.2, but PHPLRT wants to run its tests on 8.1. Instead of rewriting the code for the old version, we downgrade it with Rector for the duration of the test run only."
 image: /blog/downgrade/preview.jpg
 author: Aleksei Gagarin
 ---
 
-# Back to 8.1
+# Back to PHP 8.1
 
 Last time, [Rector helped me](/blog/self-mutation) rewrite tests between frameworks: Testo → PHPUnit and back, so that mutation testing could finally look at Testo from the outside. The conversion rules live in the [Rector bridge](/docs/bridge/rector.md) and have been quietly doing their job ever since, helping move various projects over to Testo.
 This time, though, the task came from a different direction.
