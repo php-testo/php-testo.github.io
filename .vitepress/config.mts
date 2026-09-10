@@ -58,6 +58,7 @@ function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-VYGDN3X0PR');`],
     ['script', {
+      defer: '',
       src: 'https://context7.com/widget.js',
       'data-library': '/php-testo/php-testo.github.io',
       'data-color': '#d4a574',
