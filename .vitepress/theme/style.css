@@ -83,6 +83,241 @@ html {
   --vp-custom-block-warning-bg: rgba(232, 180, 78, 0.1);
 }
 
+/* ===== TYPOGRAPHY ===== */
+
+/* IBM Plex Sans for text, JetBrains Mono for code, both self-hosted — the
+   @font-face rules are in fonts.css. Plex replaces the Inter that VitePress
+   ships: open apertures and a smaller x-height carry long paragraphs better,
+   and its Cyrillic was drawn rather than adapted. The stock stacks stay behind
+   each one as the fallback while the file loads. */
+:root {
+  --vp-font-family-base: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --vp-font-family-mono: 'JetBrains Mono', ui-monospace, 'Menlo', 'Monaco',
+    'Consolas', 'Liberation Mono', 'Courier New', monospace;
+}
+
+/* Both faces are variable, so weights are free to sit between the named steps.
+   VitePress has no variables of its own for them — every weight is hardcoded in
+   its base stylesheet and its components — so the whole scale is collected
+   here, one variable per role, and tuned in this block alone. Plex axis runs
+   100–700 and its stems are lighter than Inter's at the same number, so the
+   body sits at 400 and still reads lighter than the Inter it replaced. */
+:root {
+  /* Documents */
+  --testo-fw-body: 350;
+  --testo-fw-heading: 550;
+  --testo-fw-link: 400;
+
+  /* Chrome: nav bar, search, menus, tabs, badges, footers, pagination */
+  --testo-fw-ui: 450;
+  --testo-fw-ui-title: 550;
+  --testo-fw-sidebar-group: 600;
+  --testo-fw-sidebar-item: 400;
+  --testo-fw-outline-title: 550;
+  --testo-fw-outline-item: 400;
+
+  /* Code sets its own weight: a monospace face packs the same stem into a
+     fixed advance width, so it reads heavier than the prose around it. */
+  --testo-fw-code: 300;
+}
+
+/* Text size, the same story as the weights: VitePress puts 16px on the body and
+   then hardcodes a px size on every other piece of an article, so there is no
+   single place to turn. The variables below hold the stock values unchanged —
+   raise one and the rules under it carry the change through.
+
+   The stock line-heights are in px as well and do not follow the type, so a
+   sizeable jump here wants its leading revisited: `.vp-doc p` is 28px, the
+   headings 40/32/28/24px, all in the default theme. */
+:root {
+  --testo-fs-body: 17px;
+  --testo-fs-h1: 28px;
+  --testo-fs-h1-wide: 32px; /* from 768px up */
+  --testo-fs-h2: 24px;
+  --testo-fs-h3: 20px;
+  --testo-fs-h4: 18px;
+  --testo-fs-quote: 17px;
+  --testo-fs-table: 15px;
+
+  /* ::: blocks carry variables of their own in the default theme; they are
+     restated at their stock values so the whole scale reads in one place. */
+  --vp-custom-block-font-size: 15px;
+  --vp-custom-block-code-font-size: 15px;
+
+  /* Left sidebar, every level */
+  --testo-fs-sidebar: 15px;
+
+  /* Nav bar: the links, the menus they open and the site title, then the search
+     field and the stars button, which the theme keeps a step smaller. */
+  --testo-fs-nav: 15px;
+  --testo-fs-nav-title: 17px;
+  --testo-fs-nav-small: 14px;
+
+  /* Code. The theme sizes it in em, so it used to ride on the body; in px it
+     stands on its own and the pair of faces can be balanced by eye —
+     JetBrains Mono has the larger x-height and looks a step bigger than Plex at
+     the same number. The tab strips above a block (::: code-group and
+     CodeTabs) share one size. */
+  --testo-fs-code: 13px;
+  --testo-fs-code-tabs: 13px;
+  --vp-code-font-size: var(--testo-fs-code);
+}
+
+body {
+  font-size: var(--testo-fs-body);
+}
+
+.vp-doc h1 {
+  font-size: var(--testo-fs-h1);
+}
+
+@media (min-width: 768px) {
+  .vp-doc h1 {
+    font-size: var(--testo-fs-h1-wide);
+  }
+}
+
+.vp-doc h2 {
+  font-size: var(--testo-fs-h2);
+}
+
+.vp-doc h3 {
+  font-size: var(--testo-fs-h3);
+}
+
+.vp-doc h4 {
+  font-size: var(--testo-fs-h4);
+}
+
+.vp-doc blockquote > p {
+  font-size: var(--testo-fs-quote);
+}
+
+.vp-doc th,
+.vp-doc td {
+  font-size: var(--testo-fs-table);
+}
+
+.VPSidebar .VPSidebarItem .text {
+  font-size: var(--testo-fs-sidebar);
+}
+
+.VPNavBar .VPNavBarMenuLink,
+.VPNavBar .VPFlyout .text,
+.VPMenu .link,
+.VPMenu .VPMenuGroup .title {
+  font-size: var(--testo-fs-nav);
+}
+
+.VPNavBar .VPNavBarTitle .title {
+  font-size: var(--testo-fs-nav-title);
+}
+
+.VPNavBar .DocSearch-Button .DocSearch-Button-Placeholder {
+  font-size: var(--testo-fs-nav-small);
+}
+
+.vp-code-group .tabs label {
+  font-size: var(--testo-fs-code-tabs);
+}
+
+/* Headings keep their own weight for the code inside them — a light stem in a
+   550 heading would read as a mistake. */
+.vp-doc [class*='language-'] code,
+.vp-doc :not(pre, h1, h2, h3, h4, h5, h6) > code,
+.custom-block code {
+  font-weight: var(--testo-fw-code);
+}
+
+/* Documentation shows the characters the reader will type, so the coding
+   ligatures the face is known for are off: '!=' has to stay two glyphs, not
+   turn into '≠'. Drop this rule to get them back. */
+code,
+kbd,
+pre,
+samp {
+  font-variant-ligatures: none;
+}
+
+body {
+  font-weight: var(--testo-fw-body);
+}
+
+.vp-doc h1,
+.vp-doc h2,
+.vp-doc h3,
+.vp-doc h4,
+.vp-doc h5,
+.vp-doc h6 {
+  font-weight: var(--testo-fw-heading);
+}
+
+/* Links carry their own weight in the default theme, a step above the text they
+   sit in. Colour already marks them, so the step is smaller here. */
+.vp-doc a,
+.vp-doc .custom-block a {
+  font-weight: var(--testo-fw-link);
+}
+
+/* The default theme hardcodes a weight in nearly every component of the chrome,
+   most of them 500, and each one is a scoped style — the attribute selector Vue
+   adds puts them out of reach of a plain class, hence the extra ancestor on
+   every selector below rather than !important. The two lists are the whole set:
+   UI text, then the titles that stand above it. */
+.VPNavBar .VPNavBarMenuLink,
+.VPNavBar .VPFlyout .text,
+.VPNavBar .DocSearch-Button .DocSearch-Button-Placeholder,
+.VPNavBar .DocSearch-Button .DocSearch-Button-Key,
+.VPNavScreen .VPNavScreenMenuLink,
+.VPNavScreen .button,
+.VPNavScreen .VPNavScreenAppearance .text,
+.VPNavScreen .VPNavScreenTranslations .title,
+.VPMenu .link,
+.VPLocalNav .menu,
+.VPLocalNav .VPLocalNavOutlineDropdown button,
+.VPLocalNavOutlineDropdown .top-link,
+.VPLocalSearchBox .title.main,
+.VPDocFooter .edit-link-button,
+.VPDocFooter .desc,
+.VPDocFooter .title,
+.VPDocFooter .VPLastUpdated,
+.VPFooter .copyright,
+.VPContent .VPBadge,
+.VPFeature .link-text-value,
+.vp-code-group .tabs label,
+.vp-doc [class*='language-'] > span.lang {
+  font-weight: var(--testo-fw-ui);
+}
+
+.VPNavBar .VPNavBarTitle .title,
+.VPMenu .VPMenuGroup .title,
+.VPNavScreen .VPNavScreenMenuGroupSection .title,
+.vp-doc .custom-block-title,
+.vp-doc .custom-block.details summary {
+  font-weight: var(--testo-fw-ui-title);
+}
+
+.VPSidebar .VPSidebarItem.level-0 .text {
+  font-weight: var(--testo-fw-sidebar-group);
+}
+
+.VPSidebar .VPSidebarItem.level-1 .text,
+.VPSidebar .VPSidebarItem.level-2 .text,
+.VPSidebar .VPSidebarItem.level-3 .text,
+.VPSidebar .VPSidebarItem.level-4 .text,
+.VPSidebar .VPSidebarItem.level-5 .text {
+  font-weight: var(--testo-fw-sidebar-item);
+}
+
+.VPDocAsideOutline .outline-title {
+  font-weight: var(--testo-fw-outline-title);
+}
+
+.VPDocAsideOutline .content {
+  font-weight: var(--testo-fw-outline-item);
+}
+
 /* Show theme toggle and language switcher directly in nav bar */
 .VPNavBarAppearance,
 .VPNavBarTranslations {
@@ -939,7 +1174,7 @@ a.featured-post-card:hover {
 /* ── Mermaid diagrams ─────────────────────────────────── */
 
 .mermaid svg {
-  font-family: Inter, ui-sans-serif, system-ui, sans-serif !important;
+  font-family: var(--vp-font-family-base) !important;
 }
 
 /* ── Sortable attributes table ────────────────────────── */

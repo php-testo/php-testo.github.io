@@ -18,7 +18,7 @@ export default withMermaid(defineConfig({
   description: 'Modern PHP Testing Framework',
 
   mermaid: {
-    fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif',
+    fontFamily: "'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif",
     htmlLabels: false,
   },
 

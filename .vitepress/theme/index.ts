@@ -12,6 +12,7 @@ import BlogPosts from './BlogPosts.vue'
 import BlogPostHeader from './BlogPostHeader.vue'
 import Tweet from './Tweet.vue'
 import { isBlogPath, getBlogBackLink, localNavBackKey } from '../locales'
+import './fonts.css'
 import './style.css'
 
 function setupSortableTable() {

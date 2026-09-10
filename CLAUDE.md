@@ -10,7 +10,9 @@ docs/         # English (root)
 ├── docs/     # Documentation pages
 └── .vitepress/
     ├── config.mts       # Config: nav, sidebar, locales
-    └── theme/style.css  # Custom styles (dough colors)
+    └── theme/
+        ├── style.css    # Custom styles (dough colors, typography)
+        └── fonts.css    # @font-face for self-hosted faces (files in public/fonts/)
 
 ru/           # Russian locale (same structure)
 ```
@@ -64,6 +66,16 @@ ru/           # Russian locale (same structure)
 **Dead links:** Create stub with `::: tip Coming Soon` block
 
 **Styles:** `.vitepress/theme/style.css` - brand colors `--vp-c-brand-1`, responsive breakpoints 960px/640px
+
+## Typography
+
+Text is set in **IBM Plex Sans**, code in **JetBrains Mono** — both OFL, both self-hosted, so no request goes to a font CDN. Neither is the Inter that VitePress ships.
+
+- **Files:** `public/fonts/`, the variable cut of each face split by script (`latin`, `latin-ext`, `cyrillic`, `cyrillic-ext`, `greek`, `vietnamese`; Plex also in italic). Each subset carries a `unicode-range`, so a reader only downloads the scripts the page uses. Both OFL texts sit next to them. To refresh, re-download the same file names from `@fontsource-variable/ibm-plex-sans` and `@fontsource-variable/jetbrains-mono`.
+- **`@font-face` rules:** `theme/fonts.css`, imported from `theme/index.ts` ahead of `style.css`. They use `format('woff2-variations')` — the keyword that lets the browser interpolate a weight (e.g. 350) instead of snapping to the nearest static instance.
+- **Sizes and weights:** the `TYPOGRAPHY` block at the top of `theme/style.css`. `--vp-font-family-base` / `--vp-font-family-mono` name the faces; the whole scale lives in `--testo-fw-*` (weights) and `--testo-fs-*` (sizes) variables, one per role. VitePress hardcodes weights and sizes across its own stylesheets, so those variables are applied through overrides right below — retune there and nowhere else.
+- Coding ligatures are off (`font-variant-ligatures: none` on `code`/`kbd`/`pre`/`samp`): docs show the characters the reader types.
+- The mermaid font is set separately in `config.mts` (`mermaid.fontFamily`) — it renders into SVG and does not inherit the page variables.
 
 ## Blog
 
