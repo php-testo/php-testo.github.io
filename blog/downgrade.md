@@ -48,7 +48,7 @@ It was also a good moment to move the container into its own package, [internal/
 
 First I ran the downgrade locally: rewrote the entire codebase to 8.1 and ran the tests on it under 8.1. Rector handled almost everything, and that "almost" was the interesting part:
 
-- The `never` rule didn't know about arrow functions; it only downgraded regular `function(): never`. I sent a [fix](https://github.com/rectorphp/rector-downgrade-php/pull/397), and it was accepted.
+- The `never` rule didn't know about arrow functions; it only downgraded regular `function(): never`. I sent a [fix](https://github.com/rectorphp/rector-downgrade-php/pull/397), then a [second one](https://github.com/rectorphp/rector-downgrade-php/pull/399) for the 8.2-to-8.1 rule set.
 - There was no rule for `ReflectionMethod::hasPrototype()` at all. I wrote a [new one](https://github.com/rectorphp/rector-downgrade-php/pull/398): the call is replaced with `try { getPrototype() } catch`. `getPrototype()` has been around forever and throws when there is no prototype.
 - `memory_reset_peak_usage()` is a [dead end](https://github.com/rectorphp/rector/issues/9890). A polyfill is impossible: the function has no userland equivalent, only the engine can reset the memory peak. In the end, the call in the benchmarks is wrapped in `function_exists()`, and the one test that compares the peak memory of two algorithms is simply skipped on 8.1: without the reset, its measurement is meaningless.
 
@@ -87,7 +87,7 @@ Once everything resolves, a single Rector pass over the copied packages brings t
 
 This is how the [universal action](https://github.com/php-internal/actions) came to be: `php-internal/actions/downgrade`. You give it a target PHP version, and it installs dependencies at the newest versions that fit that platform, downgrading only what wouldn't install otherwise.
 
-It isn't limited to the vendor directory: the project's own files can be downgraded as well. The `testo.php` config and the tests themselves are written for PHP 8.2, for instance, so it makes sense to bring them down to 8.1 too. Let the tests stay pretty, and let Rector sort it out.
+It isn't limited to the vendor directory: the project's own files can be downgraded as well. The `testo.php` config and the tests themselves are written for PHP 8.2, for instance, so it makes sense to bring them down to 8.1 too. Let the tests stay pretty, and Rector will sort out the rest.
 
 
 ```yaml
