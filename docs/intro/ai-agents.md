@@ -33,20 +33,38 @@ To avoid copying skills by hand from `vendor/testo/testo/skills/` into wherever 
 composer require --dev llm/skills
 ```
 
-Once installed, `composer skills:update` copies skills into `.agents/skills/` (the path is configurable via `extra.skills.target` in `composer.json`). Testo is a trusted skill provider, so no extra configuration is needed. To make them visible to a specific agent, add its path to `extra.skills.aliases` — for example, `.claude/skills` for Claude Code:
+That's the whole setup. Composer will ask you to allow the plugin — answer **y**. After that, the plugin looks at the agent directories the project already has (`.claude/`, `.cursor/`, …), builds a configuration from them, and asks a single question to confirm it. Press **Enter** and it writes a `skills.json` at the project root and syncs the skills right away. Commit that file next to `composer.json` so the whole team gets the same setup.
+
+If you'd rather make the choices yourself, or come back to them later, run the wizard:
+
+```bash
+composer skills:init
+```
+
+Either way you end up with something like this:
 
 ```json
 {
-    "extra": {
-        "skills": {
-            "aliases": [".claude/skills", ".cursor/skills"],
-            "auto-sync": true
-        }
-    }
+    "$schema": "https://raw.githubusercontent.com/roxblnfk/skills/master/resources/skills.schema.json",
+    "target": ".agents/skills",
+    "aliases": [".claude/skills", ".cursor/skills"],
+    "auto-sync": true
 }
 ```
 
-At those paths the plugin creates links (Windows junctions or POSIX symlinks) pointing at the main folder — the same set of skills is visible to every agent with no duplicated files.
+Skills land in `target` — one real directory, tool-agnostic by default. Every path in `aliases` becomes a link to it (a junction on Windows, a symlink on POSIX), so each agent sees the same set of skills and no file is duplicated. With `auto-sync` on (the default), the skills are refreshed after every `composer install` and `composer update`; you can also run the sync by hand at any moment:
+
+```bash
+composer skills:update
+```
+
+Testo needs no extra configuration: the `testo/*` vendor is on the plugin's built-in trusted list, and a package you require directly is trusted anyway.
+
+You don't have to do any of this by hand — hand the [Set Up Agent Skills](/docs/ai/prompts/skills.md) prompt to your agent and it installs the plugin, builds a `skills.json` around the agents this project uses, and checks that the skills landed.
+
+::: tip
+The plugin isn't limited to Composer packages. `composer skills:add <vendor>/<repo>` registers a GitHub or GitLab repository as a skill source and fetches it right away — handy for your team's own skill collection.
+:::
 
 ## Typical workflow
 
@@ -58,7 +76,7 @@ The same three steps work for new tests and for porting an existing suite:
 
 ### Example prompts
 
-For ready-made, more elaborate prompts (project initialization, migrating an existing suite with `bridge-rector`, and more), see the [Prompts](/docs/ai/prompts.md) page. The two below are quick, minimal starting points.
+For ready-made, more elaborate prompts (project initialization, migrating an existing suite with `bridge-rector`, and more), see the [Prompts](/docs/intro/prompts.md) page. The two below are quick, minimal starting points.
 
 Writing tests from scratch:
 
