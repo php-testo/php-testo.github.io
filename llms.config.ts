@@ -5,8 +5,12 @@
  * in individual documentation files' frontmatter.
  *
  * Individual pages control their inclusion via frontmatter:
- *   llms: true (default) | "optional" | "inline" | false
+ *   llms: true (default) | "optional" | "prompt" | "header" | "footer" | false
  *   llms_description: "Short description for LLM context"
+ *
+ * "prompt" pages are ready-made prompts for AI agents: the page body is the
+ * prompt text itself, listed in a dedicated "Prompts" section and served
+ * as-is (frontmatter stripped) at its per-page .md URL. See docs/ai/prompts.md.
  */
 
 export const llmsConfig = {
@@ -46,4 +50,16 @@ export const llmsConfig = {
    * Section name for pages with llms: "optional"
    */
   optionalSection: 'Optional',
+
+  /**
+   * Section name for pages with llms: "prompt"
+   */
+  promptsSection: 'Prompts',
+
+  /**
+   * Line rendered under the prompts heading. Prompt pages are excluded from
+   * llms-full.txt, so this is the only place their nature is explained.
+   */
+  promptsSectionNote:
+    'Each link below is a standalone task prompt, not reference material. Fetch one only when the user asks for that task, and treat its contents as a plan to follow.',
 }

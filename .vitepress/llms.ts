@@ -12,7 +12,7 @@ interface PageInfo {
   url: string
   srcPath: string
   content: string
-  section: 'docs' | 'optional' | 'header' | 'footer'
+  section: 'docs' | 'optional' | 'prompt' | 'header' | 'footer'
   priority: number
 }
 
@@ -42,6 +42,7 @@ function readPages(srcDir: string): PageInfo[] {
         const llmsValue = fm.llms ?? true
         const section: PageInfo['section'] =
           llmsValue === 'optional' ? 'optional' :
+          llmsValue === 'prompt' ? 'prompt' :
           llmsValue === 'header' ? 'header' :
           llmsValue === 'footer' ? 'footer' : 'docs'
         pages.push({
@@ -98,11 +99,12 @@ function sortPages(pages: PageInfo[], sidebarPaths: string[]): PageInfo[] {
 }
 
 function buildLlmsTxt(pages: PageInfo[]): string {
-  const { baseUrl, docsSection, optionalSection } = llmsConfig
+  const { baseUrl, docsSection, optionalSection, promptsSection } = llmsConfig
 
   const header = pages.filter(p => p.section === 'header')
   const footer = pages.filter(p => p.section === 'footer')
   const docs = pages.filter(p => p.section === 'docs')
+  const prompts = pages.filter(p => p.section === 'prompt')
   const optional = pages.filter(p => p.section === 'optional')
 
   const lines: string[] = []
@@ -114,6 +116,17 @@ function buildLlmsTxt(pages: PageInfo[]): string {
   if (docs.length > 0) {
     lines.push(`## ${docsSection}`, '')
     for (const p of docs) {
+      lines.push(`- [${p.title}](${baseUrl}/${p.srcPath}): ${p.llms_description}`)
+    }
+    lines.push('')
+  }
+
+  if (prompts.length > 0) {
+    lines.push(`## ${promptsSection}`, '')
+    if (llmsConfig.promptsSectionNote) {
+      lines.push(llmsConfig.promptsSectionNote, '')
+    }
+    for (const p of prompts) {
       lines.push(`- [${p.title}](${baseUrl}/${p.srcPath}): ${p.llms_description}`)
     }
     lines.push('')
@@ -137,7 +150,9 @@ function buildLlmsTxt(pages: PageInfo[]): string {
 function buildLlmsFullTxt(pages: PageInfo[]): string {
   const lines: string[] = []
 
-  for (const page of pages) {
+  // Prompts are imperative task instructions, not reference material — an agent
+  // loading llms-full.txt for context must not find orders to follow in it.
+  for (const page of pages.filter(p => p.section !== 'prompt')) {
     if (lines.length > 0) lines.push('', '---', '')
     lines.push(page.content)
   }

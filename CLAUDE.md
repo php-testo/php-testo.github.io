@@ -125,12 +125,13 @@ Testo provides `llms.txt` for AI agents. Only `docs/` pages are included — blo
 ---
 llms: true              # default — included in "Docs" section
 llms: "optional"        # included in "Optional" section (secondary content)
+llms: "prompt"          # ready-made prompt — "Prompts" section, see below
 llms: false             # excluded from llms.txt
 llms_description: "Technical description of what LLM learns from this page"
 ---
 ```
 
-- `llms` — controls inclusion. Default is `true` (can be omitted). `"optional"` for secondary content, `false` to exclude
+- `llms` — controls inclusion. Default is `true` (can be omitted). `"optional"` for secondary content, `"prompt"` for prompt pages, `false` to exclude
 - `llms_description` — brief, informative note helping an LLM understand what the page covers. Required for all included pages
 
 **Guidelines for `llms_description` (per [llmstxt.org](https://llmstxt.org) spec):**
@@ -142,6 +143,35 @@ llms_description: "Technical description of what LLM learns from this page"
 - NOT: `"BeforeTest, AfterTest, BeforeClass, AfterClass, priority"` (raw list, no context)
 
 **When adding new doc pages:** add `llms_description` to the English version frontmatter. Do NOT add llms frontmatter to blog posts.
+
+## Prompts (`llms: prompt`, `<prompts-list />`)
+
+A prompt page is a ready-made task an agent runs start to finish — installing Testo, migrating a suite. **The page body is the prompt text itself**: it is served verbatim (frontmatter stripped) at its `.md` URL, and that file is what an agent fetches. Nothing that isn't part of the prompt belongs in the body.
+
+Prompts live in `docs/ai/prompts/` (EN) and `ru/docs/ai/prompts/` (RU), and are indexed by `docs/ai/prompts.md` / `ru/docs/ai/prompts.md`.
+
+**Frontmatter:**
+
+```yaml
+---
+title: "Initialize Testo"       # name shown in the table (falls back to the H1)
+llms: prompt                    # English page only — puts it in the "Prompts" section
+llms_description: "..."         # English page only — llms.txt entry, and the table cell
+description: "..."              # optional — overrides the table cell, use it in ru/ pages
+prompt_category: "Setup"        # optional, localized — adds a Category column
+---
+```
+
+**Where a prompt shows up:**
+- `llms.txt` — under "Prompts", as a link to the raw `.md` with `llms_description` as the text. The section is introduced by `promptsSectionNote` from `llms.config.ts`, which tells the agent these are tasks, not reference material.
+- `llms-full.txt` — **never.** Prompts are imperative instructions; an agent loading the full docs for context must not find orders to follow in them. `.vitepress/llms.ts` filters them out.
+- The prompts index page — via `<prompts-list />`, a sortable table of every prompt in the current locale.
+
+**Plugin:** `.vitepress/prompts-block.ts` — registry pre-scan plus the `<prompts-list />` block rule. The pre-scan reads English `docs/` pages marked `llms: prompt`, then picks up each translation by mirrored path (`ru/docs/…`), so only the English page needs the marker.
+
+The plugin also injects a localized note ("Everything below is the prompt itself…" with the raw `.md` URL) after the H1 of every prompt page. It is added at render time, so it never lands in the served `.md`. Don't write that note into the file by hand.
+
+**Prompt text stays in English in both locales** — same as the example prompts in `docs/intro/ai-agents.md`. Translate the frontmatter (title, description, category) and the index page around it, not the prompt body.
 
 ## FAQ (`::: question`)
 
@@ -350,9 +380,9 @@ Block-level tag for plugin documentation pages. Renders a styled info card with 
 ## VitePress Commands
 
 ```bash
-npm run docs:dev      # Dev server at localhost:5173
-npm run docs:build    # Build to .vitepress/dist/
-npm run docs:preview  # Preview build
+npm run dev      # Dev server at localhost:5173
+npm run build    # Thumbnails + build to .vitepress/dist/
+npm run preview  # Preview build
 ```
 
 ## Configuration

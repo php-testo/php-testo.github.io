@@ -58,6 +58,8 @@ The same three steps work for new tests and for porting an existing suite:
 
 ### Example prompts
 
+For ready-made, more elaborate prompts (project initialization, migrating an existing suite with `bridge-rector`, and more), see the [Prompts](/docs/ai/prompts.md) page. The two below are quick, minimal starting points.
+
 Writing tests from scratch:
 
 ```

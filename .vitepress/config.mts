@@ -8,6 +8,7 @@ import { faqPlugin } from './faq'
 import { infoBlockPlugin } from './info-block'
 import { funcBlockPlugin } from './signature'
 import { pluginBlockPlugin, preScanPlugins } from './plugin-block'
+import { promptsBlockPlugin, preScanPrompts } from './prompts-block'
 import { preScanSignatures } from './signature-registry'
 
 const baseUrl = 'https://php-testo.github.io'
@@ -29,10 +30,12 @@ export default withMermaid(defineConfig({
     config: (md) => {
       preScanSignatures(srcDir)
       preScanPlugins(srcDir)
+      preScanPrompts(srcDir)
       md.use(faqPlugin)
       md.use(infoBlockPlugin)
       md.use(funcBlockPlugin)
       md.use(pluginBlockPlugin)
+      md.use(promptsBlockPlugin, { baseUrl })
     },
   },
   srcExclude: ['CLAUDE.md', 'README.md'],
@@ -97,6 +100,7 @@ gtag('config', 'G-VYGDN3X0PR');`],
                 { text: 'Configuration', link: '/docs/intro/configuration.md' },
                 { text: 'Writing Tests', link: '/docs/intro/writing-tests.md' },
                 { text: 'AI Agents', link: '/docs/intro/ai-agents.md' },
+                { text: 'Prompts', link: '/docs/ai/prompts.md' },
               ],
             },
             {
@@ -177,6 +181,7 @@ gtag('config', 'G-VYGDN3X0PR');`],
                 { text: 'Конфигурация', link: '/ru/docs/intro/configuration.md' },
                 { text: 'Пишем тесты', link: '/ru/docs/intro/writing-tests.md' },
                 { text: 'AI-агенты', link: '/ru/docs/intro/ai-agents.md' },
+                { text: 'Промпты', link: '/ru/docs/ai/prompts.md' },
               ],
             },
             {

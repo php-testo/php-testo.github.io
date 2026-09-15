@@ -116,7 +116,7 @@ export function preScanPlugins(srcDir: string): void {
   }
 }
 
-function collectMdFiles(dir: string): string[] {
+export function collectMdFiles(dir: string): string[] {
   const results: string[] = []
   for (const entry of readdirSync(dir)) {
     const fullPath = join(dir, entry)
