@@ -35,12 +35,17 @@ Never run PHPUnit and Testo against the same tests in CI: a slice belongs to exa
 
 ## 3. Install
 
+Testo is set up here exactly as in any other project, so don't reinvent that part: work through the initialization prompt — <https://php-testo.github.io/docs/ai/prompts/init.md>. It installs `testo/testo`, generates `testo.php` with `vendor/bin/testo init`, and adds a CI job. Skip the step if Testo is already configured in this project.
+
+The migration needs two more packages — Rector itself and the rule set that converts PHPUnit into Testo:
+
 ```bash
-composer require --dev testo/testo testo/bridge-rector rector/rector
-vendor/bin/testo init
+composer require --dev testo/bridge-rector rector/rector
 ```
 
-`init` writes `testo.php`, detects suite folders under `tests/`, and adds `composer test` plus a script per suite. Review the generated config against the real layout before going further.
+Review the generated `testo.php` against the real layout before going further: Rector ports tests into the directories declared there.
+
+The CI job that prompt adds runs Testo across the whole project — while the migration is in flight, narrow it to the chosen slice (`--suite` or `--path`) so the same tests are not also run under PHPUnit.
 
 ## 4. Convert mechanically with Rector
 
