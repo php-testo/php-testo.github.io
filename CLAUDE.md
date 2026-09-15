@@ -148,7 +148,7 @@ llms_description: "Technical description of what LLM learns from this page"
 
 A prompt page is a ready-made task an agent runs start to finish — installing Testo, migrating a suite. **The page body is the prompt text itself**: it is served verbatim (frontmatter stripped) at its `.md` URL, and that file is what an agent fetches. Nothing that isn't part of the prompt belongs in the body.
 
-Prompts live in `docs/ai/prompts/` (EN) and `ru/docs/ai/prompts/` (RU), and are indexed by `docs/ai/prompts.md` / `ru/docs/ai/prompts.md`.
+Prompts live in `docs/ai/prompts/` (EN) and `ru/docs/ai/prompts/` (RU), and are indexed by `docs/intro/prompts.md` / `ru/docs/intro/prompts.md`.
 
 **Frontmatter:**
 
@@ -165,13 +165,15 @@ prompt_category: "Setup"        # optional, localized — adds a Category column
 **Where a prompt shows up:**
 - `llms.txt` — under "Prompts", as a link to the raw `.md` with `llms_description` as the text. The section is introduced by `promptsSectionNote` from `llms.config.ts`, which tells the agent these are tasks, not reference material.
 - `llms-full.txt` — **never.** Prompts are imperative instructions; an agent loading the full docs for context must not find orders to follow in them. `.vitepress/llms.ts` filters them out.
-- The prompts index page — via `<prompts-list />`, a sortable table of every prompt in the current locale.
+- The prompts index page — via `<prompts-list />`, a full-width card per prompt in the current locale. Each card carries two buttons: one opens the raw `.md` (not the rendered page) and needs `target="_blank"`, since VitePress's router otherwise treats a `.md` path as a route and answers with its 404 page; the other copies the absolute URL (`baseUrl` is passed to the plugin in `config.mts`, and the click handler lives in `theme/index.ts`).
 
 **Plugin:** `.vitepress/prompts-block.ts` — registry pre-scan plus the `<prompts-list />` block rule. The pre-scan reads English `docs/` pages marked `llms: prompt`, then picks up each translation by mirrored path (`ru/docs/…`), so only the English page needs the marker.
 
+**Styles:** `.vitepress/theme/style.css` — `.prompt-cards`, `.prompt-card` classes.
+
 The plugin also injects a localized note ("Everything below is the prompt itself…" with the raw `.md` URL) after the H1 of every prompt page. It is added at render time, so it never lands in the served `.md`. Don't write that note into the file by hand.
 
-**Prompt text stays in English in both locales** — same as the example prompts in `docs/intro/ai-agents.md`. Translate the frontmatter (title, description, category) and the index page around it, not the prompt body.
+Prompt bodies are translated like any other page — the agent reads them in the reader's language.
 
 ## FAQ (`::: question`)
 

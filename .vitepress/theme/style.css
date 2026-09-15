@@ -1233,3 +1233,91 @@ a.featured-post-card:hover {
   font-style: italic;
   cursor: help;
 }
+
+/* ── Prompt cards ─────────────────────────────────────── */
+
+.prompt-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 24px 0;
+}
+
+.prompt-card {
+  padding: 16px 20px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 12px;
+  background-color: var(--vp-c-bg-soft);
+  color: var(--vp-c-text-2);
+}
+
+.prompt-card-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.prompt-card-title {
+  font-size: var(--testo-fs-h4);
+  font-weight: var(--testo-fw-heading);
+  color: var(--vp-c-text-1);
+}
+
+.prompt-card-category {
+  padding: 3px 8px;
+  border-radius: 6px;
+  background-color: var(--vp-c-default-soft);
+  color: var(--vp-c-text-2);
+  font-size: var(--testo-fs-nav-small);
+  font-weight: var(--testo-fw-ui);
+  line-height: 1.2;
+}
+
+.prompt-card-desc {
+  display: block;
+  margin-top: 8px;
+  line-height: 1.6;
+}
+
+.prompt-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+/* The `.vp-doc a` variant wins over VitePress's link color and underline */
+.prompt-card-btn,
+.vp-doc a.prompt-card-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  background-color: var(--vp-c-bg);
+  color: var(--vp-c-text-2);
+  font-size: var(--testo-fs-nav-small);
+  font-weight: var(--testo-fw-ui);
+  line-height: 1.2;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 0.25s, color 0.25s;
+}
+
+.prompt-card-btn:hover,
+.vp-doc a.prompt-card-btn:hover {
+  border-color: var(--vp-c-brand-1);
+  color: var(--vp-c-text-1);
+}
+
+.prompt-card-copy.is-copied {
+  border-color: var(--vp-c-brand-1);
+  color: var(--vp-c-brand-1);
+}
+
+@media (max-width: 640px) {
+  .prompt-card {
+    padding: 14px 16px;
+  }
+}

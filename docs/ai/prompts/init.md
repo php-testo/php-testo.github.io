@@ -1,0 +1,125 @@
+---
+title: "Initialize Testo"
+llms: prompt
+llms_description: "Install Testo via Composer, generate testo.php with `vendor/bin/testo init`, verify the run, add a GitHub Actions or GitLab CI job, and wire up llm/skills for skill syncing."
+prompt_category: "Setup"
+---
+
+# Initialize Testo
+
+Set up the [Testo](https://github.com/php-testo/testo) PHP testing framework in this project. Work through the steps in order and report what you did at the end.
+
+## 0. Read the docs first
+
+Fetch `https://php-testo.github.io/llms.txt` before writing any config or test. Testo is **not** PHPUnit: assertions, discovery and lifecycle differ, and guessing the API from class names produces code that does not run. Escalate to `https://php-testo.github.io/llms-full.txt` when the short index does not answer a question.
+
+## 1. Install
+
+```bash
+composer require --dev testo/testo
+```
+
+## 2. Generate the config
+
+```bash
+vendor/bin/testo init
+```
+
+The command creates `testo.php` in the project root, detects suite folders under `tests/` (`Unit`, `Integration`, `Functional`, `Acceptance`, `Feature`, `E2E`, `Contract`), creates `tests/Unit/` if nothing is there, and adds a `composer test` script plus one `composer test:<suite>` per detected suite.
+
+Notes:
+
+- In a monorepo or sub-app layout, pass the sub-app root: `vendor/bin/testo init --path=app`. Every path baked into the generated config is resolved relative to that root.
+- An existing `testo.php` survives: `init` asks before overwriting it, and leaves it alone under `--no-interaction`.
+- `--no-interaction` also expects `<path>/src` to exist already.
+
+Then read `testo.php` and check `src` and the suite locations against the real layout.
+
+## 3. Verify the run
+
+```bash
+vendor/bin/testo --json
+```
+
+`--json` prints the whole run as a single JSON object on stdout and nothing else — parse that instead of the human-readable output. Exit codes: `0` everything passed, `1` one or more tests failed, `2` invalid command or configuration.
+
+If the project has no tests yet, write one small `#[Test]` class under `tests/Unit` so the run has something to report, and make sure it passes.
+
+## 4. Set up CI
+
+Ask which CI the project uses and add the single job for it. When a pipeline config already exists, add the Testo step to it and keep the caching and service containers already there.
+
+### GitHub Actions — `.github/workflows/tests.yml`
+
+```yaml
+name: Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [ '8.2', '8.3', '8.4' ]
+
+    name: PHP ${{ matrix.php }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+
+      - name: Install Composer dependencies
+        uses: ramsey/composer-install@v3
+
+      - name: Run Tests
+        run: vendor/bin/testo --log-junit=runtime/junit.xml
+
+      - name: Upload JUnit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-php${{ matrix.php }}
+          path: runtime/junit.xml
+```
+
+### GitLab CI — `.gitlab-ci.yml`
+
+```yaml
+stages:
+  - test
+
+tests:
+  stage: test
+  image: php:8.3-cli
+  before_script:
+    - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+    - composer install --no-interaction --prefer-dist --no-progress
+  script:
+    - vendor/bin/testo --log-junit=runtime/junit.xml
+  artifacts:
+    when: always
+    reports:
+      junit: runtime/junit.xml
+```
+
+Align the PHP versions with the constraint in `composer.json`.
+
+## 5. Offer skill syncing
+
+Testo ships AI-agent skills (writing tests, data providers, benchmarks, coverage, migration) inside the package, and the [`llm/skills`](https://packagist.org/packages/llm/skills) Composer plugin lays them out where agents look. Offer to set it up — it is `composer require --dev llm/skills` plus one `composer skills:init` — and if the offer is taken, follow <https://php-testo.github.io/docs/ai/prompts/skills.md>.
+
+## 6. Report
+
+Report what was installed, which suites `testo.php` declares, how the verification run ended, which CI file was added, and whether skill syncing was set up — and flag anything you had to guess about the project layout.

@@ -1,22 +1,13 @@
 /**
- * Prompts registry + `<prompts-list />` aggregator table.
+ * Prompts registry + the `<prompts-list />` card list.
  *
- * A prompt page is an English page under `docs/` marked with `llms: prompt`
- * in its frontmatter. Its body is the prompt text itself: llms.txt lists it
- * in the "Prompts" section (see llms.ts) and the page is served as-is,
- * frontmatter stripped, at its `.md` URL — that file is what an agent fetches.
+ * A prompt page is marked `llms: prompt` and its body is the prompt text
+ * itself — the `.md` served at its path is what an agent fetches, so nothing
+ * that isn't part of the prompt may reach it.
  *
- * Translations are picked up by mirrored path: `docs/ai/prompts/init.md`
- * has `ru/docs/ai/prompts/init.md` as its Russian version. Only the English
- * page carries the `llms: prompt` marker, per the llms.txt convention.
- *
- * Frontmatter (English page):
- *   llms: prompt
- *   llms_description: "..."    # llms.txt entry, and the table cell by default
- *   description: "..."         # optional — overrides the table cell
- *   prompt_category: "Setup"   # optional — adds a Category column
- *
- * Frontmatter (translation): `description` and `prompt_category`, both localized.
+ * The marker is an llms.txt field, and those live in English pages only, so a
+ * translation is claimed by mirrored path instead: `docs/ai/prompts/init.md`
+ * takes `ru/docs/ai/prompts/init.md` as its Russian version.
  */
 import type MarkdownIt from 'markdown-it'
 import { existsSync, readFileSync } from 'fs'
@@ -123,7 +114,7 @@ export function promptsBlockPlugin(md: MarkdownIt, opts: PromptsOptions = {}) {
   })
 
   md.renderer.rules['prompts_list'] = (tokens, idx) =>
-    renderPromptsList(md, tokens[idx].meta?.locale)
+    renderPromptsList(md, tokens[idx].meta?.locale, opts.baseUrl ?? '')
 }
 
 function renderPromptNote(locale: LocaleConfig, rawUrl: string): string {
@@ -134,37 +125,42 @@ function renderPromptNote(locale: LocaleConfig, rawUrl: string): string {
   return `<div class="tip custom-block prompt-note"><p>${text}</p></div>\n`
 }
 
-function renderPromptsList(md: MarkdownIt, locale?: LocaleConfig): string {
+function renderPromptsList(md: MarkdownIt, locale: LocaleConfig | undefined, baseUrl: string): string {
   const localeCode = locale?.code ?? 'en'
   const entries = registry.get(localeCode) ?? []
 
   if (entries.length === 0) return ''
 
-  const labels: Record<string, { prompt: string; category: string; desc: string }> = {
-    en: { prompt: 'Prompt', category: 'Category', desc: 'Description' },
-    ru: { prompt: 'Промпт', category: 'Категория', desc: 'Описание' },
-  }
-  const l = labels[localeCode] ?? labels.en
+  const l = localeCode === 'ru'
+    ? { open: 'Открыть промпт', copy: 'Скопировать ссылку', copied: 'Скопировано' }
+    : { open: 'Open prompt', copy: 'Copy URL', copied: 'Copied' }
 
-  const withCategory = entries.some(e => e.category)
-  const rows = [...entries].sort((a, b) =>
+  const cards = [...entries].sort((a, b) =>
     (a.category ?? '').localeCompare(b.category ?? '') || a.title.localeCompare(b.title))
 
-  let html = '<table class="attr-sortable prompts-list">\n<thead><tr>'
-  html += `<th data-sort="name">${escapeHtml(l.prompt)}</th>`
-  if (withCategory) html += `<th data-sort="category" data-dir="asc">${escapeHtml(l.category)}</th>`
-  html += `<th>${escapeHtml(l.desc)}</th>`
-  html += '</tr></thead>\n<tbody>\n'
+  let html = '<div class="prompt-cards">\n'
 
-  for (const row of rows) {
-    html += `<tr data-name="${escapeHtml(row.title.toLowerCase())}"`
-    html += ` data-category="${escapeHtml((row.category ?? '').toLowerCase())}">`
-    html += `<td><a href="${escapeHtml(row.pagePath)}">${escapeHtml(row.title)}</a></td>`
-    if (withCategory) html += `<td>${escapeHtml(row.category ?? '')}</td>`
-    html += `<td>${md.renderInline(row.description)}</td>`
-    html += '</tr>\n'
+  for (const card of cards) {
+    const href = card.pagePath + '.md'
+
+    html += '<div class="prompt-card">\n'
+    html += '  <span class="prompt-card-head">'
+    html += `<span class="prompt-card-title">${escapeHtml(card.title)}</span>`
+    if (card.category) {
+      html += `<span class="prompt-card-category">${escapeHtml(card.category)}</span>`
+    }
+    html += '</span>\n'
+    html += `  <span class="prompt-card-desc">${md.renderInline(card.description)}</span>\n`
+    html += '  <span class="prompt-card-actions">'
+    // `target` keeps VitePress's router from treating the .md path as a route
+    // and answering with its 404 page.
+    html += `<a class="prompt-card-btn" href="${escapeHtml(href)}" target="_blank" rel="noreferrer">${escapeHtml(l.open)}</a>`
+    html += `<button class="prompt-card-btn prompt-card-copy" type="button" data-url="${escapeHtml(baseUrl + href)}"`
+    html += ` data-copied="${escapeHtml(l.copied)}">${escapeHtml(l.copy)}</button>`
+    html += '</span>\n'
+    html += '</div>\n'
   }
 
-  html += '</tbody>\n</table>\n'
+  html += '</div>\n'
   return html
 }

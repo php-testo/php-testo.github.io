@@ -10,7 +10,7 @@
  *
  * "prompt" pages are ready-made prompts for AI agents: the page body is the
  * prompt text itself, listed in a dedicated "Prompts" section and served
- * as-is (frontmatter stripped) at its per-page .md URL. See docs/ai/prompts.md.
+ * as-is (frontmatter stripped) at its per-page .md URL. See docs/intro/prompts.md.
  */
 
 export const llmsConfig = {

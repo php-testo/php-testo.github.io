@@ -43,6 +43,28 @@ function setupSortableTable() {
   })
 }
 
+function setupPromptCopy() {
+  document.addEventListener('click', async (e) => {
+    const btn = (e.target as Element).closest?.('.prompt-card-copy') as HTMLElement | null
+    if (!btn || btn.classList.contains('is-copied')) return
+
+    try {
+      await navigator.clipboard.writeText(btn.dataset.url!)
+    } catch {
+      return
+    }
+
+    const label = btn.textContent!
+    btn.textContent = btn.dataset.copied!
+    btn.classList.add('is-copied')
+
+    setTimeout(() => {
+      btn.textContent = label
+      btn.classList.remove('is-copied')
+    }, 2000)
+  })
+}
+
 function setupFuncRefTooltips() {
   let activeTooltip: HTMLElement | null = null
   let activeRef: Element | null = null
@@ -140,6 +162,7 @@ export default {
     if (typeof window !== 'undefined') {
       setupFuncRefTooltips()
       setupSortableTable()
+      setupPromptCopy()
     }
   },
 } satisfies Theme
