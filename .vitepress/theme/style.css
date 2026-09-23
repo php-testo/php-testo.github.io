@@ -1321,3 +1321,36 @@ a.featured-post-card:hover {
     padding: 14px 16px;
   }
 }
+
+/* ===== TEAM CARDS (sponsor page) ===== */
+
+/* The cards render inside the markdown container, where `.vp-doc a` would
+   underline every link and repaint it in the brand color. */
+.vp-doc .testo-team .VPTeamMembers a {
+  font-weight: inherit;
+  text-decoration: none;
+}
+
+/* Lay the cards out three to a row, so a lone card takes a third of the page
+   instead of stretching to the widths the theme reserves for one and two cards.
+   The selectors carry the `.testo-team` wrapper so they outrank the component's
+   own scoped rules whatever order the stylesheets load in. */
+@media (min-width: 768px) {
+  .vp-doc .testo-team .VPTeamMembers.small .container {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  /* `!important` answers the theme's own: vp-doc.css pins a lone card's grid
+     to half the column, which would squeeze the three tracks into it. */
+  .vp-doc .testo-team .VPTeamMembers.small.count-1 .container,
+  .vp-doc .testo-team .VPTeamMembers.small.count-2 .container {
+    max-width: none !important;
+  }
+}
+
+/* The round GitHub mark reads smaller than the square glyphs beside it,
+   so it gets an optical size correction. */
+.vp-doc .testo-team .VPTeamMembers .vpi-social-github {
+  width: 22px;
+  height: 22px;
+}

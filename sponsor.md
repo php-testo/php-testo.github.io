@@ -1,37 +1,29 @@
 ---
+aside: false
 llms: false
 ---
 
+<script setup>
+import { VPTeamMembers } from 'vitepress/theme'
+import { members } from './.vitepress/theme/team'
+</script>
+
 # Become a Sponsor
 
-Support Testo's development and help build the future of PHP testing.
+Testo is distributed under the free BSD-3-Clause license. Developing and maintaining it takes a lot of time, and that time competes with paid work. Sponsorship makes it possible to put Testo first.
 
-## Why Sponsor?
+Any amount is welcome, and it goes straight to the author of Testo:
 
-Testo is an open-source project created to solve real-world problems in PHP testing. Your sponsorship helps:
+<div class="testo-team">
+  <VPTeamMembers size="small" :members="members" />
+</div>
 
-- **Maintain and improve** the core framework
-- **Develop new features** based on community needs
-- **Provide better documentation** and examples
-- **Support the ecosystem** with plugins and integrations
-- **Keep the project sustainable** for the long term
+## Company sponsorship
 
-## How to Support
+If your team writes its tests with Testo, your company can back it too. For **$500 per month** your logo appears on the Testo home page next to the other sponsors, with a link to your site.
 
-I accept support of any amount through:
+To discuss the details, write to [roxblnfk@gmail.com](mailto:roxblnfk@gmail.com).
 
-**[boosty.to/roxblnfk](https://boosty.to/roxblnfk)**
-
-Every contribution, big or small, helps make Testo better!
-
-## Company Sponsorship
-
-Want your company logo displayed on the Testo homepage?
-
-**$500/month** — Your company logo will be featured on the main page alongside other sponsors.
-
-For corporate sponsorship inquiries, please contact: [roxblnfk@gmail.com](mailto:roxblnfk@gmail.com)
-
----
-
-Thank you for considering supporting Testo! Every contribution helps make PHP testing better for everyone.
+::: tip Other ways to help
+Star the [Testo repository](https://github.com/php-testo/testo) on GitHub: the more stars it has, the more people find it. A good bug report, a pull request, an article about Testo, or a talk at a local meetup move the project forward just as much as money does.
+:::
