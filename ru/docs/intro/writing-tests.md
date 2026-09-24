@@ -133,6 +133,13 @@ Expect::notLeaks($connection);
     public function flakyExternalService(): void { /* ... */ }
     ```
 
+- Атрибут <attr>\Testo\Skip</attr> из плагина <plugin>Skip</plugin> пропускает тест, не удаляя его: тест попадает в отчёт со статусом <enum>\Testo\Core\Value\Status::Skipped</enum> и своей причиной, а его код не выполняется — даже его хуки <attr>\Testo\Lifecycle\BeforeTest</attr> и <attr>\Testo\Lifecycle\AfterTest</attr>:
+
+    ```php
+    #[Skip('broken by the pricing rework')]
+    public function calculatesTotal(): void { /* ... */ }
+    ```
+
 - Хуки жизненного цикла из плагина <plugin>Lifecycle</plugin> помогут подготовить окружение и очистить состояние между тестами:
   - <attr>\Testo\Lifecycle\BeforeTest</attr> — выполняется перед каждым тестом.
   - <attr>\Testo\Lifecycle\AfterTest</attr> — выполняется после каждого теста.

@@ -83,6 +83,10 @@ BeforeClass (один раз)
 AfterClass (один раз)
 ```
 
+::: info
+Тест с атрибутом <attr>\Testo\Skip</attr> до этих хуков не доходит: он попадает в отчёт со статусом <enum>\Testo\Core\Value\Status::Skipped</enum> ещё до начала своего запуска, поэтому <attr>\Testo\Lifecycle\BeforeTest</attr> и <attr>\Testo\Lifecycle\AfterTest</attr> для него не вызываются. Хуки класса выполняются, пока в тест-кейсе есть хотя бы один непропущенный тест; если пропущены все тесты, <attr>\Testo\Lifecycle\BeforeClass</attr> и <attr>\Testo\Lifecycle\AfterClass</attr> не вызываются, а класс не создаётся. Подробнее — в описании плагина <plugin>Skip</plugin>.
+:::
+
 ## Базовый пример
 
 ```php
