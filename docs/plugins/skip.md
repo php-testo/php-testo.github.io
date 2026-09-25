@@ -1,6 +1,6 @@
 ---
 outline: [2, 3]
-llms_description: "How to skip a test declaratively with #[Skip]: the test is reported as Skipped with its reason before anything runs, so #[BeforeTest]/#[AfterTest], data providers, #[Retry]/#[Repeat] and coverage never engage, and a fully skipped class runs no #[BeforeClass]/#[AfterClass]. Class-level skip and inheritance, where the reason shows up in reports, the SkipTest exception for skipping at run time, and how PHPUnit and Pest compare."
+llms_description: "How to skip a test declaratively with #[Skip]: the test is reported as Skipped with its reason before anything runs, so #[BeforeTest]/#[AfterTest], data providers, #[Retry]/#[Repeat] and coverage never engage, and a fully skipped class runs no #[BeforeClass]/#[AfterClass]. Class-level skip and inheritance, where the reason shows up in reports, the SkipTest exception for skipping at run time, and when to use #[Skip], SkipTest or a #[Group] filter."
 ---
 
 # Skip
@@ -61,11 +61,9 @@ final class BillingTest
 The skip is decided before the test starts, and the test is reported right where its own run would begin. Nothing that prepares, wraps or repeats a test body gets a chance to engage:
 
 - <attr>\Testo\Lifecycle\BeforeTest</attr> and <attr>\Testo\Lifecycle\AfterTest</attr> hooks are not called.
-- Data providers are not called: a data-driven test yields a **single** <enum>\Testo\Core\Value\Status::Skipped</enum> entry, not one per data set.
+- Data providers such as <attr>\Testo\Data\DataProvider</attr> are not called: a data-driven test yields a **single** <enum>\Testo\Core\Value\Status::Skipped</enum> entry, not one per data set.
 - <attr>\Testo\Retry</attr> and <attr>\Testo\Repeat</attr> never start their loop.
-- A method-level <attr>\Testo\Fiber\RunInFiber</attr> never wraps the test in a fiber, and no coverage is collected for it. Under a class-level `#[RunInFiber]` the skipped test still takes its turn in the case scheduler, but returns at once.
-
-The class-level hooks follow the case, not the test: <attr>\Testo\Lifecycle\BeforeClass</attr> and <attr>\Testo\Lifecycle\AfterClass</attr> still run while the case has at least one test left to run. When every test of the case is skipped, they are not called and the class is never constructed.
+- <attr>\Testo\Fiber\RunInFiber</attr> doesn't start a fiber for it, and no coverage is collected.
 
 ```php
 final class OrderTest
@@ -87,6 +85,8 @@ final class OrderTest
     }
 }
 ```
+
+The class-level hooks follow the case, not the test: <attr>\Testo\Lifecycle\BeforeClass</attr> and <attr>\Testo\Lifecycle\AfterClass</attr> still run while the case has at least one test left to run. When every test of the case is skipped, they are not called and the class is never constructed.
 
 A run consisting only of skipped tests is a success: <enum>\Testo\Core\Value\Status::Skipped</enum> is neither a failure nor an error, so the exit code is `0`.
 
@@ -141,5 +141,5 @@ All three keep a test from running, but they differ in when the decision is made
 | <attr>\Testo\Filter\Group</attr> + `--group=!slow` | at the runner invocation | not at all |
 
 ::: question Do I need to register the plugin?
-No. `SkipPlugin` is part of the default suite plugins, and the attribute wires its own interceptor. In a suite configured without the plugin the test is still reported as <enum>\Testo\Core\Value\Status::Skipped</enum>, and its `#[BeforeTest]`/`#[AfterTest]` hooks are still not called. What is lost is the class-level decision: a class whose tests are all skipped then runs its `#[BeforeClass]`/`#[AfterClass]` hooks, and a non-static hook constructs the class.
+No. `SkipPlugin` is part of the default suite plugins, and the attribute wires its own interceptor. In a suite configured without the plugin the test is still reported as <enum>\Testo\Core\Value\Status::Skipped</enum>, and its <attr>\Testo\Lifecycle\BeforeTest</attr>/<attr>\Testo\Lifecycle\AfterTest</attr> hooks are still not called. What is lost is the class-level decision: a class whose tests are all skipped then runs its <attr>\Testo\Lifecycle\BeforeClass</attr>/<attr>\Testo\Lifecycle\AfterClass</attr> hooks, and a non-static hook constructs the class.
 :::

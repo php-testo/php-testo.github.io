@@ -78,7 +78,3 @@ Retry forgives a single transient failure and stops as soon as the test passes. 
 ::: question What happens if a retry policy is defined at multiple levels?
 When multiple retry policies are defined, only the closest one to the test applies. For example, if the Test Suite has `maxAttempts: 3`, the class has `2`, and the method has `5`, the test will retry **up to 5 times**. Policies do not stack.
 :::
-
-::: question Does Retry apply to a test marked with `#[Skip]`?
-No. A test marked with <attr>\Testo\Skip</attr> is reported as <enum>\Testo\Core\Value\Status::Skipped</enum> before any attempt is made, so neither Retry nor Repeat engages for it.
-:::

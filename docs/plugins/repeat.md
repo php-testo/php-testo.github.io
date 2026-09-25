@@ -101,6 +101,4 @@ The two plugins look similar but solve opposite problems. Pick the one that matc
 
 ::: question What happens if a repetition is skipped or aborted?
 The loop terminates immediately and the test reports the corresponding status — Skipped, Cancelled, or Aborted. Only completed runs (passed or failed) count toward `$maxFailures`.
-
-A test marked with <attr>\Testo\Skip</attr> is a different case: the skip is reported before the loop starts, so no repetition happens at all.
 :::

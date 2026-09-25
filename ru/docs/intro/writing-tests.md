@@ -133,7 +133,7 @@ Expect::notLeaks($connection);
     public function flakyExternalService(): void { /* ... */ }
     ```
 
-- Атрибут <attr>\Testo\Skip</attr> из плагина <plugin>Skip</plugin> пропускает тест, не удаляя его: тест попадает в отчёт со статусом <enum>\Testo\Core\Value\Status::Skipped</enum> и своей причиной, а его код не выполняется — даже его хуки <attr>\Testo\Lifecycle\BeforeTest</attr> и <attr>\Testo\Lifecycle\AfterTest</attr>:
+- Атрибут <attr>\Testo\Skip</attr> из плагина <plugin>Skip</plugin> пропускает тест, не удаляя его: тест не выполняется, но остаётся в отчёте со статусом <enum>\Testo\Core\Value\Status::Skipped</enum> и указанной причиной:
 
     ```php
     #[Skip('broken by the pricing rework')]

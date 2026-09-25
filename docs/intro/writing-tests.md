@@ -134,7 +134,7 @@ Instead of base classes or magic methods, Testo bets on attributes.
     public function flakyExternalService(): void { /* ... */ }
     ```
 
-- The <attr>\Testo\Skip</attr> attribute from the <plugin>Skip</plugin> plugin skips a test without deleting it: the test is reported as <enum>\Testo\Core\Value\Status::Skipped</enum> with its reason, and none of its code runs — not even its <attr>\Testo\Lifecycle\BeforeTest</attr> and <attr>\Testo\Lifecycle\AfterTest</attr> hooks:
+- The <attr>\Testo\Skip</attr> attribute from the <plugin>Skip</plugin> plugin skips a test without deleting it: the test doesn't run, but stays in the report as <enum>\Testo\Core\Value\Status::Skipped</enum> with its reason:
 
     ```php
     #[Skip('broken by the pricing rework')]
