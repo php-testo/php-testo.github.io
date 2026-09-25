@@ -74,7 +74,7 @@ private static function calculateFinalPrice(
 ```php
 #[TestInline(
     arguments: ['john.doe@example.com'],
-    result: function (User $user) {
+    result: static function (User $user) {
         Assert::same('john.doe@example.com', $user->email);
         Assert::true($user->isActive);
         Assert::notNull($user->createdAt);

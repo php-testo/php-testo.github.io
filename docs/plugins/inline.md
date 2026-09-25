@@ -78,7 +78,7 @@ For complex checks, pass a closure as the second parameter, where you can perfor
 ```php
 #[TestInline(
     arguments: ['john.doe@example.com'],
-    result: function (User $user) {
+    result: static function (User $user) {
         Assert::same('john.doe@example.com', $user->email);
         Assert::true($user->isActive);
         Assert::notNull($user->createdAt);
