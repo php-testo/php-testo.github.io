@@ -1,7 +1,7 @@
 ---
 title: "Initialize Testo"
 llms: prompt
-llms_description: "Install Testo via Composer, generate testo.php with `vendor/bin/testo init`, verify the run, add a GitHub Actions or GitLab CI job, and wire up llm/skills for skill syncing."
+llms_description: "Install Testo via Composer and make sure the latest release fits (`composer why-not`, resolving blockers with the user), generate testo.php with `vendor/bin/testo init`, verify the run, add a GitHub Actions or GitLab CI job, and wire up llm/skills for skill syncing."
 prompt_category: "Setup"
 ---
 
@@ -18,6 +18,14 @@ Fetch `https://php-testo.github.io/llms.txt` before writing any config or test. 
 ```bash
 composer require --dev testo/testo
 ```
+
+Composer quietly settles for an older release when the project's constraints rule the latest one out, so check that the newest Testo actually fits. Look up the latest version (`composer show --available testo/testo`, the first entry under `versions` that is not a `-dev` branch) and ask Composer what stands in its way:
+
+```bash
+composer why-not testo/testo <latest-version>
+```
+
+If nothing blocks it and an older version got installed anyway, rerun `composer require --dev testo/testo:^<latest-version>`. If something blocks it, try to remove the cause: usually a package pinned too tightly in `composer.json` or a conflicting dependency that needs an update. Such fixes are rarely free — updating a package, loosening a constraint, or raising the PHP requirement touches the whole project — so lay out the options and let the user choose before changing anything. If the user decides to stay on the older release, carry on with it and mention that in the report.
 
 ## 2. Generate the config
 
@@ -122,4 +130,4 @@ Testo ships AI-agent skills (writing tests, data providers, benchmarks, coverage
 
 ## 6. Report
 
-Report what was installed, which suites `testo.php` declares, how the verification run ended, which CI file was added, and whether skill syncing was set up — and flag anything you had to guess about the project layout.
+Report what was installed (and, if it is not the latest Testo release, what holds it back), which suites `testo.php` declares, how the verification run ended, which CI file was added, and whether skill syncing was set up — and flag anything you had to guess about the project layout.

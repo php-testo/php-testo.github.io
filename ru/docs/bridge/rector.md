@@ -27,6 +27,17 @@ composer require --dev testo/bridge-rector rector/rector
 | PHPUnit → Testo | `TestoRectorSetList::PHPUNIT_TO_TESTO` |
 | Pest → Testo | `TestoRectorSetList::PEST_TO_TESTO` |
 
+Каждый набор переводит только то, у чего есть точный аналог в целевом фреймворке. Остальное остаётся на месте, а не удаляется молча — об этом чуть ниже.
+
+### Наборы для моков
+
+Собственных моков в ядре Testo нет, поэтому наборы для фреймворков тестовых дублёров не касаются: на какую библиотеку их переносить, выбираете вы. Для этого подключается отдельный набор — рядом с `PHPUNIT_TO_TESTO` или сам по себе:
+
+- `TestoRectorSetList::PHPUNIT_TO_DOUBLE` переносит `createMock()`/`createStub()` с цепочками `expects()`/`method()`/`will*()`/`with()` на [Double](https://github.com/jasonmccreary/double) (`testo/bridge-double`, PHP 8.3+). Сконфигурированные и частичные моки и `willReturnMap()` тоже переводятся, а PHPUnit-constraint без готового матчера превращается в предикат `Argument::satisfies()`, который выносит тот же вердикт.
+- `TestoRectorSetList::PHPUNIT_TO_MOCKERY` переводит те же цепочки на `Mockery::mock()` и `shouldReceive()`. Он подойдёт, если проект уже работает с Mockery или должен остаться на PHP 8.2. Ожидания после каждого теста тогда проверяет адаптер <plugin>Mockery</plugin>.
+- `TestoRectorSetList::MOCKERY_TO_DOUBLE` переносит на Double тесты, которые уже используют Mockery: `mock()`/`spy()`, `shouldReceive()`/`allows()`/`expects()`, `shouldHaveReceived()` и `Mockery::close()`. От тестового фреймворка набор не зависит и работает как с PHPUnit, так и с Testo.
+
+Правило для моков переписывает инструкцию настройки целиком или не трогает её вовсе. Формы без точного аналога — `prophesize()`, `getMockForAbstractClass()`, `addMethods()`, `withConsecutive()` — остаются в коде, их вы переносите вручную.
 
 ### Запуск конвертации
 
@@ -39,7 +50,10 @@ use Testo\Bridge\Rector\Set\TestoRectorSetList;
 
 return RectorConfig::configure()
     ->withPaths([__DIR__ . '/tests'])
-    ->withSets([TestoRectorSetList::PHPUNIT_TO_TESTO]);
+    ->withSets([
+        TestoRectorSetList::PHPUNIT_TO_TESTO,
+        TestoRectorSetList::PHPUNIT_TO_DOUBLE, // или PHPUNIT_TO_MOCKERY
+    ]);
 ```
 
 ```bash
@@ -53,7 +67,7 @@ Rector пройдёт по указанным файлам и перепишет
 :::
 
 ::: question Что происходит с тестом, который нельзя сконвертировать?
-Зависит от того, что именно неконвертируемо. Отдельную конструкцию без аналога (мок, PHPUnit-constraint, `arch()`-тест Pest) набор оставляет в коде как есть — остальное в тесте переписывается, а это место вы дочищаете руками. Если же целому тесту нужен живой рантайм Testo (направление Testo → PHPUnit), он превращается в видимый `markTestSkipped()` с причиной, а остальные тесты класса продолжают работать. Молча не удаляется ничего.
+Зависит от того, что именно неконвертируемо. Отдельную конструкцию без аналога (`prophesize()`, constraint в `assertThat()`, `arch()`-тест Pest) набор оставляет в коде как есть — остальное в тесте переписывается, а это место вы дочищаете руками. Если же целому тесту нужен живой рантайм Testo (направление Testo → PHPUnit), он превращается в видимый `markTestSkipped()` с причиной, а остальные тесты класса продолжают работать. Молча не удаляется ничего.
 :::
 
 ## Тестирование своих правил

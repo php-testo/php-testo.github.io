@@ -2,7 +2,7 @@
 outline: [2, 3]
 faqLevel: false
 llms: true
-llms_description: "How to convert test suites between Pest, PHPUnit and Testo with Rector rules, and how to test your own Rector rules from Testo. The testo/bridge-rector package ships three conversion sets (testo-to-phpunit, phpunit-to-testo, pest-to-testo) and a rule-testing toolkit: attach RectorTestingPlugin to a suite and mark a rule with the TestRectorFixtures attribute pointing at *.php.inc fixtures — each fixture runs through a freshly-booted Rector container and is reported as its own data set, no PHPUnit needed."
+llms_description: "How to convert test suites between Pest, PHPUnit and Testo with Rector rules, and how to test your own Rector rules from Testo. The testo/bridge-rector package ships three framework conversion sets (TESTO_TO_PHPUNIT, PHPUNIT_TO_TESTO, PEST_TO_TESTO), three mock sets that move PHPUnit createMock/createStub chains onto Double (PHPUNIT_TO_DOUBLE) or Mockery (PHPUNIT_TO_MOCKERY) and Mockery doubles onto Double (MOCKERY_TO_DOUBLE), and a rule-testing toolkit: attach RectorTestingPlugin to a suite and mark a rule with the TestRectorFixtures attribute pointing at *.php.inc fixtures — each fixture runs through a freshly-booted Rector container and is reported as its own data set, no PHPUnit needed."
 ---
 
 # Rector
@@ -31,6 +31,16 @@ Conversion works in three directions, and each one comes as a ready-made Rector 
 
 Each set converts the constructs that have a faithful counterpart in the target framework. Anything else is left untouched rather than dropped silently — more on that just below.
 
+### Mock sets
+
+Testo core has no mocking of its own, so the framework sets leave test doubles alone: which library the mocks move to is up to you. That choice is made by adding a separate mock set — next to `PHPUNIT_TO_TESTO`, or on its own:
+
+- `TestoRectorSetList::PHPUNIT_TO_DOUBLE` moves `createMock()`/`createStub()` and their `expects()`/`method()`/`will*()`/`with()` chains onto [Double](https://github.com/jasonmccreary/double) (`testo/bridge-double`, PHP 8.3+). Configured and partial mocks and `willReturnMap()` convert too, and a PHPUnit constraint without a dedicated matcher becomes an `Argument::satisfies()` predicate that gives the same verdict.
+- `TestoRectorSetList::PHPUNIT_TO_MOCKERY` converts the same chains onto `Mockery::mock()` and `shouldReceive()`. Pick it when the project already uses Mockery or has to stay on PHP 8.2; expectations are then verified after each test by the <plugin>Mockery</plugin> adapter.
+- `TestoRectorSetList::MOCKERY_TO_DOUBLE` moves a suite that already uses Mockery onto Double: `mock()`/`spy()`, `shouldReceive()`/`allows()`/`expects()`, `shouldHaveReceived()` and `Mockery::close()`. It doesn't care about the test framework, so it works on PHPUnit and Testo suites alike.
+
+A mock rule rewrites a configuration statement as a whole or leaves it untouched. Forms with no faithful counterpart — `prophesize()`, `getMockForAbstractClass()`, `addMethods()`, `withConsecutive()` — stay in the code for you to port by hand.
+
 ### Running a conversion
 
 The adapter adds no CLI command of its own — conversion runs through Rector as usual. Reference the set you need from your `rector.php`, point it at your tests, and run the process:
@@ -42,7 +52,10 @@ use Testo\Bridge\Rector\Set\TestoRectorSetList;
 
 return RectorConfig::configure()
     ->withPaths([__DIR__ . '/tests'])
-    ->withSets([TestoRectorSetList::PHPUNIT_TO_TESTO]);
+    ->withSets([
+        TestoRectorSetList::PHPUNIT_TO_TESTO,
+        TestoRectorSetList::PHPUNIT_TO_DOUBLE, // or PHPUNIT_TO_MOCKERY
+    ]);
 ```
 
 ```bash
@@ -56,7 +69,7 @@ Some constructs can't be converted — they simply have no faithful counterpart 
 :::
 
 ::: question What happens to a test that can't be converted?
-It depends on what exactly can't be converted. A standalone construct with no counterpart (a mock, a PHPUnit constraint, a Pest `arch()` test) is left in the code as-is — the rest of the test is rewritten and you clean that spot up by hand. When a whole test needs a live Testo runtime (the Testo → PHPUnit direction), it's turned into a visible `markTestSkipped()` with a reason, and the other tests in the class keep running. Either way, nothing is deleted silently.
+It depends on what exactly can't be converted. A standalone construct with no counterpart (`prophesize()`, a constraint in `assertThat()`, a Pest `arch()` test) is left in the code as-is — the rest of the test is rewritten and you clean that spot up by hand. When a whole test needs a live Testo runtime (the Testo → PHPUnit direction), it's turned into a visible `markTestSkipped()` with a reason, and the other tests in the class keep running. Either way, nothing is deleted silently.
 :::
 
 ## Testing your own rules
