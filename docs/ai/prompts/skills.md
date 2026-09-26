@@ -1,7 +1,7 @@
 ---
 title: "Set Up Agent Skills"
 llms: prompt
-llms_description: "Wire up the llm/skills Composer plugin so agents pick up Testo's bundled skills: pre-allow the plugin, bootstrap skills.json with skills:init, mirror the target into each agent's directory, and verify with skills:show."
+llms_description: "Wire up the llm/skills Composer plugin so agents pick up Testo's bundled skills: pre-allow the plugin, require llm/skills ^1.13 in the project even when it is installed globally, bootstrap skills.json with skills:init, mirror the target into each agent's directory, and verify the dependency, the config and the synced skills."
 prompt_category: "Setup"
 ---
 
@@ -36,10 +36,14 @@ Composer asks for permission to run a plugin, and an agent's shell run is not th
 ## 3. Install and configure in one line
 
 ```bash
-composer require --dev llm/skills
+composer require --dev "llm/skills:^1.13"
 composer skills:init --quick --no-interaction \
     --target=.agents/skills --alias=.claude/skills --alias=.cursor/skills
 ```
+
+Install the package into the project even if the plugin is already installed globally. A line like `[llm/skills] running auto-sync…` during `composer install` only shows that *your* machine has it: teammates and CI don't have your global plugin, and without an entry in `require-dev` nothing syncs for them.
+
+Version 1.13 is the floor: older releases don't know `--quick`, `--target` or `--alias`, and without them `skills:init` writes a config with no aliases. If the command rejects these flags, an older copy of the plugin is answering, usually the global one. Update it (`composer global update llm/skills`) and check that the project got 1.13 or newer.
 
 `skills:init` writes `skills.json` at the project root and syncs right away — the flags decide what lands in the file:
 
@@ -56,11 +60,20 @@ Left alone in a project with no configuration, the plugin makes the same offer b
 ## 4. Verify
 
 ```bash
-composer skills:show             # what is synced, what is skipped, and why
-composer skills:update           # re-sync by hand; --dry-run previews
+composer show --direct llm/skills   # the package is a direct dependency of the project
+composer skills:show                # what is synced, what is skipped, and why
+composer skills:update              # re-sync by hand; --dry-run previews
 ```
 
-The step is done when the target directory holds the `testo-*` skill directories and every alias path resolves to the target. A `[skip] not trusted` line names a donor waiting for a `--trust` pattern; a directory that already holds real files of its own is reported rather than replaced, and has to be resolved by hand.
+The step is done when all of this holds:
+
+- `composer show --direct llm/skills` lists the package at version 1.13 or newer.
+- `skills.json` declares the layout from step 1: `aliases` names every agent path, and `target` is present whenever it differs from the default `.agents/skills`. A file with only `dependencies` and an empty `sources` list means `skills:init` ran without the flags — rerun it with `--force` and the flags.
+- The target directory holds the `testo-*` skill directories, and every alias path resolves to the target.
+
+Judge by the config, not by a link that happens to be there: a link left over from an earlier attempt resolves just as well, but a fresh clone won't have it.
+
+A `[skip] not trusted` line names a donor waiting for a `--trust` pattern; a directory that already holds real files of its own is reported rather than replaced, and has to be resolved by hand.
 
 Local edits survive a sync: only files the donor actually ships get overwritten, so a `local.md` dropped next to a bundled skill stays put.
 
@@ -70,4 +83,4 @@ Local edits survive a sync: only files the donor actually ships get overwritten,
 
 ## 6. Report
 
-Report what `skills.json` declares, which agent paths are wired to the target, that the `testo-*` skills are present, and anything `skills:show` skipped along with the reason.
+Report which `llm/skills` version the project requires, what `skills.json` declares, which agent paths are wired to the target, that the `testo-*` skills are present, and anything `skills:show` skipped along with the reason.

@@ -57,6 +57,8 @@ If the project has no tests yet, write one small `#[Test]` class under `tests/Un
 
 Ask which CI the project uses and add the single job for it. When a pipeline config already exists, add the Testo step to it and keep the caching and service containers already there.
 
+If the existing job calls a shared reusable workflow (`uses: <org>/<repo>/.github/workflows/...`), ask the user before replacing it with a job of your own: the shared workflow is usually how the whole organization keeps CI uniform. Check whether it accepts a custom test command — if so, passing it the Testo run may be all that is needed.
+
 ### GitHub Actions — `.github/workflows/tests.yml`
 
 ```yaml
@@ -122,12 +124,16 @@ tests:
       junit: runtime/junit.xml
 ```
 
-Align the PHP versions with the constraint in `composer.json`.
+Align the PHP versions with the constraint in `composer.json`. Testo needs PHP 8.2 or newer. When the project still declares support for an older version, every supported version should stay covered by CI, so ask the user how to handle it and offer the options:
+
+- raise the project's minimum PHP version to 8.2;
+- keep a separate PHPUnit job for the older versions until the transition is over;
+- knowingly accept that the older version goes untested, and say so in the report.
 
 ## 5. Offer skill syncing
 
-Testo ships AI-agent skills (writing tests, data providers, benchmarks, coverage, migration) inside the package, and the [`llm/skills`](https://packagist.org/packages/llm/skills) Composer plugin lays them out where agents look. Offer to set it up — it is `composer require --dev llm/skills` plus one `composer skills:init` — and if the offer is taken, follow <https://php-testo.github.io/docs/ai/prompts/skills.md>.
+Testo ships AI-agent skills (writing tests, data providers, benchmarks, coverage, migration) inside the package, and the [`llm/skills`](https://packagist.org/packages/llm/skills) Composer plugin lays them out where agents look. Offer to set it up — it is `composer require --dev "llm/skills:^1.13"` plus one `composer skills:init` — and if the offer is taken, follow <https://php-testo.github.io/docs/ai/prompts/skills.md>.
 
 ## 6. Report
 
-Report what was installed (and, if it is not the latest Testo release, what holds it back), which suites `testo.php` declares, how the verification run ended, which CI file was added, and whether skill syncing was set up — and flag anything you had to guess about the project layout.
+Report what was installed (and, if it is not the latest Testo release, what holds it back), which suites `testo.php` declares, how the verification run ended, which CI file was added and which PHP versions it covers, and whether skill syncing was set up — and flag anything you had to guess about the project layout.
