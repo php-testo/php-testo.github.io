@@ -83,6 +83,10 @@ BeforeClass (один раз)
 AfterClass (один раз)
 ```
 
+::: info
+Для теста с атрибутом <attr>\Testo\Skip</attr> хуки <attr>\Testo\Lifecycle\BeforeTest</attr> и <attr>\Testo\Lifecycle\AfterTest</attr> не вызываются: тест помечается пропущенным ещё до начала запуска. Подробнее — в описании плагина <plugin>Skip</plugin>.
+:::
+
 ## Базовый пример
 
 ```php

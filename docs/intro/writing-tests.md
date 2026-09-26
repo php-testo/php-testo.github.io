@@ -134,6 +134,13 @@ Instead of base classes or magic methods, Testo bets on attributes.
     public function flakyExternalService(): void { /* ... */ }
     ```
 
+- The <attr>\Testo\Skip</attr> attribute from the <plugin>Skip</plugin> plugin skips a test without deleting it: the test doesn't run, but stays in the report as <enum>\Testo\Core\Value\Status::Skipped</enum> with its reason:
+
+    ```php
+    #[Skip('broken by the pricing rework')]
+    public function calculatesTotal(): void { /* ... */ }
+    ```
+
 - Lifecycle hooks from the <plugin>Lifecycle</plugin> plugin help set up the environment and clean state between tests:
     - <attr>\Testo\Lifecycle\BeforeTest</attr> — runs before each test.
     - <attr>\Testo\Lifecycle\AfterTest</attr> — runs after each test.

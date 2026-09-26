@@ -83,6 +83,10 @@ BeforeClass (once)
 AfterClass (once)
 ```
 
+::: info
+For a test marked with <attr>\Testo\Skip</attr>, the <attr>\Testo\Lifecycle\BeforeTest</attr> and <attr>\Testo\Lifecycle\AfterTest</attr> hooks are not called: the test is reported as skipped before its run begins. See the <plugin>Skip</plugin> plugin for details.
+:::
+
 ## Basic Example
 
 ```php
