@@ -49,7 +49,7 @@ ru/           # Russian locale (same structure)
 **Adding pages:**
 1. Create both `docs/page.md` (EN) and `ru/docs/page.md` (RU)
 2. Add to sidebar in `.vitepress/config.mts` for both locales
-3. Internal links: `./page` or `/docs/page` (no `.html`)
+3. Internal links: point at the source file with its `.md` extension, relative (`./page.md`, `../guide/page.md#anchor`) or root-absolute within the locale (`/docs/page.md`, `/ru/docs/page.md`) — the IDE resolves `.md` paths for navigation, and VitePress rewrites them to clean URLs
 
 **Syncing translations:**
 - **CRITICAL:** When changing documentation content (adding sections, examples, explanations), ALWAYS update BOTH English and Russian versions
