@@ -58,12 +58,13 @@ final class BillingTest
 
 ## What never runs
 
-The skip is decided before the test starts, and the test is reported right where its own run would begin. Nothing that prepares, wraps or repeats a test body gets a chance to engage:
+The skip is decided before the test starts: the test is reported as <enum>\Testo\Core\Value\Status::Skipped</enum> on the spot, and that's the end of it. Nothing that normally prepares, wraps or repeats the test body ever runs:
 
 - <attr>\Testo\Lifecycle\BeforeTest</attr> and <attr>\Testo\Lifecycle\AfterTest</attr> hooks are not called.
 - Data providers such as <attr>\Testo\Data\DataProvider</attr> are not called: a data-driven test yields a **single** <enum>\Testo\Core\Value\Status::Skipped</enum> entry, not one per data set.
 - <attr>\Testo\Retry</attr> and <attr>\Testo\Repeat</attr> never start their loop.
-- <attr>\Testo\Fiber\RunInFiber</attr> doesn't start a fiber for it, and no coverage is collected.
+- <attr>\Testo\Fiber\RunInFiber</attr> doesn't start a fiber.
+- No code coverage is collected.
 
 ```php
 final class OrderTest
@@ -86,9 +87,9 @@ final class OrderTest
 }
 ```
 
-The class-level hooks follow the case, not the test: <attr>\Testo\Lifecycle\BeforeClass</attr> and <attr>\Testo\Lifecycle\AfterClass</attr> still run while the case has at least one test left to run. When every test of the case is skipped, they are not called and the class is never constructed.
+Class-level hooks work differently, because they belong to the case rather than to a single test: <attr>\Testo\Lifecycle\BeforeClass</attr> and <attr>\Testo\Lifecycle\AfterClass</attr> still run as long as the case has at least one test that isn't skipped. When every test of the case is skipped, they are not called and the class is never even instantiated.
 
-A run consisting only of skipped tests is a success: <enum>\Testo\Core\Value\Status::Skipped</enum> is neither a failure nor an error, so the exit code is `0`.
+A run consisting only of skipped tests is a success: <enum>\Testo\Core\Value\Status::Skipped</enum> is neither a failure nor an error.
 
 ## Where the reason shows up
 
