@@ -221,11 +221,6 @@ final class DatabaseTest extends LaravelTestCase
 The fastest option for most applications. `migrate:fresh` runs once per process (and again if the schema disappears), then every test runs inside a transaction that is rolled back afterward.
 
 </description>
-<param name="$seed">Run the default seeder after migrating.</param>
-<param name="$seeder">Seeder class to run after migrating.</param>
-<param name="$dropViews">Drop all views before migrating.</param>
-<param name="$dropTypes">Drop all types before migrating (PostgreSQL).</param>
-<param name="$connections">Connections to wrap in a transaction. `null` means the default connection.</param>
 </signature>
 
 <signature h="3" name="#[\Laratesto\Attribute\DatabaseTransactions(?array $connections = null)]">
@@ -235,7 +230,6 @@ The fastest option for most applications. `migrate:fresh` runs once per process 
 Use it when the schema is already in place, for example when it is created outside the tests.
 
 </description>
-<param name="$connections">Connections to wrap in a transaction. `null` means the default connection.</param>
 </signature>
 
 <signature h="3" name="#[\Laratesto\Attribute\DatabaseMigrations(bool $seed = false, ?string $seeder = null, bool $dropViews = false, bool $dropTypes = false)]">
@@ -245,10 +239,6 @@ Use it when the schema is already in place, for example when it is created outsi
 The slowest option, but every test starts with a freshly built schema.
 
 </description>
-<param name="$seed">Run the default seeder after migrating.</param>
-<param name="$seeder">Seeder class to run after migrating.</param>
-<param name="$dropViews">Drop all views before migrating.</param>
-<param name="$dropTypes">Drop all types before migrating (PostgreSQL).</param>
 </signature>
 
 <signature h="3" name="#[\Laratesto\Attribute\DatabaseTruncation(bool $seed = false, ?string $seeder = null, bool $dropViews = false, bool $dropTypes = false, ?array $connections = null, ?array $tables = null, ?array $exceptTables = null)]">
@@ -258,13 +248,6 @@ The slowest option, but every test starts with a freshly built schema.
 Useful when the code under test can't run inside a transaction. The first time, the database is migrated with `migrate:fresh`; after that, the tables are truncated before each test and, if requested, seeded again. Nothing is cleaned up after the test.
 
 </description>
-<param name="$seed">Run the default seeder after migrating or truncating.</param>
-<param name="$seeder">Seeder class to run after migrating or truncating.</param>
-<param name="$dropViews">Drop all views before migrating.</param>
-<param name="$dropTypes">Drop all types before migrating (PostgreSQL).</param>
-<param name="$connections">Connections whose tables are truncated. `null` means the default connection.</param>
-<param name="$tables">Truncate only these tables.</param>
-<param name="$exceptTables">Truncate all tables except these.</param>
 </signature>
 
 ::: tip Seeding inside a test
@@ -289,7 +272,7 @@ git diff -- tests
 
 By default, the command processes the `tests` directory; to narrow it down, pass one or more `--path` options. Some constructs can't be converted safely, for example a database trait with non-trivial configuration. The migrator leaves such spots as they are, marks them with a `laratesto-residual` comment and lists them in `laratesto-residuals.json`. Fix them by hand, review the diff and run the tests. An empty report doesn't guarantee the tests behave exactly as before, so running them is the real check.
 
-The command's exit code tells you how it went: `0` means everything was converted, `2` means some spots need manual work, and `1` means the migration failed.
+The command's exit code tells you how it went: `2` means some spots need manual work, and `1` means the migration failed.
 
 The suite from the [Setup](#setup) section only looks in `tests/Testo`, so it won't see the converted tests. Add their directory to `location`: in a default Laravel skeleton, application tests live in `tests/Feature`. It's better to keep unit tests that don't need the application in a separate suite without the <plugin>Laravel</plugin> plugin, so no application is booted for them.
 
@@ -297,4 +280,4 @@ The full list of options and supported constructs is in the migrator's [migratio
 
 ## Skills for AI agents
 
-Laratesto ships its own skills for AI agents: `laratesto-configure`, `laratesto-write-tests` and `laratesto-migrate-from-phpunit`. They are installed the same way as Testo's skills, through the `llm/skills` Composer plugin described on the [AI Agents](../intro/ai-agents.md#skills-for-agents) page. Since you require `ichinya/laratesto` directly, the plugin trusts it and syncs its skills without any extra setup.
+Laratesto ships skills for AI agents. They are installed the same way as Testo's, through [`llm/skills`](../intro/ai-agents.md#skills-for-agents).

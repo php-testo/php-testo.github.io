@@ -219,11 +219,6 @@ final class DatabaseTest extends LaravelTestCase
 Самый быстрый вариант для большинства приложений. `migrate:fresh` выполняется один раз за процесс (и повторно, если схема пропала), а дальше каждый тест работает внутри транзакции, которая после него откатывается.
 
 </description>
-<param name="$seed">Запустить сидер по умолчанию после миграций.</param>
-<param name="$seeder">Класс сидера, который нужно запустить после миграций.</param>
-<param name="$dropViews">Удалить все представления перед миграциями.</param>
-<param name="$dropTypes">Удалить все типы перед миграциями (PostgreSQL).</param>
-<param name="$connections">Соединения, которые оборачиваются в транзакцию. `null` — соединение по умолчанию.</param>
 </signature>
 
 <signature h="3" name="#[\Laratesto\Attribute\DatabaseTransactions(?array $connections = null)]">
@@ -233,7 +228,6 @@ final class DatabaseTest extends LaravelTestCase
 Подходит, когда схема уже готова, например если её создают вне тестов.
 
 </description>
-<param name="$connections">Соединения, которые оборачиваются в транзакцию. `null` — соединение по умолчанию.</param>
 </signature>
 
 <signature h="3" name="#[\Laratesto\Attribute\DatabaseMigrations(bool $seed = false, ?string $seeder = null, bool $dropViews = false, bool $dropTypes = false)]">
@@ -243,10 +237,6 @@ final class DatabaseTest extends LaravelTestCase
 Самый медленный вариант, зато каждый тест начинается с заново построенной схемы.
 
 </description>
-<param name="$seed">Запустить сидер по умолчанию после миграций.</param>
-<param name="$seeder">Класс сидера, который нужно запустить после миграций.</param>
-<param name="$dropViews">Удалить все представления перед миграциями.</param>
-<param name="$dropTypes">Удалить все типы перед миграциями (PostgreSQL).</param>
 </signature>
 
 <signature h="3" name="#[\Laratesto\Attribute\DatabaseTruncation(bool $seed = false, ?string $seeder = null, bool $dropViews = false, bool $dropTypes = false, ?array $connections = null, ?array $tables = null, ?array $exceptTables = null)]">
@@ -256,13 +246,6 @@ final class DatabaseTest extends LaravelTestCase
 Пригодится, если тестируемый код не может работать внутри транзакции. В первый раз база создаётся через `migrate:fresh`, а дальше перед каждым тестом таблицы очищаются и при необходимости заново заполняются сидерами. После теста ничего не убирается.
 
 </description>
-<param name="$seed">Запустить сидер по умолчанию после миграций или очистки.</param>
-<param name="$seeder">Класс сидера, который нужно запустить после миграций или очистки.</param>
-<param name="$dropViews">Удалить все представления перед миграциями.</param>
-<param name="$dropTypes">Удалить все типы перед миграциями (PostgreSQL).</param>
-<param name="$connections">Соединения, таблицы которых очищаются. `null` — соединение по умолчанию.</param>
-<param name="$tables">Очищать только эти таблицы.</param>
-<param name="$exceptTables">Очищать все таблицы, кроме этих.</param>
 </signature>
 
 ::: tip Сидеры внутри теста
@@ -287,7 +270,7 @@ git diff -- tests
 
 По умолчанию команда обрабатывает каталог `tests`. Чтобы сузить область, укажите один или несколько параметров `--path`. Некоторые конструкции безопасно преобразовать нельзя, например трейт БД с нестандартной настройкой. Такие места мигратор оставляет как есть, помечает комментарием `laratesto-residual` и перечисляет в отчёте `laratesto-residuals.json`. Поправьте их вручную, просмотрите diff и запустите тесты. Пустой отчёт ещё не гарантирует, что тесты ведут себя как раньше, так что настоящая проверка — их запуск.
 
-Код выхода команды показывает результат: `0` — всё преобразовано, `2` — часть мест нужно доработать вручную, `1` — миграция не удалась.
+Код выхода команды показывает результат: `2` — часть мест нужно доработать вручную, `1` — миграция не удалась.
 
 Test Suite из раздела [Настройка](#setup) ищет тесты только в `tests/Testo` и преобразованных тестов не увидит. Добавьте их каталог в `location`: в стандартном скелете Laravel тесты приложения лежат в `tests/Feature`. Unit-тесты, которым приложение не нужно, лучше вынести в отдельный Test Suite без плагина <plugin>Laravel</plugin>, чтобы приложение не поднималось ради каждого из них.
 
@@ -295,4 +278,4 @@ Test Suite из раздела [Настройка](#setup) ищет тесты 
 
 ## Скиллы для AI-агентов
 
-В Laratesto есть собственные скиллы для AI-агентов: `laratesto-configure`, `laratesto-write-tests` и `laratesto-migrate-from-phpunit`. Устанавливаются они так же, как скиллы Testo, через Composer-плагин `llm/skills`, о котором рассказано на странице [AI-агенты](../intro/ai-agents.md#скиллы-для-агентов). Пакет `ichinya/laratesto` подключён напрямую, поэтому плагин доверяет ему и синхронизирует его скиллы без дополнительной настройки.
+В Laratesto есть скиллы для AI-агентов. Устанавливаются они так же, как скиллы Testo, через [`llm/skills`](../intro/ai-agents.md#скиллы-для-агентов).
