@@ -4,27 +4,27 @@ outline: [2, 3]
 
 # Laravel (Laratesto)
 
-[Laratesto](https://github.com/ichinya/laratesto) поднимает Laravel-приложение для каждого теста Testo. Бридж даёт доступ к HTTP, базе данных, авторизации, сессиям, фасадам и Artisan — тесты работают с самим Laravel и проверяют поведение приложения.
+[Laratesto](https://github.com/ichinya/laratesto) позволяет тестировать Laravel-приложения на Testo. Пакет поднимает новое приложение для каждого теста и даёт знакомые по тестам Laravel хелперы: HTTP-запросы, проверки аутентификации, сессии и базы данных, фасады с их фейками и Artisan-команды.
 
-Это **сторонний пакет, который поддерживает [ichinya](https://github.com/ichinya)**. Он называется [`ichinya/laratesto`](https://packagist.org/packages/ichinya/laratesto) в Composer и выпускается в собственном репозитории.
+::: info Сторонний пакет
+Laratesto разрабатывает [ichinya](https://github.com/ichinya), а не команда Testo. Пакет опубликован на Packagist как [`ichinya/laratesto`](https://packagist.org/packages/ichinya/laratesto). Сообщать об ошибках и следить за релизами можно в [его репозитории](https://github.com/ichinya/laratesto).
+:::
 
 <plugin-info class="\Laratesto\LaravelPlugin" name="Laravel" github="https://github.com/ichinya/laratesto" />
 
 ## Установка
 
-Начните в корне настроенного приложения на Laravel 13. Нужны PHP 8.3+ и Testo `^0.10.56`; текущая матрица совместимости бриджа охватывает PHP 8.3–8.5. В этом руководстве используются Laratesto 0.8.2 и отдельный пакет мигратора 0.2.1.
+Для Laratesto нужны приложение на Laravel 13 и PHP 8.3 или новее. Выполните в корне приложения:
 
 ```bash
-composer require --dev ichinya/laratesto:^0.8.2
+composer require --dev ichinya/laratesto
 ```
 
-Composer установит Testo как зависимость. **Для runtime не нужен `phpunit/phpunit`.** Существующие тесты PHPUnit или Pest могут продолжать работать со своим раннером, пока вы переходите на Testo. Для примеров выделим каталог `tests/Testo`, чтобы новый suite не подхватил старые тесты.
+Подходящую версию Testo Composer установит вместе с пакетом. PHPUnit для Laratesto не нужен, поэтому существующие тесты на PHPUnit или Pest могут работать со своим раннером, пока вы постепенно переходите на Testo.
 
-## Быстрый старт
+## Настройка {#setup}
 
-### Настройка suite
-
-Создайте `testo.php` в корне приложения. Если конфигурация уже есть, добавьте в неё этот suite:
+Создайте `testo.php` в корне приложения или добавьте Test Suite в уже существующий конфиг. В примере тесты Testo лежат в отдельном каталоге `tests/Testo`, чтобы новый Test Suite не подхватил старые тесты:
 
 ```php
 <?php
@@ -58,13 +58,21 @@ return new ApplicationConfig(
 );
 ```
 
-`basePath` указывает на корень приложения с файлом `bootstrap/app.php`. Бридж задаёт `APP_ENV` до загрузки приложения, поэтому Laravel может прочитать `.env.testing`. Значения из `config` применяются после bootstrap; настройки, которые нужны service provider во время загрузки, задавайте в тестовом окружении.
+У <class>\Laratesto\Config\LaravelConfig</class> три параметра:
 
-Для примера с базой ниже нужен PDO SQLite. Используйте отдельную тестовую базу: атрибуты работы с БД могут запускать миграции и очищать таблицы.
+- `basePath` — корень приложения, то есть каталог с `bootstrap/app.php`.
+- `environment` становится значением `APP_ENV`. Laratesto выставляет его до загрузки приложения, так что Laravel, как обычно, прочитает `.env.testing`.
+- `config` переопределяет значения конфигурации. Они применяются уже после загрузки приложения, и сервис-провайдер, который читает настройку во время загрузки, их не увидит. Такие настройки задавайте в `.env.testing`.
 
-### HTTP-тест
+::: warning Не используйте рабочую базу
+Атрибуты для работы с БД, о которых речь пойдёт ниже, запускают миграции и очищают таблицы. Подключайте тесты к базе, которую не страшно потерять, например к SQLite в памяти, как в примере (для неё нужно расширение PDO SQLite).
+:::
 
-Добавьте JSON-маршрут в `routes/web.php`:
+## Пишем тесты
+
+### Наследование от базового класса
+
+Проще всего начать с наследования от <class>\Laratesto\Testing\LaravelTestCase</class>. Добавим JSON-маршрут в `routes/web.php`:
 
 ```php
 <?php
@@ -74,7 +82,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/laratesto/ping', static fn() => response()->json(['message' => 'pong']));
 ```
 
-Создайте `tests/Testo/HttpTest.php`:
+И тест для него в `tests/Testo/HttpTest.php`:
 
 ```php
 <?php
@@ -98,19 +106,21 @@ final class HttpTest extends LaravelTestCase
 }
 ```
 
-Запустите тест из корня приложения:
+Запустите Test Suite из корня приложения:
 
 ```bash
-php vendor/bin/testo run --suite=Laravel
+vendor/bin/testo run --suite=Laravel
 ```
 
-Запрос проходит через HTTP kernel Laravel. Ответ оборачивается в <class>\Laratesto\Testing\LaravelResponse</class>, а результаты проверок попадают в Testo.
+Запрос проходит через настоящее HTTP-ядро Laravel, веб-сервер для этого не нужен. В ответ приходит <class>\Laratesto\Testing\LaravelResponse</class>: его проверки выглядят так же, как в Laravel, но засчитываются в Testo.
 
-Ставьте <attr>\Testo\Test</attr> **на тестовые методы**, а не на весь Laravel-класс: иначе Testo обнаружит и публичные служебные методы бриджа. Если в suite уже принято называть тестовые методы `test*()`, явно подключите <plugin>Convention</plugin>.
+::: warning Помечайте методы, а не класс
+Ставьте <attr>\Testo\Test</attr> на каждый тестовый метод. Если поставить атрибут на класс, тестами станут все его публичные методы, включая служебные методы, унаследованные от базового класса. Если вам привычнее называть тесты `test*()`, подключите к Test Suite плагин <plugin>Convention</plugin>.
+:::
 
 ### Трейт вместо базового класса
 
-Если тест уже наследует базовый класс проекта, подключите <class>\Laratesto\Testing\InteractsWithLaravel</class>. Плагин <plugin>Laravel</plugin> в конфигурации suite всё равно нужен. Например, создайте `tests/Testo/ContainerTest.php`:
+Если ваши тесты уже наследуют собственный базовый класс, подключите трейт <class>\Laratesto\Testing\InteractsWithLaravel</class>: он даёт классу те же хелперы. Плагин <plugin>Laravel</plugin> в Test Suite нужен и в этом случае. Например, `tests/Testo/ContainerTest.php`:
 
 ```php
 <?php
@@ -135,31 +145,47 @@ final class ContainerTest
 }
 ```
 
-## Жизненный цикл и возможности бриджа
+### Что есть под рукой
 
-Каждый тест получает свежее приложение. Подготовку, которой нужен Laravel, выполняйте в защищённом хуке <func>\Laratesto\Testing\InteractsWithLaravel::setUpLaravel()</func> после инъекции приложения; очистку с доступом к приложению — в <func>\Laratesto\Testing\InteractsWithLaravel::tearDownLaravel()</func>. Затем бридж сбросит состояние Laravel. Testo может переиспользовать экземпляр тестового класса, поэтому поля для отдельного теста инициализируйте в setup, не рассчитывая на повторный вызов конструктора.
+Базовый класс и трейт дают одинаковый набор защищённых хелперов:
 
-И базовый класс, и трейт предоставляют:
+- HTTP-запросы (`get()`, `postJson()` и другие), свои заголовки, bearer-токены и отключение middleware. Cookies из ответа уходят со следующим запросом того же теста, как в браузере.
+- Аутентификация (`actingAs()`, `assertAuthenticated()`), сессия и проверки базы данных (`assertDatabaseHas()`, `assertModelExists()` и другие).
+- Сервис-контейнер, фасады и их фейки (`Queue::fake()`, `Event::fake()`).
+- Запуск Artisan-команд с проверкой кода выхода и вывода.
 
-- HTTP- и JSON-запросы, проверки ответов, управление middleware и передачу cookies между запросами одного теста.
-- Авторизацию, проверки сессии и базы данных.
-- Контейнер сервисов, фасады и Laravel fakes. Встроенный слой совместимости позволяет использовать проверки фреймворка без PHPUnit; это не раннер PHPUnit и не полная реализация MockObject.
-- Запуск Artisan-команд и проверки кода завершения и вывода.
+Фейки Laravel проверяют ожидания через ассерты PHPUnit. Laratesto содержит небольшую замену этих классов, поэтому фейки работают и без установленного PHPUnit. Полноценным PHPUnit она при этом не является: например, `createMock()` в ней нет, а для моков стоит взять <plugin>Mockery</plugin>. Полный список хелперов и их ограничения описаны в [README Laratesto](https://github.com/ichinya/laratesto#http-helpers).
 
-Поддерживаемые методы и границы совместимости описаны в [README Laratesto](https://github.com/ichinya/laratesto#http-helpers). Выполняйте тесты приложения последовательно: из нативных Fiber-режимов поддерживается только Solo, без чередования тестов приложения.
+## Жизненный цикл приложения
+
+Каждый тест получает новый экземпляр приложения. Если для подготовки теста нужно само приложение (контейнер, конфигурация, фасады), вынесите её в хук <func>\Laratesto\Testing\InteractsWithLaravel::setUpLaravel()</func>. Очистку, которой тоже нужно приложение, поместите в <func>\Laratesto\Testing\InteractsWithLaravel::tearDownLaravel()</func>. Один тест проходит так:
+
+1. Laratesto загружает приложение и передаёт его в тест.
+2. Если у теста есть атрибут для БД, база подготавливается.
+3. Вызывается `setUpLaravel()`.
+4. Выполняется сам тест.
+5. Вызывается `tearDownLaravel()`.
+6. Транзакция или миграции откатываются, и Laratesto сбрасывает состояние Laravel.
+
+<signature compact name="\Laratesto\Testing\InteractsWithLaravel::setUpLaravel(): void">
+<short>Защищённый хук перед каждым тестом: приложение уже загружено, база подготовлена.</short>
+</signature>
+
+<signature compact name="\Laratesto\Testing\InteractsWithLaravel::tearDownLaravel(): void">
+<short>Защищённый хук после каждого теста, пока приложение ещё доступно.</short>
+</signature>
+
+Учтите, что Testo создаёт один экземпляр тестового класса и использует его для всех тестов этого класса (подробнее в <plugin>Lifecycle</plugin>). Конструктор вызывается только один раз, поэтому свойства, которые нужны каждому тесту заново, сбрасывайте в `setUpLaravel()`.
+
+::: warning По одному тесту за раз
+Laravel хранит много глобального состояния, поэтому тесты приложения должны выполняться строго друг за другом. Если вы используете <attr>\Testo\Fiber\RunInFiber</attr>, оставьте режим по умолчанию <enum>\Testo\Fiber\Schedule::Solo</enum>. С режимами <enum>\Testo\Fiber\Schedule::RoundRobin</enum> и <enum>\Testo\Fiber\Schedule::Random</enum> тесты класса чередовались бы, поэтому Laratesto завершит их с ошибкой.
+:::
 
 ## Изоляция базы данных
 
-Используйте атрибуты бриджа из `Laratesto\Attribute` вместо PHPUnit-трейтов Laravel для работы с БД:
+Трейты Laravel вроде `RefreshDatabase` рассчитаны на PHPUnit. С Laratesto вместо них используются одноимённые атрибуты из пространства имён `Laratesto\Attribute`. Любой из них можно поставить как на тестовый метод, так и на весь класс.
 
-| Атрибут | Поведение |
-|---------|-----------|
-| <attr>\Laratesto\Attribute\RefreshDatabase</attr> | Подготавливает схему и откатывает транзакцию теста; поддерживает сидинг и выбор соединений. |
-| <attr>\Laratesto\Attribute\DatabaseTransactions</attr> | Оборачивает тест в транзакцию; схема должна быть готова заранее. |
-| <attr>\Laratesto\Attribute\DatabaseMigrations</attr> | Запускает миграции перед тестом и откатывает их после. |
-| <attr>\Laratesto\Attribute\DatabaseTruncation</attr> | Выполняет миграции и очищает настроенные базы между тестами. |
-
-Подготовка БД выполняется до <func>\Laratesto\Testing\InteractsWithLaravel::setUpLaravel()</func>, очистка — после <func>\Laratesto\Testing\InteractsWithLaravel::tearDownLaravel()</func>. Если в приложении используются стандартные модель пользователя и миграция Laravel, добавьте `tests/Testo/DatabaseTest.php`:
+Если в приложении остались стандартная модель `User` и её миграция, тест с базой выглядит так (`tests/Testo/DatabaseTest.php`):
 
 ```php
 <?php
@@ -186,43 +212,87 @@ final class DatabaseTest extends LaravelTestCase
 }
 ```
 
+<signature h="3" name="#[\Laratesto\Attribute\RefreshDatabase(bool $seed = false, ?string $seeder = null, bool $dropViews = false, bool $dropTypes = false, ?array $connections = null)]">
+<short>Один раз накатывает миграции, а каждый тест оборачивает в транзакцию с откатом.</short>
+<description>
+
+Самый быстрый вариант для большинства приложений. `migrate:fresh` выполняется один раз за процесс (и повторно, если схема пропала), а дальше каждый тест работает внутри транзакции, которая после него откатывается.
+
+</description>
+<param name="$seed">Запустить сидер по умолчанию после миграций.</param>
+<param name="$seeder">Класс сидера, который нужно запустить после миграций.</param>
+<param name="$dropViews">Удалить все представления перед миграциями.</param>
+<param name="$dropTypes">Удалить все типы перед миграциями (PostgreSQL).</param>
+<param name="$connections">Соединения, которые оборачиваются в транзакцию. `null` — соединение по умолчанию.</param>
+</signature>
+
+<signature h="3" name="#[\Laratesto\Attribute\DatabaseTransactions(?array $connections = null)]">
+<short>Оборачивает каждый тест в транзакцию с откатом, миграции не запускает.</short>
+<description>
+
+Подходит, когда схема уже готова, например если её создают вне тестов.
+
+</description>
+<param name="$connections">Соединения, которые оборачиваются в транзакцию. `null` — соединение по умолчанию.</param>
+</signature>
+
+<signature h="3" name="#[\Laratesto\Attribute\DatabaseMigrations(bool $seed = false, ?string $seeder = null, bool $dropViews = false, bool $dropTypes = false)]">
+<short>Выполняет `migrate:fresh` перед каждым тестом и откатывает миграции после него.</short>
+<description>
+
+Самый медленный вариант, зато каждый тест начинается с заново построенной схемы.
+
+</description>
+<param name="$seed">Запустить сидер по умолчанию после миграций.</param>
+<param name="$seeder">Класс сидера, который нужно запустить после миграций.</param>
+<param name="$dropViews">Удалить все представления перед миграциями.</param>
+<param name="$dropTypes">Удалить все типы перед миграциями (PostgreSQL).</param>
+</signature>
+
+<signature h="3" name="#[\Laratesto\Attribute\DatabaseTruncation(bool $seed = false, ?string $seeder = null, bool $dropViews = false, bool $dropTypes = false, ?array $connections = null, ?array $tables = null, ?array $exceptTables = null)]">
+<short>Очищает таблицы перед каждым тестом.</short>
+<description>
+
+Пригодится, если тестируемый код не может работать внутри транзакции. В первый раз база создаётся через `migrate:fresh`, а дальше перед каждым тестом таблицы очищаются и при необходимости заново заполняются сидерами. После теста ничего не убирается.
+
+</description>
+<param name="$seed">Запустить сидер по умолчанию после миграций или очистки.</param>
+<param name="$seeder">Класс сидера, который нужно запустить после миграций или очистки.</param>
+<param name="$dropViews">Удалить все представления перед миграциями.</param>
+<param name="$dropTypes">Удалить все типы перед миграциями (PostgreSQL).</param>
+<param name="$connections">Соединения, таблицы которых очищаются. `null` — соединение по умолчанию.</param>
+<param name="$tables">Очищать только эти таблицы.</param>
+<param name="$exceptTables">Очищать все таблицы, кроме этих.</param>
+</signature>
+
+::: tip Сидеры внутри теста
+Метода `$this->seed()` из `TestCase` Laravel здесь нет. Используйте параметры атрибута `seed` и `seeder` или вызовите в тесте `Artisan::call('db:seed', ['--force' => true])`.
+:::
+
 ## Миграция с PHPUnit
 
-CLI миграции и Laravel-правила Rector находятся в отдельном пакете [`ichinya/laratesto-rector`](https://github.com/ichinya/laratesto-rector). Установите его рядом с runtime из Packagist — дополнительные репозитории и dev-ветки не нужны:
+У Laratesto есть отдельный пакет [`ichinya/laratesto-rector`](https://github.com/ichinya/laratesto-rector), который переводит существующие тесты Laravel с PHPUnit на Testo. Он построен на Rector и использует общие правила [интеграции с Rector](./rector.md), добавляя к ним правила для Laravel. Например, он заменяет трейт `RefreshDatabase` одноимённым атрибутом и ставит <attr>\Testo\Test</attr> на тестовые методы.
 
 ```bash
-composer require --dev ichinya/laratesto-rector:^0.2.1
-php artisan package:discover
+composer require --dev ichinya/laratesto-rector
 ```
 
-Сначала закоммитьте исходники тестов. Просмотрите план миграции, затем примените изменения:
+Перед миграцией закоммитьте тесты: если в файлах есть незакоммиченные правки, мигратор откажется их менять. Затем запустите его дважды: сначала для предпросмотра, потом чтобы применить изменения.
 
 ```bash
-php artisan laratesto:migrate-rector
-php artisan laratesto:migrate-rector --apply
+php artisan laratesto:migrate-rector          # предпросмотр: файлы не меняются
+php artisan laratesto:migrate-rector --apply  # переписать тесты
 git diff -- tests
 ```
 
-По умолчанию обрабатывается каталог `tests`; для более узкой области можно несколько раз указать `--path`. Успешный dry-run не меняет исходники, но записывает `laratesto-residuals.json`. Код завершения `2` означает, что остались ручные доработки — residuals. Код `1` сообщает об ошибке проверки безопасности, конфигурации или обработки. Просмотрите маркеры и преобразованный код, затем запустите все мигрированные тесты. Сам по себе пустой отчёт не доказывает сохранение поведения.
+По умолчанию команда обрабатывает каталог `tests`. Чтобы сузить область, укажите один или несколько параметров `--path`. Некоторые конструкции безопасно преобразовать нельзя, например трейт БД с нестандартной настройкой. Такие места мигратор оставляет как есть, помечает комментарием `laratesto-residual` и перечисляет в отчёте `laratesto-residuals.json`. Поправьте их вручную, просмотрите diff и запустите тесты. Пустой отчёт ещё не гарантирует, что тесты ведут себя как раньше, так что настоящая проверка — их запуск.
 
-Suite из быстрого старта сканирует только `tests/Testo`. До запуска Testo добавьте преобразованные feature-тесты в его `location`, сохранив отдельные unit suites там, где они нужны; иначе мигрированные тесты не выполнятся. Для стандартного скелета Laravel укажите `location: ['tests']`, чтобы проверить все преобразованные примеры в настроенном Laravel suite:
+Код выхода команды показывает результат: `0` — всё преобразовано, `2` — часть мест нужно доработать вручную, `1` — миграция не удалась.
 
-```bash
-php vendor/bin/testo run --suite=Laravel
-```
+Test Suite из раздела [Настройка](#setup) ищет тесты только в `tests/Testo` и преобразованных тестов не увидит. Добавьте их каталог в `location`: в стандартном скелете Laravel тесты приложения лежат в `tests/Feature`. Unit-тесты, которым приложение не нужно, лучше вынести в отдельный Test Suite без плагина <plugin>Laravel</plugin>, чтобы приложение не поднималось ради каждого из них.
 
-Мигратор переиспользует подходящие общие правила `testo/bridge-rector` и сохраняет проверки совместимости для Laravel. Параметры, residuals и поддерживаемые конструкции описаны в его [руководстве по миграции](https://github.com/ichinya/laratesto-rector/blob/main/MIGRATING.md). Старый встроенный конвертер `laratesto:migrate-phpunit` объявлен устаревшим.
+Полный список параметров и поддерживаемых конструкций есть в [руководстве по миграции](https://github.com/ichinya/laratesto-rector/blob/main/MIGRATING.md).
 
-## Необязательные Agent Skills
+## Скиллы для AI-агентов
 
-В Laratesto входят skills `laratesto-configure`, `laratesto-write-tests` и `laratesto-migrate-from-phpunit`. Они дополняют [инструкции Testo для агентов](../intro/ai-agents.md) и поставляются вместе с runtime; пакет миграции остаётся отдельной зависимостью.
-
-Для синхронизации установите необязательный Composer-плагин [`llm/skills`](https://github.com/roxblnfk/skills). Разрешите его при запросе Composer, затем выберите каталог вашего агента и доверенные пакеты в инициализаторе:
-
-```bash
-composer require --dev llm/skills
-composer skills:init
-composer skills:update ichinya/laratesto testo/testo --no-discovery
-```
-
-Настройки `skills.json`, доверие, каталог назначения и auto-sync принадлежат вашему приложению. Установка одного Laratesto не включает плагин и не выбирает настройки агента. Ручное копирование и полный список описаны в [руководстве по skills Laratesto](https://github.com/ichinya/laratesto/tree/v0.8.2/skills).
+В Laratesto есть собственные скиллы для AI-агентов: `laratesto-configure`, `laratesto-write-tests` и `laratesto-migrate-from-phpunit`. Устанавливаются они так же, как скиллы Testo, через Composer-плагин `llm/skills`, о котором рассказано на странице [AI-агенты](../intro/ai-agents.md#скиллы-для-агентов). Пакет `ichinya/laratesto` подключён напрямую, поэтому плагин доверяет ему и синхронизирует его скиллы без дополнительной настройки.
