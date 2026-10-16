@@ -4,10 +4,10 @@ outline: [2, 3]
 
 # Laravel (Laratesto)
 
-[Laratesto](https://github.com/ichinya/laratesto) позволяет тестировать Laravel-приложения на Testo. Пакет поднимает новое приложение для каждого теста и даёт знакомые по тестам Laravel хелперы: HTTP-запросы, проверки аутентификации, сессии и базы данных, фасады с их фейками и Artisan-команды.
+[Laratesto](https://packagist.org/packages/ichinya/laratesto) помогает тестировать Laravel-приложения на Testo. Пакет поднимает новое приложение для каждого теста и даёт знакомые по тестам Laravel хелперы: HTTP-запросы, проверки аутентификации, сессии и базы данных, фасады с их фейками и Artisan-команды.
 
 ::: info Сторонний пакет
-Laratesto разрабатывает [ichinya](https://github.com/ichinya), а не команда Testo. Пакет опубликован на Packagist как [`ichinya/laratesto`](https://packagist.org/packages/ichinya/laratesto). Сообщать об ошибках и следить за релизами можно в [его репозитории](https://github.com/ichinya/laratesto).
+Laratesto разрабатывается и поддерживается сторонним разработчиком [ichinya](https://github.com/ichinya). Сообщать об ошибках и следить за релизами можно в [его репозитории](https://github.com/ichinya/laratesto).
 :::
 
 <plugin-info class="\Laratesto\LaravelPlugin" name="Laravel" github="https://github.com/ichinya/laratesto" />
@@ -20,49 +20,41 @@ Laratesto разрабатывает [ichinya](https://github.com/ichinya), а �
 composer require --dev ichinya/laratesto
 ```
 
-Подходящую версию Testo Composer установит вместе с пакетом. PHPUnit для Laratesto не нужен, поэтому существующие тесты на PHPUnit или Pest могут работать со своим раннером, пока вы постепенно переходите на Testo.
+Подходящую версию Testo Composer установит вместе с пакетом. Переходить можно постепенно: существующие тесты на PHPUnit или Pest продолжат работать со своим раннером.
 
-## Настройка {#setup}
+## Настройка
 
-Создайте `testo.php` в корне приложения или добавьте Test Suite в уже существующий конфиг. В примере тесты Testo лежат в отдельном каталоге `tests/Testo`, чтобы новый Test Suite не подхватил старые тесты:
+Зарегистрируйте <class>\Laratesto\LaravelPlugin</class> в секции `plugins` того Test Suite, тестам которого нужно запущенное приложение Laravel. Обычно это feature-тесты. Юнит-тесты лучше держать в отдельном Test Suite без плагина, чтобы приложение не поднималось ради каждого из них. Если Testo в проекте ещё не настроен, начните со страницы [Начало работы](../intro/getting-started.md#конфигурация).
 
 ```php
-<?php
-
-declare(strict_types=1);
-
 use Laratesto\Config\LaravelConfig;
 use Laratesto\LaravelPlugin;
-use Testo\Application\Config\ApplicationConfig;
 use Testo\Application\Config\SuiteConfig;
 
-return new ApplicationConfig(
-    suites: [
-        new SuiteConfig(
-            name: 'Laravel',
-            location: ['tests/Testo'],
-            plugins: [
-                new LaravelPlugin(new LaravelConfig(
-                    basePath: __DIR__,
-                    environment: 'testing',
-                    config: [
-                        'database.default' => 'sqlite',
-                        'database.connections.sqlite.database' => ':memory:',
-                        'cache.default' => 'array',
-                        'session.driver' => 'array',
-                    ],
-                )),
+new SuiteConfig(
+    name: 'Laravel',
+    location: ['tests/Feature'],
+    plugins: [
+        new LaravelPlugin(new LaravelConfig(
+            basePath: __DIR__,
+            environment: 'testing',
+            config: [
+                'database.default' => 'sqlite',
+                'database.connections.sqlite.database' => ':memory:',
+                'cache.default' => 'array',
+                'session.driver' => 'array',
             ],
-        ),
+        )),
     ],
 );
 ```
 
-У <class>\Laratesto\Config\LaravelConfig</class> три параметра:
-
-- `basePath` — корень приложения, то есть каталог с `bootstrap/app.php`.
-- `environment` становится значением `APP_ENV`. Laratesto выставляет его до загрузки приложения, так что Laravel, как обычно, прочитает `.env.testing`.
-- `config` переопределяет значения конфигурации. Они применяются уже после загрузки приложения, и сервис-провайдер, который читает настройку во время загрузки, их не увидит. Такие настройки задавайте в `.env.testing`.
+<signature h="3" name="new \Laratesto\Config\LaravelConfig(string $basePath, string $environment = 'testing', array $config = [])">
+<short>Определяет, как Laratesto загружает Laravel-приложение для каждого теста.</short>
+<param name="$basePath">Корень приложения, то есть каталог с `bootstrap/app.php`.</param>
+<param name="$environment">Становится значением `APP_ENV`. Laratesto выставляет его до загрузки приложения, так что Laravel, как обычно, прочитает `.env.testing`.</param>
+<param name="$config">Переопределяет значения конфигурации. Они применяются уже после загрузки приложения, и сервис-провайдер, который читает настройку во время загрузки, их не увидит. Такие настройки задавайте в `.env.testing`.</param>
+</signature>
 
 ::: warning Не используйте рабочую базу
 Атрибуты для работы с БД, о которых речь пойдёт ниже, запускают миграции и очищают таблицы. Подключайте тесты к базе, которую не страшно потерять, например к SQLite в памяти, как в примере (для неё нужно расширение PDO SQLite).
@@ -82,21 +74,21 @@ use Illuminate\Support\Facades\Route;
 Route::get('/laratesto/ping', static fn() => response()->json(['message' => 'pong']));
 ```
 
-И тест для него в `tests/Testo/HttpTest.php`:
+И тест для него в `tests/Feature/HttpTest.php`:
 
 ```php
 <?php
 
 declare(strict_types=1);
 
-namespace Tests\Testo;
+namespace Tests\Feature;
 
 use Laratesto\Testing\LaravelTestCase;
 use Testo\Test;
 
+#[Test]
 final class HttpTest extends LaravelTestCase
 {
-    #[Test]
     public function returnsJson(): void
     {
         $this->get('/laratesto/ping')
@@ -106,38 +98,28 @@ final class HttpTest extends LaravelTestCase
 }
 ```
 
-Запустите Test Suite из корня приложения:
-
-```bash
-vendor/bin/testo run --suite=Laravel
-```
-
-Запрос проходит через настоящее HTTP-ядро Laravel, веб-сервер для этого не нужен. В ответ приходит <class>\Laratesto\Testing\LaravelResponse</class>: его проверки выглядят так же, как в Laravel, но засчитываются в Testo.
-
-::: warning Помечайте методы, а не класс
-Ставьте <attr>\Testo\Test</attr> на каждый тестовый метод. Если поставить атрибут на класс, тестами станут все его публичные методы, включая служебные методы, унаследованные от базового класса. Если вам привычнее называть тесты `test*()`, подключите к Test Suite плагин <plugin>Convention</plugin>.
-:::
+При запуске теста запрос проходит через настоящее HTTP-ядро Laravel, веб-сервер для этого не нужен. В ответ приходит <class>\Laratesto\Testing\LaravelResponse</class>: его проверки выглядят так же, как в Laravel, но засчитываются в Testo.
 
 ### Трейт вместо базового класса
 
-Если ваши тесты уже наследуют собственный базовый класс, подключите трейт <class>\Laratesto\Testing\InteractsWithLaravel</class>: он даёт классу те же хелперы. Плагин <plugin>Laravel</plugin> в Test Suite нужен и в этом случае. Например, `tests/Testo/ContainerTest.php`:
+Если ваши тесты уже наследуют собственный базовый класс, подключите трейт <class>\Laratesto\Testing\InteractsWithLaravel</class>: он даёт классу те же хелперы. Плагин <plugin>Laravel</plugin> в Test Suite нужен и в этом случае. Например, `tests/Feature/ContainerTest.php`:
 
 ```php
 <?php
 
 declare(strict_types=1);
 
-namespace Tests\Testo;
+namespace Tests\Feature;
 
 use Laratesto\Testing\InteractsWithLaravel;
 use Testo\Assert;
 use Testo\Test;
 
+#[Test]
 final class ContainerTest
 {
     use InteractsWithLaravel;
 
-    #[Test]
     public function usesTheTestingEnvironment(): void
     {
         Assert::same($this->app()->environment(), 'testing');
@@ -185,23 +167,23 @@ Laravel хранит много глобального состояния, по�
 
 Трейты Laravel вроде `RefreshDatabase` рассчитаны на PHPUnit. С Laratesto вместо них используются одноимённые атрибуты из пространства имён `Laratesto\Attribute`. Любой из них можно поставить как на тестовый метод, так и на весь класс.
 
-Если в приложении остались стандартная модель `User` и её миграция, тест с базой выглядит так (`tests/Testo/DatabaseTest.php`):
+Если в приложении остались стандартная модель `User` и её миграция, тест с базой выглядит так (`tests/Feature/DatabaseTest.php`):
 
 ```php
 <?php
 
 declare(strict_types=1);
 
-namespace Tests\Testo;
+namespace Tests\Feature;
 
 use App\Models\User;
 use Laratesto\Attribute\RefreshDatabase;
 use Laratesto\Testing\LaravelTestCase;
 use Testo\Test;
 
+#[Test]
 final class DatabaseTest extends LaravelTestCase
 {
-    #[Test]
     #[RefreshDatabase]
     public function persistsAUser(): void
     {
@@ -271,8 +253,6 @@ git diff -- tests
 По умолчанию команда обрабатывает каталог `tests`. Чтобы сузить область, укажите один или несколько параметров `--path`. Некоторые конструкции безопасно преобразовать нельзя, например трейт БД с нестандартной настройкой. Такие места мигратор оставляет как есть, помечает комментарием `laratesto-residual` и перечисляет в отчёте `laratesto-residuals.json`. Поправьте их вручную, просмотрите diff и запустите тесты. Пустой отчёт ещё не гарантирует, что тесты ведут себя как раньше, так что настоящая проверка — их запуск.
 
 Код выхода команды показывает результат: `2` — часть мест нужно доработать вручную, `1` — миграция не удалась.
-
-Test Suite из раздела [Настройка](#setup) ищет тесты только в `tests/Testo` и преобразованных тестов не увидит. Добавьте их каталог в `location`: в стандартном скелете Laravel тесты приложения лежат в `tests/Feature`. Unit-тесты, которым приложение не нужно, лучше вынести в отдельный Test Suite без плагина <plugin>Laravel</plugin>, чтобы приложение не поднималось ради каждого из них.
 
 Полный список параметров и поддерживаемых конструкций есть в [руководстве по миграции](https://github.com/ichinya/laratesto-rector/blob/main/MIGRATING.md).
 

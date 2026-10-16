@@ -6,10 +6,10 @@ llms_description: "How to test Laravel applications with Testo through the third
 
 # Laravel (Laratesto)
 
-[Laratesto](https://github.com/ichinya/laratesto) lets you test Laravel applications with Testo. It boots a fresh Laravel application for every test and brings the helpers you know from Laravel's own testing layer: HTTP requests, authentication, session and database assertions, facades with their fakes, and Artisan commands.
+[Laratesto](https://packagist.org/packages/ichinya/laratesto) helps you test Laravel applications with Testo. It boots a fresh Laravel application for every test and brings the helpers you know from Laravel's own testing layer: HTTP requests, authentication, session and database assertions, facades with their fakes, and Artisan commands.
 
 ::: info Third-party package
-Laratesto is developed by [ichinya](https://github.com/ichinya), not by the Testo team. It is published on Packagist as [`ichinya/laratesto`](https://packagist.org/packages/ichinya/laratesto). Report issues and follow releases in [its repository](https://github.com/ichinya/laratesto).
+Laratesto is developed and maintained by a third-party developer, [ichinya](https://github.com/ichinya). Report issues and follow releases in [its repository](https://github.com/ichinya/laratesto).
 :::
 
 <plugin-info class="\Laratesto\LaravelPlugin" name="Laravel" github="https://github.com/ichinya/laratesto" />
@@ -22,49 +22,41 @@ Laratesto needs a Laravel 13 application and PHP 8.3 or newer. Run this in the a
 composer require --dev ichinya/laratesto
 ```
 
-Composer pulls in a compatible version of Testo along with it. Laratesto doesn't need PHPUnit, so your existing PHPUnit or Pest tests can keep running on their own runner while you move to Testo step by step.
+Composer pulls in a compatible version of Testo along with it. You can move over step by step: existing PHPUnit or Pest tests keep running on their own runner.
 
 ## Setup
 
-Create `testo.php` in the application root, or add a suite to the one you already have. The example below keeps Testo tests in a separate `tests/Testo` directory, so the new suite doesn't pick up your old tests:
+Register <class>\Laratesto\LaravelPlugin</class> in the `plugins` section of the Test Suite whose tests need a running Laravel application, usually feature tests. Unit tests are better kept in a separate suite without the plugin, so an application isn't booted for each of them. If Testo isn't configured in the project yet, start with [Getting Started](../intro/getting-started.md#configuration).
 
 ```php
-<?php
-
-declare(strict_types=1);
-
 use Laratesto\Config\LaravelConfig;
 use Laratesto\LaravelPlugin;
-use Testo\Application\Config\ApplicationConfig;
 use Testo\Application\Config\SuiteConfig;
 
-return new ApplicationConfig(
-    suites: [
-        new SuiteConfig(
-            name: 'Laravel',
-            location: ['tests/Testo'],
-            plugins: [
-                new LaravelPlugin(new LaravelConfig(
-                    basePath: __DIR__,
-                    environment: 'testing',
-                    config: [
-                        'database.default' => 'sqlite',
-                        'database.connections.sqlite.database' => ':memory:',
-                        'cache.default' => 'array',
-                        'session.driver' => 'array',
-                    ],
-                )),
+new SuiteConfig(
+    name: 'Laravel',
+    location: ['tests/Feature'],
+    plugins: [
+        new LaravelPlugin(new LaravelConfig(
+            basePath: __DIR__,
+            environment: 'testing',
+            config: [
+                'database.default' => 'sqlite',
+                'database.connections.sqlite.database' => ':memory:',
+                'cache.default' => 'array',
+                'session.driver' => 'array',
             ],
-        ),
+        )),
     ],
 );
 ```
 
-<class>\Laratesto\Config\LaravelConfig</class> takes three settings:
-
-- `basePath` is the application root, the directory that contains `bootstrap/app.php`.
-- `environment` becomes `APP_ENV`. Laratesto sets it before the application boots, so Laravel loads `.env.testing` as usual.
-- `config` overrides configuration values. They are applied after the application has booted, so a service provider that reads a setting while booting won't see the override: put such settings in `.env.testing` instead.
+<signature h="3" name="new \Laratesto\Config\LaravelConfig(string $basePath, string $environment = 'testing', array $config = [])">
+<short>Configures how Laratesto boots the Laravel application for each test.</short>
+<param name="$basePath">The application root, the directory that contains `bootstrap/app.php`.</param>
+<param name="$environment">Becomes `APP_ENV`. Laratesto sets it before the application boots, so Laravel loads `.env.testing` as usual.</param>
+<param name="$config">Overrides configuration values. They are applied after the application has booted, so a service provider that reads a setting while booting won't see the override: put such settings in `.env.testing` instead.</param>
+</signature>
 
 ::: warning Use a throwaway database
 The database attributes described below run migrations and truncate tables. Point tests at a database you don't mind losing, like the in-memory SQLite from the example (it needs the PDO SQLite extension).
@@ -84,21 +76,21 @@ use Illuminate\Support\Facades\Route;
 Route::get('/laratesto/ping', static fn() => response()->json(['message' => 'pong']));
 ```
 
-And a test for it in `tests/Testo/HttpTest.php`:
+And a test for it in `tests/Feature/HttpTest.php`:
 
 ```php
 <?php
 
 declare(strict_types=1);
 
-namespace Tests\Testo;
+namespace Tests\Feature;
 
 use Laratesto\Testing\LaravelTestCase;
 use Testo\Test;
 
+#[Test]
 final class HttpTest extends LaravelTestCase
 {
-    #[Test]
     public function returnsJson(): void
     {
         $this->get('/laratesto/ping')
@@ -108,38 +100,28 @@ final class HttpTest extends LaravelTestCase
 }
 ```
 
-Run the suite from the application root:
-
-```bash
-vendor/bin/testo run --suite=Laravel
-```
-
-The request goes through Laravel's real HTTP kernel, without a web server. The response comes back as <class>\Laratesto\Testing\LaravelResponse</class>: its assertions look just like Laravel's, but they report to Testo.
-
-::: warning Mark methods, not the class
-Put <attr>\Testo\Test</attr> on each test method. On the class, it would turn every public method into a test, including the helper methods inherited from the base class. If you'd rather recognize tests by their `test*()` names, enable the <plugin>Convention</plugin> plugin for the suite.
-:::
+When the test runs, the request goes through Laravel's real HTTP kernel, without a web server. The response comes back as <class>\Laratesto\Testing\LaravelResponse</class>: its assertions look just like Laravel's, but they report to Testo.
 
 ### Using the trait
 
-If your tests already extend a base class of your own, use the <class>\Laratesto\Testing\InteractsWithLaravel</class> trait instead: it gives a class the same helpers. The suite still needs the <plugin>Laravel</plugin> plugin. For example, `tests/Testo/ContainerTest.php`:
+If your tests already extend a base class of your own, use the <class>\Laratesto\Testing\InteractsWithLaravel</class> trait instead: it gives a class the same helpers. The suite still needs the <plugin>Laravel</plugin> plugin. For example, `tests/Feature/ContainerTest.php`:
 
 ```php
 <?php
 
 declare(strict_types=1);
 
-namespace Tests\Testo;
+namespace Tests\Feature;
 
 use Laratesto\Testing\InteractsWithLaravel;
 use Testo\Assert;
 use Testo\Test;
 
+#[Test]
 final class ContainerTest
 {
     use InteractsWithLaravel;
 
-    #[Test]
     public function usesTheTestingEnvironment(): void
     {
         Assert::same($this->app()->environment(), 'testing');
@@ -187,23 +169,23 @@ Laravel keeps a lot of global state, so application tests must run strictly one 
 
 Laravel's `RefreshDatabase` and similar traits are built for PHPUnit. With Laratesto, use attributes with the same names from the `Laratesto\Attribute` namespace instead. You can put any of them on a test method or on the whole class.
 
-For a standard Laravel application with the default `User` model and its migration, a database test looks like this (`tests/Testo/DatabaseTest.php`):
+For a standard Laravel application with the default `User` model and its migration, a database test looks like this (`tests/Feature/DatabaseTest.php`):
 
 ```php
 <?php
 
 declare(strict_types=1);
 
-namespace Tests\Testo;
+namespace Tests\Feature;
 
 use App\Models\User;
 use Laratesto\Attribute\RefreshDatabase;
 use Laratesto\Testing\LaravelTestCase;
 use Testo\Test;
 
+#[Test]
 final class DatabaseTest extends LaravelTestCase
 {
-    #[Test]
     #[RefreshDatabase]
     public function persistsAUser(): void
     {
@@ -273,8 +255,6 @@ git diff -- tests
 By default, the command processes the `tests` directory; to narrow it down, pass one or more `--path` options. Some constructs can't be converted safely, for example a database trait with non-trivial configuration. The migrator leaves such spots as they are, marks them with a `laratesto-residual` comment and lists them in `laratesto-residuals.json`. Fix them by hand, review the diff and run the tests. An empty report doesn't guarantee the tests behave exactly as before, so running them is the real check.
 
 The command's exit code tells you how it went: `2` means some spots need manual work, and `1` means the migration failed.
-
-The suite from the [Setup](#setup) section only looks in `tests/Testo`, so it won't see the converted tests. Add their directory to `location`: in a default Laravel skeleton, application tests live in `tests/Feature`. It's better to keep unit tests that don't need the application in a separate suite without the <plugin>Laravel</plugin> plugin, so no application is booted for them.
 
 The full list of options and supported constructs is in the migrator's [migration guide](https://github.com/ichinya/laratesto-rector/blob/main/MIGRATING.md).
 
