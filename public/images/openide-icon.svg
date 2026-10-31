@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="none" viewBox="0 0 32 32">
+<defs>
+<clipPath id="square"><rect width="32" height="32" rx="7"/></clipPath>
+<filter id="filter0_f_679_3447" x="-9.47213" y="-9.46993" width="50.6564" height="50.6564" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="4.03795" result="effect1_foregroundBlur_679_3447"/>
+</filter>
+<filter id="filter1_f_679_3447" x="7.92216" y="-30.567" width="50.6564" height="50.6564" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="4.03795" result="effect1_foregroundBlur_679_3447"/>
+</filter>
+<filter id="filter2_f_679_3447" x="-6.95405" y="13.7967" width="47.3715" height="48.5075" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="4.21069" result="effect1_foregroundBlur_679_3447"/>
+</filter>
+<filter id="filter3_f_679_3447" x="-22.668" y="6.33558" width="36.457" height="45.6866" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="4.03795" result="effect1_foregroundBlur_679_3447"/>
+</filter>
+<filter id="filter4_f_679_3447" x="10.8614" y="4.0949" width="42.2695" height="42.9794" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="5.95255" result="effect1_foregroundBlur_679_3447"/>
+</filter>
+<filter id="filter5_f_679_3447" x="-26.1387" y="-21.3697" width="56.2902" height="51.5157" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="5.58546" result="effect1_foregroundBlur_679_3447"/>
+</filter>
+</defs>
+<g clip-path="url(#square)">
+<rect width="32" height="32" fill="#7a63cc"/>
+<g filter="url(#filter0_f_679_3447)">
+<circle cx="15.8561" cy="15.8583" r="17.2523" fill="#9B84E7"/>
+</g>
+<g filter="url(#filter1_f_679_3447)">
+<circle cx="33.2503" cy="-5.23882" r="17.2523" fill="#9B84E7"/>
+</g>
+<g filter="url(#filter2_f_679_3447)">
+<ellipse cx="16.7317" cy="38.0504" rx="15.2644" ry="15.8324" fill="#F06462"/>
+</g>
+<g filter="url(#filter3_f_679_3447)">
+<ellipse cx="-4.43956" cy="29.1789" rx="10.1526" ry="14.7674" fill="#9B84E7"/>
+</g>
+<g filter="url(#filter4_f_679_3447)">
+<ellipse cx="31.9961" cy="25.5846" rx="9.22963" ry="9.58461" fill="#FFE8E8"/>
+</g>
+<g filter="url(#filter5_f_679_3447)">
+<ellipse cx="2.00641" cy="4.38818" rx="16.9742" ry="14.5869" fill="#4D409B"/>
+</g>
+</g>
+<g transform="translate(6 6) scale(0.625)">
+<path d="M21.5616 9.71377H28.7081C30.3591 9.71377 31.6971 8.45749 31.6971 6.90943V3.81655C31.6971 2.26849 30.3591 1.01221 28.7081 1.01221H21.5616C19.9106 1.01221 18.5726 2.26849 18.5726 3.81655V6.90943C18.5726 8.45749 19.9106 9.71377 21.5616 9.71377Z" fill="white"/>
+<path d="M29.0507 12.011H21.2199C19.5931 12.011 18.2745 13.3354 18.2745 14.9694V24.9661C18.2745 25.5789 17.8145 26.1154 17.2061 26.1527C16.546 26.1932 15.9972 25.668 15.9972 25.0099V2.02239C15.9972 0.801769 14.9256 -0.149762 13.7232 0.0220647C5.96346 1.13083 0 7.83208 0 15.9306C0.00161393 24.7959 7.17229 31.998 15.9989 31.998C24.8254 31.998 31.9961 24.804 31.9961 15.9274V14.9677C31.9961 13.3338 30.6775 12.0094 29.0507 12.0094V12.011Z" fill="white"/>
+</g>
+</svg>

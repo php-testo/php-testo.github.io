@@ -1354,3 +1354,11 @@ a.featured-post-card:hover {
   width: 22px;
   height: 22px;
 }
+
+/* JetBrains Marketplace and OpenIDE buttons side by side on the home page. */
+.ide-plugin-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}

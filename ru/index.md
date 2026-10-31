@@ -306,11 +306,14 @@ final class Calculator
 ></div>
 <div class="home-feature-text">
 
-Нативный плагин для PhpStorm и IntelliJ IDEA.
+Нативный плагин для PhpStorm, IntelliJ IDEA и OpenIDE.
 
 Весь привычный функционал: запуск и перезапуск из gutter-иконок, навигация между тестами и кодом, отладка с брейкпоинтами, генерация тестов, дерево результатов.
 
+<div class="ide-plugin-buttons">
 <JetBrainsPluginButton :pluginId="jbPlugin.pluginId" :downloads="jbPlugin.downloads" :rating="jbPlugin.rating" />
+<OpenIdePluginButton url="https://marketplace.openide.ru/plugin/testo/461/" />
+</div>
 
 </div>
 </div>

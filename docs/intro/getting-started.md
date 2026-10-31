@@ -89,9 +89,10 @@ You should see output showing the test results with detailed information about p
 
 ## IDE Support
 
-Testo comes with an official IDEA plugin for PhpStorm and IntelliJ IDEA.
+Testo comes with an official IDEA plugin for PhpStorm, IntelliJ IDEA, and OpenIDE.
 
 <JetBrainsPlugin />
+<OpenIdePlugin />
 
 The plugin provides:
 - Running tests directly from the IDE

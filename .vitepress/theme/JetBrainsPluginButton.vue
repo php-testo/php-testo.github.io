@@ -20,7 +20,10 @@ const formatRating = (num: number): string => {
 
 <template>
   <a :href="pluginUrl" target="_blank" rel="noopener" class="jb-plugin-button">
-    <span class="jb-plugin-label">Get Plugin</span>
+    <span class="jb-plugin-label">
+      Testo for
+      <img src="/images/phpstorm-wordmark.svg" alt="PhpStorm" class="jb-plugin-logo" />
+    </span>
     <span v-if="rating || downloads" class="jb-plugin-stats">
       <span v-if="rating" class="jb-plugin-rating">
         <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor">
@@ -58,6 +61,17 @@ const formatRating = (num: number): string => {
   transform: translateY(-2px);
   color: #000;
   box-shadow: 0 4px 16px rgba(255, 49, 140, 0.4);
+}
+
+.jb-plugin-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.jb-plugin-logo {
+  height: 16px;
+  width: auto;
 }
 
 .jb-plugin-stats {

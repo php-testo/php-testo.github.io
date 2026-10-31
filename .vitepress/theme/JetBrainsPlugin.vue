@@ -15,11 +15,7 @@ const formatDownloads = (num: number): string => {
     <span class="jb-plugin-card-gradient"></span>
     <span class="jb-plugin-card-body">
       <span class="jb-plugin-card-icon">
-        <svg viewBox="0 0 24 24" width="32" height="32" fill="none">
-          <rect width="24" height="24" rx="4" fill="#000"/>
-          <rect x="4" y="17" width="8" height="2" fill="#fff"/>
-          <text x="4" y="14" font-size="10" font-weight="700" font-family="system-ui, sans-serif" fill="#fff">PS</text>
-        </svg>
+        <img src="/images/phpstorm-logo.svg" alt="PhpStorm" width="40" height="40" />
       </span>
       <span class="jb-plugin-card-content">
         <span class="jb-plugin-card-title">Testo for PhpStorm</span>

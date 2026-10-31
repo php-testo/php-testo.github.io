@@ -307,11 +307,14 @@ final class Calculator
 ></div>
 <div class="home-feature-text">
 
-Native plugin for PhpStorm and IntelliJ IDEA.
+Native plugin for PhpStorm, IntelliJ IDEA, and OpenIDE.
 
 Full-featured workflow: run and re-run from gutter icons, navigation between tests and code, debugging with breakpoints, test generation, results tree.
 
+<div class="ide-plugin-buttons">
 <JetBrainsPluginButton :pluginId="jbPlugin.pluginId" :downloads="jbPlugin.downloads" :rating="jbPlugin.rating" />
+<OpenIdePluginButton url="https://marketplace.openide.ru/plugin/testo/461/" />
+</div>
 
 </div>
 </div>

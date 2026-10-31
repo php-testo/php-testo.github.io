@@ -103,11 +103,12 @@ Just 3 steps:
    - `Tests` for regular unit tests in the `tests` folder.
     :::
 
-3. Install the PHPStorm plugin:
+3. Install the plugin for PHPStorm or OpenIDE:
 
     <JetBrainsPlugin />
+    <OpenIdePlugin />
 
-Run tests directly from PHPStorm using the plugin, or via CLI:
+Run tests directly from the IDE using the plugin, or via CLI:
 
 ```bash
 ./vendor/bin/testo

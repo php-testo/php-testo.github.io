@@ -88,9 +88,10 @@ vendor/bin/testo
 
 ## Поддержка IDE
 
-Для PhpStorm и IntelliJ IDEA существует официальный плагин IDEA.
+Для PhpStorm, IntelliJ IDEA и OpenIDE существует официальный плагин IDEA.
 
 <JetBrainsPlugin />
+<OpenIdePlugin />
 
 Плагин предоставляет:
 - Запуск тестов прямо из IDE

@@ -8,6 +8,8 @@ import CodeTabs from './CodeTabs.vue'
 import HomeBench from './HomeBench.vue'
 import JetBrainsPluginButton from './JetBrainsPluginButton.vue'
 import JetBrainsPlugin from './JetBrainsPlugin.vue'
+import OpenIdePluginButton from './OpenIdePluginButton.vue'
+import OpenIdePlugin from './OpenIdePlugin.vue'
 import BlogPosts from './BlogPosts.vue'
 import BlogPostHeader from './BlogPostHeader.vue'
 import Tweet from './Tweet.vue'
@@ -156,6 +158,8 @@ export default {
     app.component('HomeBench', HomeBench)
     app.component('JetBrainsPluginButton', JetBrainsPluginButton)
     app.component('JetBrainsPlugin', JetBrainsPlugin)
+    app.component('OpenIdePluginButton', OpenIdePluginButton)
+    app.component('OpenIdePlugin', OpenIdePlugin)
     app.component('BlogPosts', BlogPosts)
     app.component('Tweet', Tweet)
 
