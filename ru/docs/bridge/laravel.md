@@ -14,7 +14,7 @@ Laratesto разрабатывается и поддерживается сто�
 
 ## Установка
 
-Требования Laratesto к PHP и Laravel указаны в [composer.json](https://github.com/ichinya/laratesto/blob/main/composer.json). Выполните в корне приложения:
+Для Laratesto нужны приложение на Laravel 13 и PHP 8.3 или новее (актуальные требования указаны в [composer.json](https://github.com/ichinya/laratesto/blob/main/composer.json)). Выполните в корне приложения:
 
 ```bash
 composer require --dev ichinya/laratesto
@@ -51,14 +51,13 @@ new SuiteConfig(
 
 <signature h="3" name="new \Laratesto\Config\LaravelConfig(string $basePath, string $environment = 'testing', array $config = [], bool $captureSql = false, bool $captureLogs = false, bool $includeSqlBindings = false, bool $includeLogContext = false)">
 <short>Определяет, как Laratesto загружает Laravel-приложение для каждого теста.</short>
-<description>Настройте необязательный сбор диагностических данных. Подробнее — в разделе [SQL и логи приложения](#sql-и-логи-приложения).</description>
 <param name="$basePath">Корень приложения, то есть каталог с `bootstrap/app.php`.</param>
 <param name="$environment">Становится значением `APP_ENV`. Laratesto выставляет его до загрузки приложения, так что Laravel, как обычно, прочитает `.env.testing`.</param>
 <param name="$config">Переопределяет значения конфигурации. Они применяются уже после загрузки приложения, и сервис-провайдер, который читает настройку во время загрузки, их не увидит. Такие настройки задавайте в `.env.testing`.</param>
-<param name="$captureSql">Передаёт запросы к базе в канал `sql` Testo.</param>
-<param name="$captureLogs">Передаёт сообщения Laravel в канал `laravel` Testo.</param>
-<param name="$includeSqlBindings">Добавляет параметры SQL-запросов; по умолчанию выключен.</param>
-<param name="$includeLogContext">Добавляет контекст логов приложения; по умолчанию выключен.</param>
+<param name="$captureSql">Выводит запросы к базе в канал `sql`. Подробнее в разделе [SQL и логи приложения](#sql-и-логи-приложения).</param>
+<param name="$captureLogs">Выводит сообщения лога Laravel в канал `laravel`.</param>
+<param name="$includeSqlBindings">Добавляет к перехваченным запросам их параметры. Работает только вместе с `$captureSql`.</param>
+<param name="$includeLogContext">Добавляет к перехваченным сообщениям контекст лога. Работает только вместе с `$captureLogs`.</param>
 </signature>
 
 ::: warning Не используйте рабочую базу
@@ -132,9 +131,20 @@ final class ContainerTest
 }
 ```
 
-### HTTP-тесты без наследования
+### Что есть под рукой
 
-Для тестов, которым нужны только HTTP-запросы, оставьте плагин <plugin>Laravel</plugin> в suite и вызывайте <func>\Laratesto\Laratesto::http()</func> из тестовой функции. Для того же маршрута `/laratesto/ping` создайте `tests/Feature/HttpFunctionTest.php`:
+Базовый класс и трейт дают одинаковый набор защищённых хелперов:
+
+- HTTP-запросы (`get()`, `postJson()` и другие), свои заголовки, bearer-токены и отключение middleware. Cookies из ответа уходят со следующим запросом того же теста, как в браузере.
+- Аутентификация (`actingAs()`, `assertAuthenticated()`), сессия и проверки базы данных (`assertDatabaseHas()`, `assertModelExists()` и другие).
+- Сервис-контейнер, фасады и их фейки (`Queue::fake()`, `Event::fake()`).
+- Запуск Artisan-команд с проверкой кода выхода и вывода.
+
+Фейки Laravel проверяют ожидания через ассерты PHPUnit. Laratesto содержит небольшую замену этих классов, поэтому фейки работают и без установленного PHPUnit. Полноценным PHPUnit она при этом не является: например, `createMock()` в ней нет, а для моков стоит взять <plugin>Mockery</plugin>. Полный список хелперов и их ограничения описаны в [README Laratesto](https://github.com/ichinya/laratesto#http-helpers).
+
+### HTTP-тесты в функциях
+
+Для тестов, которым нужны только HTTP-запросы, оставьте плагин <plugin>Laravel</plugin> в Test Suite и вызывайте <func>\Laratesto\Laratesto::http()</func> из тестовой функции. Для того же маршрута `/laratesto/ping` создайте `tests/Feature/HttpFunctionTest.php`:
 
 ```php
 <?php
@@ -157,25 +167,14 @@ function returnsJsonWithoutInheritance(): void
 ```
 
 <signature compact name="\Laratesto\Laratesto::http(): \Laratesto\Testing\HttpClient">
-<short>Возвращает типизированный HTTP-клиент текущего теста с Laravel.</short>
+<short>Возвращает типизированный HTTP-клиент для текущего запуска теста.</short>
 </signature>
 
-Тот же клиент доступен через `app(\Laratesto\Testing\HttpClient::class)`. В пределах одного запуска теста он делит заголовки, cookies, настройки сессии и следования редиректам с хелперами базового класса и трейта. Доступны запросы `get`, `getJson`, `post`, `postJson`, `put`, `patch`, `delete`, `deleteJson` и `call`, а также методы настройки вроде `withHeaders`, `withToken`, `withCookies`, `withSession` и `followingRedirects`. Ответы проверяются теми же методами <class>\Laratesto\Testing\LaravelResponse</class>.
+Тот же клиент доступен через `app(\Laratesto\Testing\HttpClient::class)`. Заголовки, cookies, данные сессии и режим редиректов у него общие с хелперами базового класса и трейта в рамках одного запуска теста. Он отправляет привычные запросы (`get()`, `postJson()`, `call()` и другие), а настраивается методами вроде `withHeaders()`, `withToken()` и `followingRedirects()`. Ответы проверяются теми же методами <class>\Laratesto\Testing\LaravelResponse</class>.
 
-При повторном запуске через <attr>\Testo\Retry</attr> или <attr>\Testo\Repeat</attr> создаётся новый клиент. Он доступен после загрузки приложения, во время Laravel teardown и отката БД. Перед очисткой приложения клиент отключается: если сохранить его и использовать в другом запуске, будет исключение. Получить его во время bootstrap, в конструкторе или вне теста Testo с плагином <plugin>Laravel</plugin> тоже нельзя. Настоящий PHPUnit можно оставить установленным рядом с Testo, но в тестах под раннером PHPUnit этот API не работает.
+При повторном запуске через <attr>\Testo\Retry</attr> или <attr>\Testo\Repeat</attr> создаётся новый клиент. Он доступен с момента загрузки приложения и до конца очистки после теста, включая `tearDownLaravel()` и откат БД. Перед очисткой приложения клиент отключается: если сохранить его и использовать в другом запуске, будет исключение. Получить его во время загрузки приложения, в конструкторе или вне теста Testo с плагином <plugin>Laravel</plugin> тоже нельзя. Настоящий PHPUnit можно оставить установленным рядом с Testo, но в тестах под раннером PHPUnit этот API не работает.
 
-Для авторизации, управления middleware, проверок БД и Artisan пока нужны базовый класс или трейт. Сокращения `Laratesto::get()` нет. Реализация и результаты её проверок описаны в [PR #39](https://github.com/ichinya/laratesto/pull/39).
-
-### Что есть под рукой
-
-Базовый класс и трейт дают одинаковый набор защищённых хелперов:
-
-- HTTP-запросы (`get()`, `postJson()` и другие), свои заголовки, bearer-токены и отключение middleware. Cookies из ответа уходят со следующим запросом того же теста, как в браузере.
-- Аутентификация (`actingAs()`, `assertAuthenticated()`), сессия и проверки базы данных (`assertDatabaseHas()`, `assertModelExists()` и другие).
-- Сервис-контейнер, фасады и их фейки (`Queue::fake()`, `Event::fake()`).
-- Запуск Artisan-команд с проверкой кода выхода и вывода.
-
-Фейки Laravel проверяют ожидания через ассерты PHPUnit. Laratesto содержит небольшую замену этих классов, поэтому фейки работают и без установленного PHPUnit. Полноценным PHPUnit она при этом не является: например, `createMock()` в ней нет, а для моков стоит взять <plugin>Mockery</plugin>. Полный список хелперов и их ограничения описаны в [README Laratesto](https://github.com/ichinya/laratesto#http-helpers).
+Для авторизации, управления middleware, проверок БД и Artisan пока нужны базовый класс или трейт.
 
 ## Жизненный цикл приложения
 
@@ -204,23 +203,22 @@ Laravel хранит много глобального состояния, по�
 
 ## SQL и логи приложения
 
-Включите сбор диагностики в <class>\Laratesto\Config\LaravelConfig</class> вашего suite:
+Включите сбор диагностики в <class>\Laratesto\Config\LaravelConfig</class> вашего Test Suite:
 
 ```php
 use Laratesto\Config\LaravelConfig;
+use Laratesto\LaravelPlugin;
 
-new LaravelConfig(
+new LaravelPlugin(new LaravelConfig(
     basePath: __DIR__,
     captureSql: true,
     captureLogs: true,
-    includeSqlBindings: false,
-    includeLogContext: false,
-);
+));
 ```
 
-Запросы к БД попадают в канал `sql` Testo вместе с именем соединения и временем выполнения. Сообщения Laravel попадают в `laravel` с исходным уровнем логирования. Это диагностические каналы Testo: бридж не заменяет логгер Laravel и не требует менять `LOG_CHANNEL`.
+Запросы к БД попадают в [канал](../guide/messages.md) `sql` Testo вместе с именем соединения и временем выполнения. Сообщения Laravel попадают в `laravel` с исходным уровнем логирования. Laratesto только слушает эти события: логгер Laravel остаётся прежним, и менять `LOG_CHANNEL` не нужно.
 
-Сбор начинается после загрузки приложения и относится к текущему запуску теста, включая setup, teardown и очистку БД. Счётчик выполнения в сообщениях помогает различать повторные попытки. Параметры SQL и контекст логов по умолчанию исключены; включайте их, только если их содержимое допустимо выводить в отчёт теста. Сам SQL-текст и сообщения логов сохраняются в том виде, в котором их передаёт приложение.
+Сбор начинается сразу после загрузки приложения и охватывает весь запуск теста: подготовку БД, сам тест и очистку после него. Счётчик выполнения в сообщениях помогает различать повторные попытки. Параметры SQL и контекст логов по умолчанию исключены; включайте их, только если их содержимое допустимо выводить в отчёт теста. Сам SQL-текст и сообщения логов сохраняются в том виде, в котором их передаёт приложение.
 
 ## Изоляция базы данных
 
