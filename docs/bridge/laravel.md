@@ -1,7 +1,7 @@
 ---
 outline: [2, 3]
 llms: true
-llms_description: "How to test Laravel applications with Testo through the third-party ichinya/laratesto package: register LaravelPlugin with LaravelConfig in a suite, write HTTP, database and Artisan tests with LaravelTestCase or the InteractsWithLaravel trait, prepare state in setUpLaravel(), isolate the database with #[RefreshDatabase], #[DatabaseTransactions], #[DatabaseMigrations] or #[DatabaseTruncation], and convert PHPUnit tests with the ichinya/laratesto-rector migrator."
+llms_description: "How to test Laravel applications with Testo through ichinya/laratesto: configure LaravelPlugin, use LaravelTestCase or InteractsWithLaravel, and isolate the database. Use the typed Laratesto::http() client without inheritance and capture optional SQL/application log channels within a test execution."
 ---
 
 # Laravel (Laratesto)
@@ -16,7 +16,7 @@ Laratesto is developed and maintained by a third-party developer, [ichinya](http
 
 ## Installation
 
-Laratesto needs a Laravel 13 application and PHP 8.3 or newer. Run this in the application root:
+Laratesto needs a Laravel 13 application and PHP 8.3 or newer (the current requirements are in its [composer.json](https://github.com/ichinya/laratesto/blob/main/composer.json)). Run this in the application root:
 
 ```bash
 composer require --dev ichinya/laratesto
@@ -51,11 +51,15 @@ new SuiteConfig(
 );
 ```
 
-<signature h="3" name="new \Laratesto\Config\LaravelConfig(string $basePath, string $environment = 'testing', array $config = [])">
+<signature h="3" name="new \Laratesto\Config\LaravelConfig(string $basePath, string $environment = 'testing', array $config = [], bool $captureSql = false, bool $captureLogs = false, bool $includeSqlBindings = false, bool $includeLogContext = false)">
 <short>Configures how Laratesto boots the Laravel application for each test.</short>
 <param name="$basePath">The application root, the directory that contains `bootstrap/app.php`.</param>
 <param name="$environment">Becomes `APP_ENV`. Laratesto sets it before the application boots, so Laravel loads `.env.testing` as usual.</param>
 <param name="$config">Overrides configuration values. They are applied after the application has booted, so a service provider that reads a setting while booting won't see the override: put such settings in `.env.testing` instead.</param>
+<param name="$captureSql">Sends every database query to Testo's `sql` channel. See [SQL and application logs](#sql-and-application-logs).</param>
+<param name="$captureLogs">Sends Laravel log messages to Testo's `laravel` channel.</param>
+<param name="$includeSqlBindings">Adds query bindings to captured queries. Only takes effect together with `$captureSql`.</param>
+<param name="$includeLogContext">Adds the log context to captured messages. Only takes effect together with `$captureLogs`.</param>
 </signature>
 
 ::: warning Use a throwaway database
@@ -140,6 +144,40 @@ The base class and the trait provide the same set of protected helpers:
 
 Laravel's fakes check their expectations through PHPUnit assertions. Laratesto ships a small stand-in for those classes, so the fakes work without PHPUnit installed. It isn't a full PHPUnit replacement, though: there's no `createMock()`, for example. For mocks, use <plugin>Mockery</plugin>. The full list of helpers and their limitations is in the [Laratesto README](https://github.com/ichinya/laratesto#http-helpers).
 
+### HTTP tests in functions
+
+For HTTP-only tests, keep the suite's <plugin>Laravel</plugin> plugin and call <func>\Laratesto\Laratesto::http()</func> from a test function. Using the same `/laratesto/ping` route, create `tests/Feature/HttpFunctionTest.php`:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Feature;
+
+use Laratesto\Laratesto;
+use Testo\Test;
+
+#[Test]
+function returnsJsonWithoutInheritance(): void
+{
+    Laratesto::http()
+        ->get('/laratesto/ping')
+        ->assertOk()
+        ->assertExactJson(['message' => 'pong']);
+}
+```
+
+<signature compact name="\Laratesto\Laratesto::http(): \Laratesto\Testing\HttpClient">
+<short>Returns the typed HTTP client for the active Laravel test execution.</short>
+</signature>
+
+The same client is available through `app(\Laratesto\Testing\HttpClient::class)`. It shares headers, cookies, session overrides and redirect settings with the base-class and trait helpers in that execution. It sends the familiar requests (`get()`, `postJson()`, `call()` and others) and has configuration methods such as `withHeaders()`, `withToken()` and `followingRedirects()`. Responses use the same <class>\Laratesto\Testing\LaravelResponse</class> assertions.
+
+Every attempt started by <attr>\Testo\Retry</attr> or <attr>\Testo\Repeat</attr> gets a fresh client. Access starts after application bootstrap and lasts through Laravel teardown and database rollback. The client is revoked before application cleanup: keeping it for another execution raises an exception. Resolving it during bootstrap, in a constructor or outside a Testo execution with the <plugin>Laravel</plugin> plugin also fails. Real PHPUnit may remain installed alongside Testo, but this accessor cannot be used in tests run by PHPUnit itself.
+
+Authentication, middleware controls, database assertions and Artisan helpers still use the base class or trait.
+
 ## Application lifecycle
 
 Every test gets a new application instance. Setup that needs the application (the container, configuration, facades) goes into the <func>\Laratesto\Testing\InteractsWithLaravel::setUpLaravel()</func> hook, and cleanup that still needs it goes into <func>\Laratesto\Testing\InteractsWithLaravel::tearDownLaravel()</func>. Here's the order of a single test:
@@ -164,6 +202,25 @@ Keep in mind that Testo creates one instance of a test class and reuses it for a
 ::: warning One test at a time
 Laravel keeps a lot of global state, so application tests must run strictly one after another. If you use <attr>\Testo\Fiber\RunInFiber</attr>, keep the default <enum>\Testo\Fiber\Schedule::Solo</enum>: with <enum>\Testo\Fiber\Schedule::RoundRobin</enum> or <enum>\Testo\Fiber\Schedule::Random</enum> on a class, tests would interleave, so Laratesto stops them with an error.
 :::
+
+## SQL and application logs
+
+Enable optional diagnostics in the suite's <class>\Laratesto\Config\LaravelConfig</class>:
+
+```php
+use Laratesto\Config\LaravelConfig;
+use Laratesto\LaravelPlugin;
+
+new LaravelPlugin(new LaravelConfig(
+    basePath: __DIR__,
+    captureSql: true,
+    captureLogs: true,
+));
+```
+
+Database queries appear in Testo's `sql` [channel](../guide/messages.md) with the connection name and duration. Laravel log messages appear in `laravel`, preserving their log level. Laratesto only listens to these events: Laravel's logger stays as it is, and you don't need to change `LOG_CHANNEL`.
+
+Capture starts once the application has booted and covers the whole test run: database preparation, the test itself and cleanup afterwards. Messages include an execution counter to distinguish repeated attempts. SQL bindings and application log context are excluded by default; enable them only when their contents are appropriate to include in test output. SQL text and log messages are still recorded as supplied by the application.
 
 ## Database isolation
 
